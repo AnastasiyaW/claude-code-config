@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 9 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 10 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -96,6 +96,16 @@ Protect against malicious package updates by gating fresh packages. Set `min-rel
 
 ---
 
+### [10 - Agent Security](10-agent-security.md)
+
+Comprehensive defense against prompt injection, tool poisoning, memory poisoning, sandbox escape, and data exfiltration targeting AI coding agents. Covers the full attack taxonomy with real CVEs, a six-layer defense architecture (content isolation, sandboxing, permissions, output filtering, MCP defenses, monitoring), and references to 16+ academic papers.
+
+**When to use:** Always. Every AI agent deployment, every MCP server integration, every project that opens untrusted repositories. Designing agent permission models. Incident response for suspected agent compromise.
+
+**Source:** OWASP Top 10 for LLM/Agentic Applications 2025-2026, CVE database, 16+ arxiv papers (2025-2026), industry research (HiddenLayer, Invariant Labs, Ona Security, Check Point, Trail of Bits)
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -115,6 +125,11 @@ Use this table to pick the right principle for your situation:
 | "Multi-file refactoring keeps breaking things" | 06 Multi-Agent Decomposition | 02 Proof Loop |
 | "Agent invents false claims about completion" | 02 Proof Loop | 04 Deterministic Orchestration |
 | "Worried about malicious dependency updates" | 09 Supply Chain Defense | 04 Deterministic Orchestration |
+| "Agent might be reading poisoned content" | 10 Agent Security | 02 Proof Loop |
+| "Opening untrusted repos with AI agent" | 10 Agent Security | 09 Supply Chain Defense |
+| "MCP server might be malicious" | 10 Agent Security | 04 Deterministic Orchestration |
+| "Agent disabled its own security controls" | 10 Agent Security | 04 Deterministic Orchestration |
+| "Multi-agent system needs trust boundaries" | 10 Agent Security | 06 Multi-Agent Decomposition |
 
 ### Composition Patterns
 
@@ -124,3 +139,5 @@ These principles are designed to layer:
 2. **Decomposition + Evaluation:** Use Multi-Agent Decomposition (06) to split the work, Harness Design (01) to evaluate each piece.
 3. **Context + Orchestration:** Use Codified Context (07) for state management, Deterministic Orchestration (04) for process control.
 4. **Reasoning + Verification:** Use Structured Reasoning (05) to analyze, Proof Loop (02) to prove the analysis is correct.
+5. **Security + Supply Chain:** Use Agent Security (10) for runtime defense against injection, Supply Chain Defense (09) for dependency-level protection. Together they cover both code-level and package-level attack vectors.
+6. **Security + Proof Loop:** Use Agent Security (10) to prevent injection during build, Proof Loop (02) with fresh-session verification to catch any injection that persisted.

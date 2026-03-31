@@ -6,6 +6,10 @@ Changelog for claude-code-skills. Newest first.
 
 ## 2026-03-31
 
+### Added: Agent Security (Principle 10)
+
+Comprehensive defense guide against prompt injection and adversarial attacks on AI coding agents. Covers 7 attack categories (in-code injection, repo metadata, package metadata, MCP tool poisoning, web content injection, memory poisoning, sandbox escape) with real CVEs and incidents. Six-layer defense architecture from content isolation to monitoring. See [principles/10-agent-security.md](principles/10-agent-security.md).
+
 ### Added: Supply Chain Defense (Principle 09)
 
 Package age gating as defense against supply chain attacks. Two config lines that block packages published less than 7 days ago:
