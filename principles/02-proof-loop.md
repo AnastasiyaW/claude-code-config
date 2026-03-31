@@ -1,0 +1,193 @@
+# 02 - Proof Loop: Verification Through Durable Artifacts
+
+**Source:** OpenClaw-RL paper (arxiv 2603.10165) + DenisSergeevitch/repo-task-proof-loop
+
+## Overview
+
+The Proof Loop pattern ensures that AI agents cannot self-certify task completion. Instead of trusting an agent's claim that "it works," the pattern requires durable, verifiable artifacts -- test outputs, log files, verdict documents -- as evidence. A separate verifier in a fresh session (one that never witnessed the build process) examines the repository state and renders a verdict.
+
+**Core principle:** Next-state signals are universal proof. Test results, tool outputs, user reactions -- these are all verification evidence. An agent cannot simply declare completion; it must produce artifacts that an independent party can verify.
+
+---
+
+## Execution Protocol
+
+The protocol follows a strict sequence:
+
+```
+spec freeze --> build --> evidence --> fresh verify --> fix --> verify again
+```
+
+### Step 1: Spec Freeze
+
+Define concrete acceptance criteria (AC1, AC2, ...) before any implementation begins. These criteria are:
+
+- **Concrete** -- each criterion maps to a testable condition
+- **Frozen** -- no changes once implementation starts
+- **Enumerated** -- explicitly numbered for tracking
+
+Example:
+```
+AC1: Login endpoint returns 200 with valid credentials
+AC2: Login endpoint returns 401 with invalid credentials
+AC3: Rate limiting kicks in after 5 failed attempts within 60 seconds
+AC4: JWT token expires after 24 hours
+```
+
+### Step 2: Build
+
+Implement the minimum safe changeset that addresses the acceptance criteria. The builder:
+
+- Writes code to satisfy each AC
+- Keeps changes minimal and focused
+- Does NOT self-evaluate quality
+
+### Step 3: Evidence Collection
+
+After building, the builder switches to **read-only mode** and collects evidence:
+
+- Runs the test suite, captures output to a file
+- Captures relevant log output
+- Documents the state of each AC (pass/fail with evidence)
+- Stores evidence in the repository (e.g., `.agent/tasks/{task-id}/evidence/`)
+
+**Critical:** The builder collects evidence but does NOT render a verdict. Evidence and judgment are separate responsibilities.
+
+### Step 4: Fresh Verify
+
+A **new session** -- one that has never seen the build process -- examines:
+
+- The repository state (code changes)
+- The evidence files
+- The acceptance criteria
+
+The verifier produces a `verdict.json`:
+```json
+{
+  "task_id": "login-auth-flow",
+  "verdict": "FAIL",
+  "ac_results": {
+    "AC1": "PASS",
+    "AC2": "PASS",
+    "AC3": "FAIL - rate limit triggers at 10 attempts, not 5",
+    "AC4": "PASS"
+  },
+  "problems": ["Rate limit threshold is 10, AC3 requires 5"]
+}
+```
+
+### Step 5: Fix
+
+If the verdict is FAIL:
+
+- Read `problems.md` or the verdict file
+- Apply **minimal** fixes targeting only the failing ACs
+- Regenerate evidence
+
+### Step 6: Loop
+
+Repeat steps 4-5 until the verdict is PASS across all acceptance criteria.
+
+---
+
+## Four Sub-Agent Roles
+
+Each role has strict boundaries to prevent contamination:
+
+| Role | Reads | Writes | Cannot Do |
+|---|---|---|---|
+| **Spec-freezer** | Repository, requirements, existing tests | Acceptance criteria document | Touch code |
+| **Builder** | Spec, codebase | Code changes, then evidence (read-only switch) | Render verdict |
+| **Verifier** | Repo state, evidence, acceptance criteria | Verdict only | See build history, modify code |
+| **Fixer** | Verdict, problems list, code | Minimal targeted fixes | Sign final approval |
+
+### Why these boundaries matter
+
+- **Spec-freezer** does not touch code because spec and implementation must be independent
+- **Builder** switches to read-only for evidence because the same agent that wrote the code will be biased about its quality
+- **Verifier** uses a fresh session because shared context creates shared blind spots
+- **Fixer** cannot approve because the same entity that patches should not also certify
+
+---
+
+## Key Differences from Anthropic Harness
+
+The Proof Loop extends the Harness Design pattern (see [01-harness-design.md](01-harness-design.md)) with important distinctions:
+
+| Aspect | Anthropic Harness | Proof Loop |
+|---|---|---|
+| **Artifact storage** | Conversation history | Repository (`.agent/tasks/`) |
+| **Verifier isolation** | Separate prompt in same session | Fresh session (separate context entirely) |
+| **Spec mutability** | Sprint Contract can change mid-sprint | Spec frozen before build begins |
+| **Evidence format** | Evaluator's judgment | Durable files (test output, logs, verdict.json) |
+| **Recommended runtime** | Any LLM agent | Designed for Codex-class sub-agents, works in Claude Code |
+
+### Why repository-based artifacts?
+
+- Conversation history is ephemeral -- it disappears with the session
+- Repository artifacts survive context resets, session changes, and model swaps
+- Other agents (or humans) can independently verify the same artifacts
+- Git provides versioning and audit trail for free
+
+### Why fresh-session verification?
+
+A verifier in the same session has seen:
+- The builder's reasoning process
+- The builder's confidence signals
+- Intermediate states that may have been "fixed"
+
+This creates anchoring bias. A fresh session sees only the final state and the evidence, judging purely on outcomes.
+
+---
+
+## Anti-Fabrication Rules
+
+The Proof Loop includes explicit guards against agents fabricating completion:
+
+1. **Tests passed?** -- Requires a file with actual output, not the text "tests passed"
+2. **Review done?** -- Requires an artifact with specific findings, not "I reviewed it, looks good"
+3. **Subtask complete?** -- Check the state file, do not trust the agent's claim
+4. **Parallel/subagent tasks:** Before accepting results, verify that child processes actually completed -- do not trust status claims from sub-agents
+
+---
+
+## File Structure
+
+A typical Proof Loop task directory in the repository:
+
+```
+.agent/tasks/
+  login-auth-flow/
+    spec.md                 # Frozen acceptance criteria
+    evidence/
+      test-output.txt       # Raw test runner output
+      coverage-report.html  # Coverage artifact
+      api-responses.json    # Captured API responses
+    verdict.json            # Verifier's judgment
+    problems.md             # Issues found (if FAIL)
+    fix-log.md              # What the fixer changed and why
+```
+
+---
+
+## When to Use
+
+**Good fit:**
+- Production deployments where failure has real cost
+- Tasks requiring audit trails (compliance, security)
+- Multi-agent handoffs where trust boundaries are important
+- Any task where "the agent says it works" is not sufficient
+
+**Overkill:**
+- Quick prototyping
+- Single-file changes with obvious correctness
+- Exploratory coding where the spec is still forming
+
+---
+
+## Relationship to Other Principles
+
+- **Harness Design (01):** Proof Loop extends the Generator-Evaluator pattern with fresh-session verification
+- **Autoresearch (03):** Autoresearch optimizes iteratively; Proof Loop verifies the final result
+- **Deterministic Orchestration (04):** Anti-Fabrication is a shared concern -- both patterns insist on artifacts over claims
+- **Codified Context (07):** The `.agent/tasks/` directory structure is codified context -- structured handoff artifacts
