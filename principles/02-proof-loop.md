@@ -185,9 +185,52 @@ A typical Proof Loop task directory in the repository:
 
 ---
 
+## Revision Trajectories: Learning from Corrected Mistakes
+
+**Source:** Agent-R (arxiv 2501.11425)
+
+A key insight from Agent-R: **trajectories where mistakes are caught and fixed teach more than perfect trajectories.** The failed-then-fixed cycle is the most valuable learning material.
+
+This maps directly to the Proof Loop:
+
+1. **The fix -> verify again cycle is the most valuable part.** When the Builder produces code that fails Verifier checks, the resulting fix trajectory carries more information than a clean first-pass build.
+
+2. **Capture error -> fix trajectories explicitly.** When a verdict is FAIL:
+   - Log the exact failure point (which AC, which file, which assumption was wrong)
+   - Log the reflection (why it failed -- root cause, not surface symptom)
+   - Log the minimal fix applied
+   - Log the re-verification result
+   - This becomes `fix-log.md` with structured fields, not free-text narrative
+
+3. **Structured Evaluator feedback.** Instead of "please fix these issues," the Verifier should provide:
+   - **Cut point** -- the first file/decision where the implementation diverged from the spec
+   - **Reflection** -- why the approach failed (e.g., "assumed synchronous execution but the API is async")
+   - **Direction** -- what a correct approach looks like (not the solution, but the direction)
+
+This format gives the Fixer a precise recovery point instead of a vague issues list.
+
+### problems.md Schema
+
+A structured format for the Verifier's problem reports:
+
+```markdown
+## Problem: AC3 - Rate limit threshold
+
+- **Criterion:** AC3
+- **Status:** FAIL
+- **Reproduction:** POST /login 6 times with wrong password in 60s -> still returns 401, not 429
+- **Expected:** 429 after 5 attempts
+- **Actual:** 401 continues indefinitely
+- **Affected files:** src/middleware/rateLimit.ts:42
+- **Smallest safe fix:** Change threshold constant from 10 to 5
+- **Root cause:** Default imported from config that uses a different rate limit context
+```
+
+---
+
 ## Relationship to Other Principles
 
 - **Harness Design (01):** Proof Loop extends the Generator-Evaluator pattern with fresh-session verification
-- **Autoresearch (03):** Autoresearch optimizes iteratively; Proof Loop verifies the final result
+- **Autoresearch (03):** Autoresearch optimizes iteratively; Proof Loop verifies the final result. Failed experiments carry direction signals (Agent-R insight)
 - **Deterministic Orchestration (04):** Anti-Fabrication is a shared concern -- both patterns insist on artifacts over claims
 - **Codified Context (07):** The `.agent/tasks/` directory structure is codified context -- structured handoff artifacts
