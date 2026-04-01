@@ -6,7 +6,7 @@
 
 For complex tasks -- debugging, architecture decisions, optimization, security review -- free-form chain-of-thought reasoning is unreliable. Models build plausible but incorrect reasoning chains ("planning hallucinations"). The Structured Reasoning Protocol replaces free-form thinking with a semi-formal framework that forces explicit tracking of what is known, what was observed, what follows logically, and what was ruled out.
 
-**Key finding from the paper:** Structured prompting consistently outperforms free-form reasoning for code-related tasks. The structure itself prevents the most common reasoning failures.
+**Key finding from the paper:** Structured prompting consistently outperforms free-form reasoning for code-related tasks. The structure itself prevents the most common reasoning failures. Paper v2 results: accuracy 78% → 93% on real-world agent-generated patches (patch equivalence verification, fault localization, code QA).
 
 ---
 
