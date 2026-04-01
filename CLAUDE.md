@@ -210,6 +210,7 @@ An agent **cannot claim** that a task is done -- durable artifacts are required:
 - Review done? -> artifact with findings, not "I checked, everything is fine"
 - Subtask completed? -> check the state file, do not trust the claim
 - **Especially for parallel/subagent tasks**: before accepting a result -- verify that child runs actually completed
+- **Deletion = re-verification.** After executing a delete command (file, container, resource, branch), **always verify** the object is actually gone (`ls`, `docker ps`, `git branch`, etc.). Do not consider it deleted until confirmed. Commands can exit successfully without doing anything (permissions, locks, wrong path).
 
 ### context_hint for Sub-agents
 When launching an Agent tool for an isolated task -- explicitly specify what context to pass:

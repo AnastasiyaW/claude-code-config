@@ -42,7 +42,7 @@ Skills live in `~/.claude/skills/<skill-name>/SKILL.md`. Claude Code picks them 
 
 ## Principles Overview
 
-The `CLAUDE.md` file encodes 9 architectural principles for AI-assisted development. Each one addresses a specific failure mode observed in real agent workflows.
+The `CLAUDE.md` file encodes 10 architectural principles for AI-assisted development. Each one addresses a specific failure mode observed in real agent workflows.
 
 | # | Principle | Core Idea |
 |---|---|---|
@@ -55,6 +55,7 @@ The `CLAUDE.md` file encodes 9 architectural principles for AI-assisted developm
 | 7 | **Codified Context** | Context is infrastructure, not documentation. CLAUDE.md = runtime config. Memory = persistent state. JIT loading over full-context dumps. |
 | 8 | **Skills Best Practices** | Skill descriptions are model triggers, not human docs. Mandatory Gotchas section. Critical validations belong in scripts, not words. |
 | 9 | **Supply Chain Defense** | Gate fresh packages with `min-release-age=7` (npm) and `exclude-newer = "7 days"` (uv). Most poisoned packages are caught within days. |
+| 10 | **Agent Security** | Defense against prompt injection and adversarial attacks. 7 attack categories (in-code injection, repo metadata, MCP poisoning, etc.) with real CVEs. Six-layer defense architecture. |
 
 ---
 

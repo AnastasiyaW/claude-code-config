@@ -4,6 +4,18 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-01
+
+### Fixed: README principle count (9 -> 10)
+
+README.md listed "9 architectural principles" and was missing Principle 10 (Agent Security) from the principles table. Updated to reflect all 10 principles.
+
+### Added: "Deletion = re-verification" rule to Anti-Fabrication
+
+Added the pattern: after executing a delete command, always verify the object is actually gone. Commands can exit 0 without doing anything (permissions, locks, wrong path). Part of the Anti-Fabrication section in Deterministic Orchestration.
+
+---
+
 ## 2026-03-31
 
 ### Added: Agent Security (Principle 10)
