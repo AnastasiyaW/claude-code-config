@@ -133,6 +133,8 @@ Any system with all three is vulnerable. Defense means breaking at least one leg
 | 2025 | mcp-server-git chained RCE | Full RCE via .git/config | CVE-2025-68145 |
 | 2025 | Claude Code pre-trust exec | Code runs before trust dialog | CVE-2025-59536 (8.7) |
 | 2026 | Claude Code API key leak | API key exfiltration | CVE-2026-21852 (5.3) |
+| 2026 Mar | OpenClaw ClawHavoc campaign | 800+ malicious skills (20% of marketplace), 30K+ exposed instances | CVE-2026-25253 (8.8) |
+| 2026 Mar | axios@1.14.1 supply chain + RAT | DPRK-backed account hijack, WAVESHAPER.V2 RAT deployment | GHSA-fw8c-xr5c-95f9 |
 
 ---
 
@@ -330,9 +332,9 @@ MCP is a particularly dangerous attack surface because it was designed for ease 
 
 ## Open Problems (Where Defenses Are Still Weak)
 
-1. **No structural fix for prompt injection.** IFC approaches are promising but not deployed in production agents. The fundamental same-channel problem remains unsolved.
+1. **No structural fix for prompt injection.** IFC approaches are promising but not deployed in production agents. The fundamental same-channel problem remains unsolved. OpenAI publicly acknowledged (March 2026) that prompt injection in browser agents "is unlikely to ever be fully solved." Even with adversarial training + RL-based red teaming, best defenses reduce attack success to 5-10%, not 0%. Defense strategy must be depth-based risk reduction, not elimination.
 
-2. **Memory poisoning detection.** Traditional security tools cannot detect poisoned memory. Temporal decoupling makes forensics extremely difficult.
+2. **Memory poisoning detection.** Traditional security tools cannot detect poisoned memory. Temporal decoupling makes forensics extremely difficult. MemoryGraft [2512.16962] exploits "semantic imitation heuristic" - agents copy patterns from retrieved successful tasks, so injected "successful experiences" get replicated. InjecMEM demonstrates query-only injection without direct write access to memory store.
 
 3. **MCP ecosystem security.** 8,000+ MCP servers exposed as of Feb 2026 with widespread OAuth flaws, command injection, plaintext credentials. No mandatory security review for MCP server publication.
 
