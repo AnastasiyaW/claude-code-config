@@ -6,6 +6,14 @@ Changelog for claude-code-skills. Newest first.
 
 ## 2026-04-01
 
+### Added: axios@1.14.1 case study to Supply Chain Defense (Principle 09)
+
+Real-world supply chain attack on the official `axios` npm package (~100M weekly downloads), attributed to DPRK-nexus threat actor UNC1069 by Google Threat Intelligence. Maintainer account hijacked, RAT deployed via postinstall hook. Exposure window: ~3 hours. `min-release-age=7` would have completely blocked the attack. Full timeline, attack chain, defense matrix, and IOCs documented. Sources: Elastic Security Labs, Snyk, Wiz, Google Cloud Blog.
+
+### Added: Revision Trajectories + problems.md schema to Proof Loop (Principle 02)
+
+Based on Agent-R (arxiv 2501.11425): failed-then-fixed trajectories are more valuable than clean passes. Added structured Evaluator feedback format (cut point + reflection + direction) and a concrete `problems.md` schema with criterion ID, reproduction steps, expected vs actual, affected files, and smallest safe fix. Improves the fix -> verify again cycle.
+
 ### Fixed: README principle count (9 -> 10)
 
 README.md listed "9 architectural principles" and was missing Principle 10 (Agent Security) from the principles table. Updated to reflect all 10 principles.

@@ -78,14 +78,55 @@ Package age gating is one layer. Combine with:
 
 ---
 
+## Real-World Case: axios@1.14.1 (March 31, 2026)
+
+The `axios` npm package (~100M weekly downloads) was compromised via maintainer account hijack. Attributed to **UNC1069** (DPRK-nexus threat actor) by Google Threat Intelligence.
+
+**Timeline (UTC):**
+- **Mar 30 05:57** - Attacker publishes `plain-crypto-js@4.2.0` (clean decoy, establishes npm history)
+- **Mar 30 23:59** - `plain-crypto-js@4.2.1` published with malicious postinstall hook
+- **Mar 31 00:21** - `axios@1.14.1` published (tagged `latest`) - adds `plain-crypto-js` dependency
+- **Mar 31 01:00** - `axios@0.30.4` published (tagged `legacy`) - same payload
+- **Mar 31 03:29** - Both malicious versions yanked from npm
+
+**Exposure window: ~3 hours.** `min-release-age=7` would have blocked it completely.
+
+**Attack chain:**
+1. Stolen npm token -> manual publish (no GitHub Actions OIDC provenance, unlike legitimate releases)
+2. `plain-crypto-js` postinstall hook (`setup.js`) deobfuscates and runs a dropper
+3. Dropper uses XOR cipher + dynamic `require()` to bypass static analysis
+4. Downloads platform-native RAT (WAVESHAPER.V2) from `sfrclak[.]com:8000`
+5. RAT beacons every 60s - full remote access: file exfiltration, arbitrary code execution, persistence
+6. Dropper self-destructs after deployment - **inspecting `node_modules` after infection shows nothing**
+
+**What would have helped:**
+
+| Defense | Effective? |
+|---------|-----------|
+| `min-release-age=7` | **Yes** - `plain-crypto-js` was <24h old |
+| `npm ci` (lockfile) | **Yes** - lockfile pinned to 1.14.0 |
+| `--ignore-scripts` in CI | **Yes** - blocks postinstall hook |
+| SLSA provenance check | **Yes** - malicious versions lacked GitHub OIDC attestation |
+| `npm audit` | Partial - detected ~6min after publish, but only if you check before install |
+
+**Key takeaway:** The decoy package was pre-staged 18 hours before the attack to build npm history. Even a 24-hour age gate might not be enough if attackers plan ahead. **7 days is the right buffer.**
+
+Sources: Elastic Security Labs, Snyk, Wiz, Google Cloud Blog (GTIG attribution), GitHub Advisory GHSA-fw8c-xr5c-95f9.
+
+---
+
 ## Gotchas
 
 - **CI caches may bypass age gating** - If your CI caches `node_modules`, the config only applies on cache miss. Ensure clean installs periodically.
 - **Monorepo lockfile drift** - In monorepos, one dev's `npm install` without the config can pull fresh packages. Enforce the config at repo level (`.npmrc` in repo root).
 - **Transitive dependencies** - The config applies to transitive deps too (good), but you might not notice when a deep dependency is being held back (check `npm outdated`).
 - **Private registries** - If you use a private npm/PyPI registry that mirrors public, ensure the mirror also respects age gating, or the freshness check happens client-side.
+- **Self-destructing malware** - Modern supply chain payloads clean up after execution. Post-infection inspection of `node_modules` may reveal nothing. Check for RAT artifacts on disk and network IOCs.
+- **Account hijack vs typosquat** - Age gating protects against both, but account hijacks of legitimate packages are harder to detect because the package name is correct.
 
 ## See Also
 
 - [npm min-release-age docs](https://docs.npmjs.com/cli/using-npm/config#min-release-age)
 - [uv configuration reference](https://docs.astral.sh/uv/reference/settings/)
+- [Elastic Security Labs - axios supply chain analysis](https://www.elastic.co/security-labs/axios-one-rat-to-rule-them-all)
+- [StepSecurity Safe Chain](https://www.stepsecurity.io/) - enforces package age + SLSA provenance
