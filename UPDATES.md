@@ -4,6 +4,22 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-02
+
+### Added: Research evidence to Codified Context (Principle 07)
+
+Two contradictory studies on context files (AGENTS.md/CLAUDE.md): one shows -28.6% task time, other shows -3% success rate. Resolution: auto-generated context hurts, human-written non-inferable knowledge helps. Added "The Rule" - only include what the agent cannot derive from reading the code. ETH Zurich data: LLM-generated context = +20% cost, +2-4 extra reasoning steps.
+
+### Added: Principle Map by Reasoning Level to README
+
+Three-level taxonomy (arxiv 2601.12538, 2504.19678) maps to our 10 principles: L1 Foundational (single agent), L2 Self-Evolving (feedback + memory), L3 Collective (multi-agent). Helps users pick which principles to adopt first.
+
+### Updated: Structured Reasoning accuracy to 93% (Principle 05)
+
+Paper v2 results on real-world agent-generated patches: 78% -> 93% accuracy.
+
+---
+
 ## 2026-04-01
 
 ### Added: axios@1.14.1 case study to Supply Chain Defense (Principle 09)

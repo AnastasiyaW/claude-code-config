@@ -159,6 +159,20 @@ Different tasks should have isolated contexts:
 
 ---
 
+## Research Evidence: Quality > Quantity
+
+Two studies reached contradictory conclusions about context files:
+
+**Study 1** (arxiv 2601.20404, Jan 2026): AGENTS.md files reduce task time by 28.6% and token consumption by 16.5%.
+
+**Study 2** (ETH Zurich, Feb 2026): LLM-generated context files **decrease** success rate by 3%, **increase** inference cost by 20%, and add 2-4 extra reasoning steps.
+
+**Resolution:** The difference is content quality. Auto-generated context that restates what the agent can infer from code is noise -- it costs tokens and dilutes focus. Human-written context with **non-inferable** information (specific build commands, custom flags, operational gotchas from real incidents) is what helps.
+
+**The Rule:** Only include in CLAUDE.md what the agent **cannot derive** from reading the code. If the agent could figure it out by reading `package.json` or the source, it does not belong in CLAUDE.md. If it is a hard-won lesson from a production incident, a non-obvious architectural constraint, or a specific command that differs from the default -- that is exactly what CLAUDE.md is for.
+
+---
+
 ## Practical Guidelines
 
 ### Writing Effective CLAUDE.md
@@ -166,10 +180,13 @@ Different tasks should have isolated contexts:
 **Do:**
 - State constraints concisely ("SSH: one tunnel per host, no parallel connections")
 - Include facts that affect every task ("ssr:false -- meta tags in source, content invisible to bots")
+- Include non-inferable knowledge (build quirks, deployment gotchas, operational lessons)
 - Update immediately when facts change
 
 **Do not:**
+- Let an LLM auto-generate CLAUDE.md content (ETH Zurich: -3% success rate)
 - Include historical narratives ("Last week we tried X and it did not work")
+- Restate what is obvious from the code (frameworks used, file structure, standard patterns)
 - Duplicate information available elsewhere ("See architecture.md for details" is better than copying architecture.md)
 - Include task-specific state (that belongs in memory files)
 

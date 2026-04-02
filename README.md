@@ -57,6 +57,19 @@ The `CLAUDE.md` file encodes 10 architectural principles for AI-assisted develop
 | 9 | **Supply Chain Defense** | Gate fresh packages with `min-release-age=7` (npm) and `exclude-newer = "7 days"` (uv). Most poisoned packages are caught within days. |
 | 10 | **Agent Security** | Defense against prompt injection and adversarial attacks. 7 attack categories (in-code injection, repo metadata, MCP poisoning, etc.) with real CVEs. Six-layer defense architecture. |
 
+### Principle Map by Reasoning Level
+
+Based on the three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678):
+
+| Level | Focus | Principles |
+|---|---|---|
+| **L1: Foundational** | Single agent, planning, tool use | 04 Deterministic Orchestration, 05 Structured Reasoning, 08 Skills |
+| **L2: Self-Evolving** | Self-improvement via feedback + memory | 03 Autoresearch, 07 Codified Context, 02 Proof Loop |
+| **L3: Collective** | Multi-agent coordination, knowledge sharing | 01 Harness Design, 06 Multi-Agent Decomposition |
+| **Cross-cutting** | Security and supply chain | 09 Supply Chain Defense, 10 Agent Security |
+
+Start with L1 for any project. Add L2 when tasks repeat and optimization matters. Use L3 only when a task exceeds reliable solo-agent performance.
+
 ---
 
 ## Alternative Approaches
