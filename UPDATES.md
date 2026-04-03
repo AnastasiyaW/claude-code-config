@@ -4,6 +4,18 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-03
+
+### Added: Session Handoff comparison (Alternative)
+
+Five approaches to seamless session transitions compared: Manual HANDOFF.md, Stop Hook (auto), Session Journal (living log), ContextHarness (framework), Memory Only (baseline). Sources: claude-handoff plugin, ContextHarness, JD Hodges patterns, GitHub issue #11455 community patterns.
+
+Key insight: structured handoff (500-2000 tokens) beats raw conversation dump (50-100K tokens) by ~50x compression with higher signal. "What did NOT work" is the most valuable section - prevents the next session from repeating dead ends.
+
+See [alternatives/session-handoff.md](alternatives/session-handoff.md).
+
+---
+
 ## 2026-04-02
 
 ### Added: Research evidence to Codified Context (Principle 07)
