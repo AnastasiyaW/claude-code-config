@@ -6,6 +6,10 @@ Changelog for claude-code-skills. Newest first.
 
 ## 2026-04-03
 
+### Rewritten: README.md
+
+Repositioned from "skills collection" to "configuration system for Claude Code agents". Focus on: what problems each principle solves (not abstract descriptions), alternatives as key feature (agent picks the right approach), security hardening section, principles by maturity level (L1-L3). Skills described as secondary/reference implementations.
+
 ### Added: Session Handoff comparison (Alternative)
 
 Five approaches to seamless session transitions compared: Manual HANDOFF.md, Stop Hook (auto), Session Journal (living log), ContextHarness (framework), Memory Only (baseline). Sources: claude-handoff plugin, ContextHarness, JD Hodges patterns, GitHub issue #11455 community patterns.
