@@ -1,5 +1,10 @@
 # Claude Code Configuration System
 
+> **Quick start:** Copy this repo URL from the address bar, paste it into your Claude Code chat, and type:
+> *"Read this repo and apply the principles and CLAUDE.md to my project"*
+>
+> That's it. Your agent will read the principles and start using them immediately.
+
 A practical configuration kit for Claude Code agents. Drop it into your project and your agent immediately gets battle-tested architectural principles, security hardening, and decision frameworks - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
