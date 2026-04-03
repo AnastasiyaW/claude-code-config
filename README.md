@@ -1,119 +1,132 @@
-# Claude Code Skills & Principles
+# Claude Code Configuration System
 
-Curated skills, architectural principles, and decision frameworks for Claude Code.
+A practical configuration kit for Claude Code agents. Drop it into your project and your agent immediately gets battle-tested architectural principles, security hardening, and decision frameworks - instead of figuring them out from scratch every session.
 
-A collection of battle-tested `.claude/skills/` and a universal `CLAUDE.md` distilled from real production work -- multi-agent orchestration, AI/ML pipelines, code review, frontend craft, and more.
+This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
+
+---
+
+## What This Gives You
+
+**10 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+
+- **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
+- **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
+- **Need to improve a prompt/skill/config?** Automated Read-Change-Test loop ([Autoresearch](principles/03-autoresearch.md))
+- **LLM skips steps in complex workflows?** Shell scripts for mechanical tasks, one step at a time ([Deterministic Orchestration](principles/04-deterministic-orchestration.md))
+- **Wrong debugging conclusions?** Structured Premises-Trace-Conclusions format ([Structured Reasoning](principles/05-structured-reasoning.md))
+- **Task too big for one agent?** Coordinator + specialized sub-agents ([Multi-Agent Decomposition](principles/06-multi-agent-decomposition.md))
+- **Context degrades in long sessions?** Treat CLAUDE.md as runtime config, not docs ([Codified Context](principles/07-codified-context.md))
+- **Supply chain attack?** Two config lines block packages younger than 7 days ([Supply Chain Defense](principles/09-supply-chain-defense.md))
+- **Prompt injection via repo/MCP/web?** Six-layer defense with real CVEs ([Agent Security](principles/10-agent-security.md))
+
+**Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
+
+| Problem | Approaches Compared |
+|---|---|
+| [Multi-step orchestration](alternatives/orchestration.md) | Harness Design, Proof Loop, Deterministic Orchestration, Prompt-only |
+| [Code review](alternatives/code-review.md) | Sequential checklist, Parallel competency, Cross-model, LLM + static |
+| [Iterative optimization](alternatives/optimization.md) | Autoresearch, HyperAgent, Manual, Eval-driven |
+| [Context in long sessions](alternatives/context-management.md) | JIT Loading, Full Context Upfront, Compaction, Fresh Sessions |
+| [Session transitions](alternatives/session-handoff.md) | Manual HANDOFF.md, Auto hooks, Session Journal, ContextHarness, Memory |
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone the repo
+# Clone
 git clone https://github.com/AnastasiyaW/claude-code-skills.git
 
-# Copy skills you need into your project
-cp -r claude-code-skills/skills/deep-review ~/.claude/skills/
-
-# Or copy the full CLAUDE.md as your global config
+# Option 1: Copy the full CLAUDE.md as your global config
 cp claude-code-skills/CLAUDE.md ~/.claude/CLAUDE.md
+
+# Option 2: Copy specific principles you need
+# (each principle is a standalone .md file)
+
+# Option 3: Copy skills you need
+cp -r claude-code-skills/skills/development/deep-review ~/.claude/skills/
 ```
 
-Skills live in `~/.claude/skills/<skill-name>/SKILL.md`. Claude Code picks them up automatically.
+The CLAUDE.md encodes all 10 principles. Principles are standalone files you can read, adapt, or cherry-pick. Skills are `.claude/skills/<name>/SKILL.md` files that Claude Code picks up automatically.
+
+---
+
+## Principles by Maturity Level
+
+Start with L1 for any project. Add L2 when tasks repeat and optimization matters. L3 only when solo agent is not enough.
+
+| Level | Focus | Principles |
+|---|---|---|
+| **L1: Foundational** | Single agent, planning, tool use | Deterministic Orchestration, Structured Reasoning, Skills Best Practices |
+| **L2: Self-Evolving** | Feedback loops, memory, optimization | Autoresearch, Codified Context, Proof Loop |
+| **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition |
+| **Cross-cutting** | Security | Supply Chain Defense, Agent Security |
+
+Based on three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678).
+
+---
+
+## Security Hardening
+
+Two principles specifically address agent security:
+
+**Supply Chain Defense** - most poisoned npm/PyPI packages are caught within 1-3 days. Two config lines create a 7-day buffer:
+```ini
+# ~/.npmrc
+min-release-age=7
+```
+```toml
+# ~/.config/uv/uv.toml
+exclude-newer = "7 days"
+```
+
+**Agent Security** - covers 7 real attack categories with documented CVEs: in-code prompt injection, repo metadata poisoning, package metadata, MCP tool poisoning, web content injection, memory poisoning, sandbox escape. Includes a six-layer defense architecture.
 
 ---
 
 ## Skills Catalog
 
-| Category | Skill | Description |
+Skills are practical tools for specific domains. They are secondary to the principles - think of them as reference implementations.
+
+| Category | Skill | What It Does |
 |---|---|---|
-| Development | `deep-review` | Parallel competency-based code review with 8 specialist reviewers: security, performance, architecture, database, concurrency, error-handling, frontend, testing |
-| AI/ML | `diffusion-engineering` | Diffusion model engineering -- UNet, DiT, Flow Matching, Flux architectures, LoRA, schedulers, memory optimization |
-| AI/ML | `flux2-lora-training` | LoRA training pipelines for FLUX.2 Klein 9B and Qwen Image Edit models |
-| AI/ML | `flux2-klein-prompting` | Prompt engineering techniques for FLUX.2 Klein image generation |
-| AI/ML | `vlm-segmentation` | Vision-Language Models + segmentation -- SAM2/3, Florence-2, YOLO-World, GPU deployment |
-| AI/ML | `forensic-prompt-compiler` | Reverse-engineer existing images into reproducible generation prompts |
-| Frontend | `frontend-design` | Production-grade web interfaces with high design quality, not template defaults |
-| Architecture | `harness-design` | Multi-agent harness patterns -- Generator-Evaluator, Sprint Contracts, context management |
-| iOS | `ios-development` | iOS application development -- Swift, SwiftUI, UIKit, MVVM/TCA, Metal/GPU compute |
-| Writing | `humanize-english` | Transform AI-generated text into natural-sounding prose that passes detection |
+| Development | `deep-review` | 8 parallel specialist reviewers (security, perf, arch, DB, concurrency, errors, frontend, tests) |
+| AI/ML | `diffusion-engineering` | UNet, DiT, Flow Matching, Flux architectures, LoRA, schedulers, memory optimization |
+| AI/ML | `flux2-lora-training` | LoRA training for FLUX.2 Klein 9B and Qwen Image Edit |
+| AI/ML | `flux2-klein-prompting` | Prompt engineering for FLUX.2 Klein |
+| AI/ML | `vlm-segmentation` | VLM + segmentation: SAM2/3, Florence-2, YOLO-World |
+| AI/ML | `forensic-prompt-compiler` | Reverse-engineer images into reproducible prompts |
+| Frontend | `frontend-design` | Production-grade interfaces, not template defaults |
+| Architecture | `harness-design` | Multi-agent patterns: Generator-Evaluator, Sprint Contracts |
+| iOS | `ios-development` | Swift, SwiftUI, UIKit, MVVM/TCA, Metal/GPU |
+| Writing | `humanize-english` | Transform AI text into natural prose |
 
 ---
 
-## Principles Overview
+## Complementary Tools
 
-The `CLAUDE.md` file encodes 10 architectural principles for AI-assisted development. Each one addresses a specific failure mode observed in real agent workflows.
+These work well alongside the principles:
 
-| # | Principle | Core Idea |
-|---|---|---|
-| 1 | **Harness Design** | Generator and Evaluator must be separate agents. Models praise their own work (self-evaluation bias). Source: Anthropic Engineering. |
-| 2 | **Proof Loop** | `spec freeze -> build -> evidence -> fresh verify -> fix -> loop`. Agents cannot self-certify completion -- durable artifacts required. Source: OpenClaw-RL. |
-| 3 | **Autoresearch** | Read -> Change ONE thing -> Test mechanically -> Keep/Discard -> Repeat. Any measurable output can be improved automatically. Source: Karpathy. |
-| 4 | **Deterministic Orchestration** | Shell Bypass (mechanical tasks skip the LLM), Relay Pattern (one task at a time), Findings Taxonomy (structured knowledge capture). |
-| 5 | **Structured Reasoning** | Replace free-form chain-of-thought with: Premises -> Execution Trace -> Conclusions -> Rejected Paths. Eliminates planning hallucinations. |
-| 6 | **Multi-Agent Decomposition** | Coordinator distributes tasks, specialized sub-agents execute. Coordination via shared artifacts in repo, not conversation history. |
-| 7 | **Codified Context** | Context is infrastructure, not documentation. CLAUDE.md = runtime config. Memory = persistent state. JIT loading over full-context dumps. |
-| 8 | **Skills Best Practices** | Skill descriptions are model triggers, not human docs. Mandatory Gotchas section. Critical validations belong in scripts, not words. |
-| 9 | **Supply Chain Defense** | Gate fresh packages with `min-release-age=7` (npm) and `exclude-newer = "7 days"` (uv). Most poisoned packages are caught within days. |
-| 10 | **Agent Security** | Defense against prompt injection and adversarial attacks. 7 attack categories (in-code injection, repo metadata, MCP poisoning, etc.) with real CVEs. Six-layer defense architecture. |
-
-### Principle Map by Reasoning Level
-
-Based on the three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678):
-
-| Level | Focus | Principles |
-|---|---|---|
-| **L1: Foundational** | Single agent, planning, tool use | 04 Deterministic Orchestration, 05 Structured Reasoning, 08 Skills |
-| **L2: Self-Evolving** | Self-improvement via feedback + memory | 03 Autoresearch, 07 Codified Context, 02 Proof Loop |
-| **L3: Collective** | Multi-agent coordination, knowledge sharing | 01 Harness Design, 06 Multi-Agent Decomposition |
-| **Cross-cutting** | Security and supply chain | 09 Supply Chain Defense, 10 Agent Security |
-
-Start with L1 for any project. Add L2 when tasks repeat and optimization matters. Use L3 only when a task exceeds reliable solo-agent performance.
+- **[gstack](https://github.com/nichochar/gstack)** - dev workflow skills: /review, /qa, /ship, /investigate, /design-review
+- **[hookify](https://github.com/AstroMined/hookify)** - git hooks generator for Claude Code
+- **[Semgrep](https://semgrep.dev/)** - static analysis, pairs with deep-review
+- **[task-orchestrator](https://github.com/jpicklyk/task-orchestrator)** - MCP task orchestration with dependency ordering
 
 ---
 
-## Alternative Approaches
+## This Repo Is Updated Regularly
 
-The `alternatives/` directory contains comparison documents for key architectural decisions:
-
-- **Orchestration** -- Memento vs Roo Code vs manual skill chains
-- **Code Review** -- deep-review skill vs CodeRabbit vs Semgrep vs manual PR review
-- **Optimization** -- Autoresearch vs HyperAgent vs manual iteration
-- **Context Management** -- Codified Context vs vanilla CLAUDE.md vs .cursorrules
-
-Each document follows the same structure: what the approach does, when to pick it, known tradeoffs.
-
----
-
-## Recommended External Tools
-
-These complement the skills and principles in this repo:
-
-- **[gstack](https://github.com/nichochar/gstack)** -- Dev workflow skills for Claude Code: /review, /qa, /ship, /investigate, /design-review, /retro, and more.
-- **[hookify](https://github.com/AstroMined/hookify)** -- Git hooks generator for Claude Code. Pre-commit validation, lint, format.
-- **[Semgrep](https://semgrep.dev/)** -- Static analysis rules. Pairs well with `deep-review` for automated security/quality gates.
-- **[task-orchestrator](https://github.com/jpicklyk/task-orchestrator)** -- MCP-based task orchestration with dependency ordering and gate-checked transitions.
+Principles are updated with new research findings, real-world incidents, and community patterns. Security sections track actual CVEs and attack chains. See [UPDATES.md](UPDATES.md) for the full changelog.
 
 ---
 
 ## Contributing
 
 1. Fork the repo
-2. Add or improve a skill in `skills/<category>/<skill-name>/SKILL.md`
-3. Follow the Skills Best Practices from `CLAUDE.md`:
-   - Description = trigger for the model, not human-readable summary
-   - Include `## Gotchas` with real failure cases
-   - Include `## Troubleshooting` with symptom -> cause -> fix
-   - Keep SKILL.md under 5000 words; details go in `references/`
-4. Open a PR with a clear description of what the skill does and when to use it
-
-For principles or alternatives, open an issue first to discuss the addition.
-
----
-
-## Updates
-
-See [UPDATES.md](UPDATES.md) for the changelog.
+2. Add/improve a skill (`skills/<category>/<name>/SKILL.md`) or principle (`principles/`)
+3. Skill descriptions = triggers for the model, not human summaries. Include `## Gotchas` from real failures
+4. For principles or alternatives: open an issue first
 
 ---
 
