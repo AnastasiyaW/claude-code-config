@@ -14,6 +14,7 @@ Each document below compares 2-4 approaches to the same problem, with pros, cons
 | [code-review.md](code-review.md) | Code review strategies | Sequential checklist, Parallel competency, Cross-model adversarial, LLM + static analysis |
 | [optimization.md](optimization.md) | Iterative code/prompt optimization | Autoresearch, HyperAgent, Manual iteration, Eval-driven development |
 | [context-management.md](context-management.md) | Managing context in long sessions | JIT Loading, Full Context Upfront, Compaction + Re-injection, Fresh Sessions |
+| [session-handoff.md](session-handoff.md) | Seamless transitions between sessions | Manual HANDOFF.md, Stop Hook, Session Journal, ContextHarness, Memory Only |
 
 ## How to Use These
 
