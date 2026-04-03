@@ -36,16 +36,16 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ```bash
 # Clone
-git clone https://github.com/AnastasiyaW/claude-code-skills.git
+git clone https://github.com/AnastasiyaW/claude-code-config.git
 
 # Option 1: Copy the full CLAUDE.md as your global config
-cp claude-code-skills/CLAUDE.md ~/.claude/CLAUDE.md
+cp claude-code-config/CLAUDE.md ~/.claude/CLAUDE.md
 
 # Option 2: Copy specific principles you need
 # (each principle is a standalone .md file)
 
 # Option 3: Copy skills you need
-cp -r claude-code-skills/skills/development/deep-review ~/.claude/skills/
+cp -r claude-code-config/skills/development/deep-review ~/.claude/skills/
 ```
 
 The CLAUDE.md encodes all 10 principles. Principles are standalone files you can read, adapt, or cherry-pick. Skills are `.claude/skills/<name>/SKILL.md` files that Claude Code picks up automatically.
