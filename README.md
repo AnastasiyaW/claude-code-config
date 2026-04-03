@@ -1,9 +1,10 @@
 # Claude Code Configuration System
 
-> **Quick start:** Copy this repo URL from the address bar, paste it into your Claude Code chat, and type:
-> *"Read this repo and apply the principles and CLAUDE.md to my project"*
->
-> That's it. Your agent will read the principles and start using them immediately.
+**Setup in 10 seconds:** paste this into your Claude Code chat and hit Enter:
+
+```
+https://github.com/AnastasiyaW/claude-code-config — look through everything here, pick what fits my project, and set it up
+```
 
 A practical configuration kit for Claude Code agents. Drop it into your project and your agent immediately gets battle-tested architectural principles, security hardening, and decision frameworks - instead of figuring them out from scratch every session.
 
