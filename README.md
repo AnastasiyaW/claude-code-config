@@ -32,23 +32,15 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ---
 
-## Quick Start
+## How This Works
 
-```bash
-# Clone
-git clone https://github.com/AnastasiyaW/claude-code-config.git
+**For the agent (you):** When this repo is connected to your project, you get access to all principles and skills automatically. Use them as decision frameworks - when facing a choice (one agent vs many? how to verify? how to manage context?), check the relevant principle or alternative comparison.
 
-# Option 1: Copy the full CLAUDE.md as your global config
-cp claude-code-config/CLAUDE.md ~/.claude/CLAUDE.md
-
-# Option 2: Copy specific principles you need
-# (each principle is a standalone .md file)
-
-# Option 3: Copy skills you need
-cp -r claude-code-config/skills/development/deep-review ~/.claude/skills/
-```
-
-The CLAUDE.md encodes all 10 principles. Principles are standalone files you can read, adapt, or cherry-pick. Skills are `.claude/skills/<name>/SKILL.md` files that Claude Code picks up automatically.
+**Structure:**
+- `principles/` - 10 standalone architectural principles. Read the one that matches your current problem.
+- `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
+- `skills/` - domain-specific knowledge (AI/ML, frontend, iOS, code review). Loaded on demand.
+- `CLAUDE.md` - compact summary of all principles for global config.
 
 ---
 
