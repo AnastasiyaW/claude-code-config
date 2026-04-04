@@ -4,6 +4,16 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-04
+
+### Added: Principle 11 - Research Pipeline
+- Save research results to `.research/incoming/` after every research session
+- Prevents duplicate work across sessions
+- Creates a knowledge pipeline: research -> incoming -> review -> knowledge base
+- Connected to Codified Context, Session Handoff, Autoresearch principles
+
+---
+
 ## 2026-04-03
 
 ### Rewritten: README.md
