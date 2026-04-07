@@ -4,6 +4,17 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-07
+
+### Added: Alternative - Workspace Organization
+- `alternatives/workspace-organization.md` - система из 3 навигационных .md файлов
+- WORKSPACE.md (карта), PROJECTS.md (реестр), session-handoff (правило)
+- Research Hub с тематическими подпапками (_inbox, agentic, ml, infra, security, product)
+- Потоки данных: raw research → research/{тема}/ → knowledge pipeline → проекты
+- Связь с Karpathy LLM Wiki, MemPalace, CORAL patterns
+
+---
+
 ## 2026-04-04
 
 ### Added: Principle 11 - Research Pipeline
