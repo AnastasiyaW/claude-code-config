@@ -4,6 +4,25 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-08
+
+### Updated: English Text Humanization Skill
+- `skills/writing/humanize-english/SKILL.md` - upgraded sources from SEO blogs to peer-reviewed research
+- Added Liang et al. (arxiv 2406.07016) data: 10 marker words, excess ratios (delve 25.2x, showcasing 9.2x)
+- Added structural anti-patterns section (AI shape, symmetry, tone traps)
+- Added co-evolution note (word lists go stale, principles > specific words)
+- Replaced "humanizer tool" sources with academic papers + research data repos
+
+### Added: Russian Text Humanization Skill
+- `skills/writing/humanize-russian/SKILL.md` - new skill for Russian-language text naturalization
+- Russian-specific markers: "является", "не просто..., а...", deverbal nouns (отглагольные существительные)
+- English calque detection (word order, syntax patterns)
+- Conversational elements dosing (частицы, вводные, оценочные)
+- Checklist + comparison table RU vs EN detection differences
+- Sources: gramota.ru, Habr 918226, Sber GigaCheck, Russian Wikipedia
+
+---
+
 ## 2026-04-07
 
 ### Added: Alternative - Workspace Organization
