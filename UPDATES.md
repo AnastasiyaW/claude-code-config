@@ -6,6 +6,11 @@ Changelog for claude-code-skills. Newest first.
 
 ## 2026-04-08
 
+### Added: 3 new alternatives from Telegram research digest
+- `alternatives/memory-strategies.md` - verbatim vs extraction vs hybrid, MemPalace 4-layer model, temporal validity, when to use ChromaDB
+- `alternatives/token-economy.md` - Caveman Prompting (75% token savings), where to apply/avoid, quantitative benchmarks
+- `alternatives/multi-agent-patterns.md` - Generator-Evaluator, Coordinator+Specialists, CORAL heartbeat, Proof Loop, implementation in Claude Code
+
 ### Updated: English Text Humanization Skill
 - `skills/writing/humanize-english/SKILL.md` - upgraded sources from SEO blogs to peer-reviewed research
 - Added Liang et al. (arxiv 2406.07016) data: 10 marker words, excess ratios (delve 25.2x, showcasing 9.2x)
