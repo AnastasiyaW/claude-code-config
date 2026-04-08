@@ -84,6 +84,35 @@ exclude-newer = "7 days"
 
 ---
 
+## Session Handoff - Moving Between Chats
+
+When a Claude Code session gets long, or you want to continue tomorrow on a different machine, or your current chat predates any automation you've set up - just tell the agent to prepare a handoff.
+
+**Type one of these phrases and hit Enter:**
+
+- `prepare handoff`
+- `save context for new chat`
+- `write handoff`
+- `handoff this session`
+
+The agent writes `.claude/HANDOFF.md` with:
+- What was the goal
+- What got done
+- **What did NOT work** (the most valuable part - prevents repeating dead ends)
+- Current state (working / broken / blocked)
+- Key decisions and why
+- The single next step
+
+Then it stops. Close the chat. Open a new one in the same directory. The new session reads the handoff automatically (if you set up the `SessionStart` hook) or you can paste the file as your first message.
+
+**Why a phrase and not a button:** the trigger lives in `.claude/rules/session-handoff.md` as plain markdown. No plugin install, no settings file, no hook. Works in any Claude Code session immediately. This is essential for migrating *existing* sessions that were started before you configured anything.
+
+Copy the ready-made rule file from [rules/session-handoff.md](rules/session-handoff.md) into your project's `.claude/rules/` (or `~/.claude/rules/` for global) and you're done.
+
+**For automation nerds:** pair this with a `Stop` hook that blocks long-session closure until a handoff is written. See [alternatives/session-handoff.md](alternatives/session-handoff.md) for all 5 approaches compared.
+
+---
+
 ## Skills Catalog
 
 Skills are practical tools for specific domains. They are secondary to the principles - think of them as reference implementations.
