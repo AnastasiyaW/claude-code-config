@@ -4,6 +4,19 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-08 (night update)
+
+### Updated: Principle 12 - Added Trap 7 (Loss Asymmetry on Bipolar Residuals)
+- **Critical discovery from visual inspection**: L2 loss silently ignores half of bipolar residual distributions (e.g., Dodge&Burn where dodge spots are +5% but burn spots are -2%)
+- Metrics (MAE, PSNR) looked fine because the missed side contributes less to mean error — but visual contrast enhancement revealed model was producing "zero" for darker corrections
+- New **Trap 7** section: cause, diagnosis, fix (L1/Huber instead of L2)
+- Updated "Which Loss" section: L2 is wrong for bipolar residuals, Huber is safe default, Active weighting helps on dense/complex scenes
+- Added diagnostic step #8: compare enhanced prediction vs enhanced GT side-by-side, check both sides of distribution
+- Updated quick-reference config: `loss_fn: huber` (was L2)
+- Key lesson: **don't trust metrics alone for low-signal tasks - always visually inspect with contrast enhancement ×5-10**
+
+---
+
 ## 2026-04-08 (evening)
 
 ### Added: Principle 12 - Low-Signal Residual Training
