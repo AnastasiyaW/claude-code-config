@@ -161,15 +161,63 @@ Rule of thumb: warmup_epochs = 5 for pretrained encoders, 10+ for random-init ar
 
 ---
 
+## Trap 7: Loss Asymmetry on Bipolar Residuals
+
+**Symptom**: model learns one side of the distribution (e.g., bright corrections) but completely misses the other side (e.g., dark corrections). Metrics look reasonable because the missed side contributes less to mean error. Visual inspection reveals the gap.
+
+**Cause**: When residuals are bipolar (both positive and negative deviations from baseline), L2 gradient `2 × error` scales with error magnitude. If one side of the distribution has larger typical deviations than the other, L2 prioritizes the larger side and effectively ignores the smaller one. The model converges to predict "zero" for the smaller-magnitude side, which still reduces loss because most pixels there are near zero anyway.
+
+This is distinct from Trap 1 (Predict Zero Attractor). Trap 1 is global collapse. Trap 7 is **half collapse**: the model learns structure on one side, zero on the other.
+
+Examples:
+- **Dodge & Burn overlays**: artists apply brighter dodges (+5%) and darker burns (-2%) - the +5% side dominates L2 gradients
+- **Temperature shifts**: warming edits typically more aggressive than cooling
+- **Sharpening residuals**: positive overshoots often stronger than negative undershoots
+- Any residual with asymmetric magnitude distribution
+
+**Diagnosis**: Enhance contrast of GT target and model prediction separately (`×5-10`). If GT shows both bright and dark corrections but prediction shows only bright (or only dark), you have this trap. MAE might be acceptable because the missing side contributes less absolute error, but visually the output is wrong.
+
+### Fix: L1 or Huber loss instead of L2
+
+```python
+# WRONG for bipolar residuals
+criterion = nn.MSELoss()  # grad ∝ error magnitude → biased toward larger side
+
+# RIGHT: L1 treats + and - equally regardless of magnitude
+criterion = nn.L1Loss()  # grad = ±1 constant
+
+# ALSO RIGHT: Huber - L2 smoothness near zero, L1 robustness on tails
+criterion = nn.HuberLoss(delta=0.1)
+```
+
+**L1 caveat**: Can NaN during warmup at high amplify factor because constant gradients don't scale down on small errors. Use gradient clipping (`clip_grad_norm=1.0`) and lower LR if L1 spikes.
+
+**Huber recommendation**: Best general-purpose choice for bipolar residuals. You get L2's smooth convergence near zero AND L1's equal treatment of both sides on outliers. Survives warmup more reliably than pure L1.
+
+**Active pixel weighting** as an alternative: keep L2 but weight pixels with `|target| > threshold` higher. This forces attention on non-neutral pixels regardless of sign. Experimentally: works BETTER than L1/Huber on **complex scenes** with dense corrections (many active pixels per tile), WORSE on **sparse scenes** where L1/Huber remain more balanced.
+
+### The Two-Stage Diagnostic
+
+1. **Check metric**: does MAE or PSNR look OK?
+2. **Check visual**: enhance contrast ×8 on GT and prediction. Look at both sides.
+   - If both sides present in both: loss is fine
+   - If prediction missing one side: switch to L1/Huber
+
+Don't skip step 2. Metrics can look great while the model is silently ignoring half the signal.
+
+---
+
 ## Which Loss?
 
-**L2 (MSE)**: Standard default. Works well with amplified targets. Gradient scales with error magnitude → clean predictions.
+**L2 (MSE)**: Standard default. Works on **symmetric** residual distributions. **Fails on bipolar/asymmetric** distributions (Trap 7): grad ∝ magnitude biases toward the larger side. Wins on metrics but loses half the signal.
 
-**L1**: Can be unstable with amplification because gradient is constant ±1 regardless of error size. Causes NaN spikes during warmup in our experiments. Not recommended for low-signal + high amp.
+**L1**: Constant gradient ±1 treats both sides equally. Best for **bipolar residuals** like Dodge&Burn. **Caveat**: can NaN during warmup at high amplify; may recover within a few epochs. Use gradient clipping.
 
-**Huber**: Best of both worlds. L2 for small errors (smooth learning near convergence), L1 for large errors (robust to outliers). In our sweep, Huber was the most *stable* loss, slightly behind L2 on final pixel MAE but never failed.
+**Huber**: Best general-purpose choice for low-signal bipolar tasks. L2 smooth convergence near zero + L1 balanced treatment on outliers. **Most stable** of the three in our sweep - never NaN'd. Slightly behind pure L1 on final metric but visually preserves both sides of distribution.
 
-**Active weighting** (weight pixels with |target| > threshold higher): sounds good in theory, **did not help in practice**. The amplified L2 already puts enough attention on active pixels; adding explicit weighting causes instability without accuracy gain.
+**Active weighting** (L2 + weight pixels with |target| > threshold higher): initial assumption was "doesn't help". **Revised after visual inspection**: helps on **complex scenes with dense active pixels** (details, contrast, intricate body poses). Hurts or is neutral on **sparse scenes** (simple subject, mostly empty background). Consider **scene-adaptive routing** if your dataset is heterogeneous.
+
+**Key learning**: For bipolar residual prediction, the right loss depends on **your data distribution**, not just theoretical properties. Run a parallel sweep (L2, L1, Huber, L2+active) on 5-10 epochs, compare by **visual contrast enhancement** (not just metrics), pick winner per-scene-type or pick Huber as safe default.
 
 ---
 
@@ -184,6 +232,7 @@ When a low-signal residual training underperforms, check in this order:
 5. **How much of each tile is background?** Sample 20 tiles visually. If most are empty, you have Trap 5.
 6. **When did val_loss diverge?** If epoch 1-3, you likely have warmup problems. If later, it's overfitting - look at the train/val gap.
 7. **What amp factor?** Start at 3-5. Higher is not better. Test with a small sweep.
+8. **Compare enhanced prediction vs enhanced GT side-by-side.** Does the prediction capture BOTH sides of the bipolar signal? If GT has bright highlights AND dark shadows but prediction shows only one side, you have Trap 7 - switch to L1 or Huber loss.
 
 ---
 
@@ -202,8 +251,8 @@ data:
   targets_format: png     # lossless
 
 loss:
-  loss_fn: L2             # or huber
-  active_weight: 0.0      # don't bother
+  loss_fn: huber          # bipolar residuals - L2 loses half the signal (Trap 7)
+  active_weight: 0.0      # 0 for sparse scenes, 3-5 for dense detailed scenes
   tv_weight: 0.0          # TV kills low-signal learning
 
 training:
@@ -211,10 +260,10 @@ training:
   warmup_epochs: 5
   ema_start_epoch: 5
   batch_size: 16
-  clip_grad_norm: 1.0     # just in case
+  clip_grad_norm: 1.0     # just in case (required for L1)
 ```
 
-This config came from a sweep that tested 7 variations in parallel over 10 epochs on 2.1M tiles, after 4 rounds of collapse failures on incorrect configurations.
+This config came from a sweep that tested 7 variations in parallel over 10 epochs on 2.1M tiles, after 4 rounds of collapse failures on incorrect configurations. The loss choice was determined by **visual contrast enhancement** of epoch 4 predictions vs ground truth, not by metrics alone - the metric-based winner (L2 amp5) was visually worst because it learned only one side of the bipolar distribution.
 
 ---
 
