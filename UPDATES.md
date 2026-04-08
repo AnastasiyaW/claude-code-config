@@ -4,6 +4,17 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-08 (evening)
+
+### Added: Principle 12 - Low-Signal Residual Training
+- `principles/12-low-signal-residual-training.md` - 6 traps + fixes for ML tasks where targets have small deviations from a constant baseline
+- Covers: "predict zero" attractor, PSNR metric lies, JPEG target poisoning, tanh saturation, subject background pollution, warmup/EMA timing
+- Source: 4 rounds of retouch training failure + 7-config parallel sweep
+- Includes known-good config (U-Net + EffB4, amp=5, no tanh, Huber/L2, warmup+delayed EMA)
+- General applicability: any residual prediction task (denoise, color correction, enhancement)
+
+---
+
 ## 2026-04-08
 
 ### Added: 3 new alternatives from Telegram research digest
