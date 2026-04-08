@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**10 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**11 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -25,6 +25,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Context degrades in long sessions?** Treat CLAUDE.md as runtime config, not docs ([Codified Context](principles/07-codified-context.md))
 - **Supply chain attack?** Two config lines block packages younger than 7 days ([Supply Chain Defense](principles/09-supply-chain-defense.md))
 - **Prompt injection via repo/MCP/web?** Six-layer defense with real CVEs ([Agent Security](principles/10-agent-security.md))
+- **Docs reference files that no longer exist?** SessionStart hook validates every reference ([Documentation Integrity](principles/11-documentation-integrity.md)) - ships with a working validator script
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -59,7 +60,7 @@ Start with L1 for any project. Add L2 when tasks repeat and optimization matters
 | **L1: Foundational** | Single agent, planning, tool use | Deterministic Orchestration, Structured Reasoning, Skills Best Practices |
 | **L2: Self-Evolving** | Feedback loops, memory, optimization | Autoresearch, Codified Context, Proof Loop |
 | **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition |
-| **Cross-cutting** | Security | Supply Chain Defense, Agent Security |
+| **Cross-cutting** | Security + Integrity | Supply Chain Defense, Agent Security, Documentation Integrity |
 
 Based on three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678).
 

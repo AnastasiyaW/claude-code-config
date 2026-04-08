@@ -49,6 +49,25 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-08
+
+### Added: Principle 11 - Documentation Integrity
+
+Fundamental solution to documentation drift for AI agents: validate all file references at session start via a SessionStart hook, not rules.
+
+**Core insight**: rules are instructions of hope - the agent follows them only if it remembers and chooses to. Hooks are shell processes that run unconditionally. For guaranteed behaviors (validation, handoff, cleanup), use hooks, not rules.
+
+The principle ships with a working Python validator (`scripts/validate_config.py`) that:
+- Distinguishes real references (absolute paths, multi-segment with `/`) from examples (bare filenames like `foo.py`)
+- Uses multi-strategy path resolution (absolute -> relative to file -> cwd -> workspace roots)
+- Keeps false positives low via skip patterns for template placeholders
+
+Drop the script into `~/.claude/scripts/` and register a `SessionStart` hook - the agent sees drift warnings automatically on every session start.
+
+See [principles/11-documentation-integrity.md](principles/11-documentation-integrity.md) and [scripts/validate_config.py](scripts/validate_config.py).
+
+---
+
 ## 2026-04-03
 
 ### Rewritten: README.md
