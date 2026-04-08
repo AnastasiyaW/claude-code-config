@@ -51,6 +51,16 @@ Changelog for claude-code-skills. Newest first.
 
 ## 2026-04-08
 
+### Added: Manual handoff trigger phrases + ready-to-copy rule file
+
+Natural-language trigger phrases ("prepare handoff", "save context for new chat", etc.) for writing `.claude/HANDOFF.md` on demand. Essential for migrating existing sessions that predate any hook-based automation.
+
+- New file: [rules/session-handoff.md](rules/session-handoff.md) - drop-in rule with trigger phrases, HANDOFF.md format, session-start behavior, and rule-vs-hook rationale
+- New README section: "Session Handoff - Moving Between Chats" with the trigger phrases and usage explanation for humans
+- Updated [alternatives/session-handoff.md](alternatives/session-handoff.md): trigger-phrase variant added to Approach A (Manual HANDOFF.md)
+
+The rule complements hook-based automation: hook handles forgetful users, rule handles deliberate session closure.
+
 ### Added: Principle 11 - Documentation Integrity
 
 Fundamental solution to documentation drift for AI agents: validate all file references at session start via a SessionStart hook, not rules.

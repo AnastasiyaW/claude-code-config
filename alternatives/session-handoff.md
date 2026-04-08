@@ -66,6 +66,32 @@ What we're building/fixing and why.
 
 **Key insight:** "What did NOT work" is the most valuable section. Without it, the next session will waste time rediscovering dead ends.
 
+**Trigger-phrase variant (no plugin required):** Add a rule file listing natural-language trigger phrases. When the agent sees one of them, it writes HANDOFF.md and stops. This works out of the box with any Claude Code setup and is ideal for older sessions started before automation was configured.
+
+```markdown
+# .claude/rules/session-handoff.md
+
+## Manual trigger
+
+When the user sends one of these phrases, immediately write .claude/HANDOFF.md
+and stop working:
+
+- "prepare handoff"
+- "save context for new chat"
+- "write handoff"
+- "handoff this session"
+
+What to do:
+1. Write .claude/HANDOFF.md with real session content (not a template)
+2. Group by topic if the session covered multiple areas
+3. Fill the "what did NOT work" section even if everything succeeded
+4. Tell the user: "Handoff written to .claude/HANDOFF.md. You can open a new chat."
+5. Do NOT continue working after writing the handoff.
+```
+
+This complements hook-based automation (approach B): the hook handles forgetful
+users, the trigger phrase handles deliberate session closure.
+
 **Pros:**
 - [+] Zero setup -- just ask Claude to write it
 - [+] Human can review and edit before next session
