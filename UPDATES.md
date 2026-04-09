@@ -4,6 +4,30 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-09 (evening)
+
+### Updated: Principle 10 - OWASP ASI01-ASI10 + fresh CVEs + 30-minute audit
+
+Major update to the agent security principle based on OWASP Gen AI Security Project's [Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) (published December 2025, 100+ industry experts).
+
+**New sections:**
+
+1. **Full OWASP ASI01-ASI10 mapping** - explicit table showing which of our Attack Taxonomy items cover which OWASP risks, and four new sub-sections for the items our taxonomy did not previously address: ASI07 Insecure Inter-Agent Communication, ASI08 Cascading Failures, ASI09 Human-Agent Trust Erosion, ASI10 Rogue Agent Behavior.
+
+2. **Minimum Viable Security Audit (5 steps, 30 minutes)** - concrete shell commands for version check, environment hardening, MCP/tool inventory, hook audit, and provenance check. Catches ~70% of realistic attack vectors without architectural changes.
+
+3. **Using RedCodeAgent defensively** - how to use the ICLR 2026 red-team agent ([arxiv 2510.02609](https://arxiv.org/html/2510.02609)) against your own setup. RedCodeAgent memory module discovered 82 unique vulnerabilities on OpenCodeInterpreter where baseline red-teaming found zero.
+
+**Timeline additions (2026 real CVEs):**
+
+- **CVE-2025-59944** (Cursor IDE, CVSS 8.0): case-sensitivity bypass in MCP config (`.cursor/mcp.json` vs `.Cursor/mcp.json`) leading to RCE via prompt injection. Fixed in Cursor v1.7.
+- **Claude Code source leak (March 31, 2026):** 59.8 MB source map accidentally shipped in npm v2.1.88, exposed internal architecture to attackers.
+- **CVE-2026-35020 / 35021 / 35022** (Claude Code CLI): three command injection CVEs with a shared root cause (unsanitized shell interpolation in TERMINAL env var lookup, editor path invocation, and auth helper). Discovered by Phoenix Security hours after the source leak, validated unpatched on v2.1.91 (production) as of April 3, 2026. CVSS 7.2-8.4.
+
+**Why this matters for Claude Code users:** anyone on a Claude Code version at or before v2.1.91 needs to watch for the security advisory and upgrade via the native installer (not npm) when the patch ships.
+
+---
+
 ## 2026-04-09
 
 ### Added: AGENTS.md at repo root

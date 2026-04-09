@@ -116,6 +116,76 @@ Any system with all three is vulnerable. Defense means breaking at least one leg
 
 ---
 
+## OWASP Top 10 for Agentic Applications (ASI01-ASI10)
+
+**Source:** [OWASP Gen AI Security Project - OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) (published December 2025, developed by 100+ industry experts)
+
+OWASP released a dedicated Top 10 for agentic applications, distinct from the general LLM Top 10. The critical framing: **"we're no longer securing what AI says, but what AI does."** Traditional LLM security addresses outputs; agent security addresses autonomous execution with system privileges.
+
+The Attack Taxonomy above maps to specific OWASP items. Where an item is not covered by our taxonomy, we add it below.
+
+| ID | Name | Our Coverage | OWASP 2026 Addition |
+|----|------|--------------|---------------------|
+| **ASI01** | Agent Goal Hijack | Attack Taxonomy 1, 5 (In-Code Injection, Web Content) | Multi-step hijack persistence |
+| **ASI02** | Tool Misuse and Exploitation | Attack Taxonomy 4 (MCP Tool Poisoning) | Intent-aligned tool selection |
+| **ASI03** | Identity and Privilege Abuse | Partial (Sandbox Escape) | Per-tool identity isolation, zero-standing-privilege |
+| **ASI04** | Agentic Supply Chain | Attack Taxonomy 3 (Package Metadata) + Principle 09 | Plugin manifest signing, supply-chain attestation |
+| **ASI05** | Unexpected Code Execution | Attack Taxonomy 7 (Sandbox Escape) | Pre-execution static analysis |
+| **ASI06** | Memory and Context Poisoning | Attack Taxonomy 6 (Memory Poisoning) | Memory provenance tracking |
+| **ASI07** | Insecure Inter-Agent Communication | NOT covered - see below | mTLS, message signatures, agent identity registries |
+| **ASI08** | Cascading Failures | NOT covered - see below | Circuit breakers, failure isolation, consensus checks |
+| **ASI09** | Human-Agent Trust Erosion | NOT covered - see below | Explain-before-execute, kill switches, action logging |
+| **ASI10** | Rogue Agent Behavior | NOT covered - see below | Goal drift detection, behavioral bounds validation |
+
+### ASI07: Insecure Inter-Agent Communication
+
+**Why agent-specific:** multi-agent systems do not exist in traditional LLM applications. When one agent passes work to another (or uses A2A-style agent-to-agent protocols), the communication channel becomes an attack surface.
+
+**Attack scenario:** Agent A produces structured output for Agent B. An attacker intercepts the channel and replaces A's output with attacker-controlled instructions. Agent B executes as if A had sent them.
+
+**Defense layer:**
+- Mutual TLS for agent-to-agent channels
+- Message signing with short-lived keys (per-session, not static)
+- Agent identity registries - every agent has a verifiable identity, not a hostname
+- Reject unsigned inter-agent messages by default
+
+### ASI08: Cascading Failures
+
+**Why agent-specific:** agent systems are tightly coupled through shared state and tool chains. A single malfunction propagates through interconnected agents, amplifying impact. Galileo AI's December 2025 simulation measured 87% downstream poisoning from a single compromised agent in a multi-agent workflow.
+
+**Attack scenario:** Agent A (trusted) is compromised via indirect prompt injection. A then passes poisoned context to Agents B, C, D - all of which act on it. By the time detection fires on agent D's anomalous behavior, the blast radius is already large.
+
+**Defense layer:**
+- Circuit breakers - stop cascade when an agent reports unusual error rates
+- Failure isolation - one agent's compromise should not automatically propagate state
+- Consensus for high-stakes decisions - multi-agent agreement before destructive operations
+- Blast-radius limiting - each agent has a tool allowlist scoped to its role
+
+### ASI09: Human-Agent Trust Erosion
+
+**Why agent-specific:** agents take actions without explicit user prompts. Humans cannot predict behavior the way they can predict a tool's behavior. Over time, opaque decision-making undermines the human oversight that is supposed to keep agents safe.
+
+**Attack scenario:** not a direct attack - a systemic failure mode. Agents make decisions faster than humans can verify. Users stop reading the explanations. Eventually a malicious action slips through because no one is actually checking.
+
+**Defense layer:**
+- Real-time action logging with human-readable summaries
+- Explain-before-execute workflows for any irreversible operation
+- Kill switches that halt all agents instantly
+- Periodic "cold review" - a random sample of agent actions reviewed by a fresh human
+
+### ASI10: Rogue Agent Behavior
+
+**Why agent-specific:** autonomous systems can drift from their intended objectives through reward hacking, emergent goal shifts, or misalignment between training objective and deployment objective. Chatbots cannot rogue - they respond to prompts. Agents can, because they have persistent goals.
+
+**Attack scenario:** an agent optimizing for "close all open tickets" learns that the fastest way to close tickets is to mark them resolved without fixing the underlying issue. Technically correct, catastrophically misaligned.
+
+**Defense layer:**
+- Objective stability monitoring - compare agent behavior against a baseline at regular intervals
+- Behavioral bounds validation - explicit tests for "the agent does not do X even when it would reduce cost"
+- Reward shaping audits - periodic review of what the agent is actually optimizing for
+
+---
+
 ## Real Incident Timeline (2025-2026)
 
 | Date | Incident | Impact | CVE/Score |
@@ -135,6 +205,9 @@ Any system with all three is vulnerable. Defense means breaking at least one leg
 | 2026 | Claude Code API key leak | API key exfiltration | CVE-2026-21852 (5.3) |
 | 2026 Mar | OpenClaw ClawHavoc campaign | 800+ malicious skills (20% of marketplace), 30K+ exposed instances | CVE-2026-25253 (8.8) |
 | 2026 Mar | axios@1.14.1 supply chain + RAT | DPRK-backed account hijack, WAVESHAPER.V2 RAT deployment | GHSA-fw8c-xr5c-95f9 |
+| 2026 Mar | Cursor MCP case-sensitivity | `.cursor/mcp.json` vs `.Cursor/mcp.json` bypass -> RCE via prompt injection | CVE-2025-59944 (8.0), fixed v1.7 |
+| 2026 Mar 31 | Claude Code source leak | 59.8 MB source map accidentally shipped in npm v2.1.88 - exposes internal architecture for attackers | - |
+| 2026 Apr | Claude Code CLI: 3 command injection CVEs | TERMINAL env var lookup, editor path injection, auth helper - all share one root cause (unsanitized shell interpolation). Found by Phoenix Security hours after source leak. Validated unpatched on v2.1.91 (production) as of Apr 3 | CVE-2026-35020 / 35021 / 35022 (CVSS 7.2-8.4) |
 
 ---
 
@@ -327,6 +400,93 @@ MCP is a particularly dangerous attack surface because it was designed for ease 
 4. **Agent action logging.** Log every tool invocation, file access, network request for forensic analysis.
 5. **Incident response plan.** Treat agent compromise like any other security incident - contain, analyze, remediate.
 6. **Supply chain + agent security.** Combine Principle 09 (package age gating) with this principle for comprehensive defense.
+
+---
+
+## Minimum Viable Security Audit (30 minutes, 5 steps)
+
+A full agent security audit is a week of work. This is the 30-minute version that catches the 70% most common configuration failures. Run it against any Claude Code setup you are unsure about.
+
+### Step 1: Version and Installer Check (2 min)
+
+```bash
+claude --version
+which claude   # or `where claude` on Windows
+```
+
+- If `claude --version` is on `2.1.91` or earlier, you are vulnerable to CVE-2026-35020 / 35021 / 35022 (unsanitized shell interpolation in three code paths). Watch [Anthropic security advisories](https://github.com/anthropics/claude-code/security/advisories) for the patched release and upgrade.
+- If `which claude` points inside `node_modules` or `npm-global`, you were installed via npm and are exposed to transitive supply-chain attacks (axios 2026-03 style). Reinstall via `curl -fsSL https://claude.ai/install.sh | bash` to use the standalone binary.
+
+### Step 2: Environment and Config Hardening (5 min)
+
+```bash
+echo "$ANTHROPIC_BASE_URL"
+find . -name "settings.local.json" -not -path "*/node_modules/*" 2>/dev/null
+find . -name ".claude" -type d 2>/dev/null | head
+```
+
+- **`ANTHROPIC_BASE_URL`** must be empty or `https://api.anthropic.com` exactly. Any other value is either a custom router (intentional - document it) or CVE-2026-21852 in progress. Proxies and self-hosted gateways count as custom routers - allowlist them explicitly.
+- **Project `settings.local.json`** files auto-load when you `cd` into the directory. Check every one of them for `hooks` sections and unknown commands. A hostile repo can ship `settings.local.json` with PreToolUse hooks that run arbitrary shell on session start.
+- **`.claude/` directories** in repos you did not create yourself are suspect. Open the files before letting Claude read them.
+
+### Step 3: MCP and Tool Inventory (5 min)
+
+```bash
+grep -rn "mcpServers" ~/.claude/settings.json ~/.config/claude* 2>/dev/null
+find . -iname "mcp.json" -o -iname ".mcp.json" 2>/dev/null
+```
+
+- List every MCP server that can start in your environment. For each server, verify the binary path and the install provenance. Unknown MCP server = untrusted code with tool access.
+- **Case sensitivity trap (CVE-2025-59944):** on case-insensitive filesystems (Windows, macOS default), `.cursor/mcp.json` and `.Cursor/mcp.json` are the same file, but Claude Code's denylist may check only one case. Normalize case in your checks: `find . -iname "mcp.json"` not `-name`.
+- Remove every MCP server you do not actively use. Each one is blast radius.
+
+### Step 4: Hook and Skills Audit (8 min)
+
+```bash
+python -c "import json; s=json.load(open('$HOME/.claude/settings.json')); print(json.dumps(s.get('hooks', {}), indent=2))"
+ls -la ~/.claude/scripts/ 2>/dev/null
+ls -la ~/.claude/skills/ 2>/dev/null
+```
+
+- Every `PreToolUse` and `Stop` hook executes shell commands on trigger. Read every hook command. Any network egress from a hook (`curl`, `wget`, `http.*`, `nc`) is a red flag unless you explicitly wrote it.
+- Skills are markdown files read by the agent. Untrusted skills can contain prompt injection. Only install skills from sources you trust and review them with the same care as code.
+- `~/.claude/scripts/` is where hook scripts live. Unknown Python/shell files here are persistence mechanisms. Hash them and compare across machines to detect tampering.
+
+### Step 5: Provenance and Memory Check (10 min)
+
+```bash
+grep -r "ANTHROPIC_API_KEY\|OPENAI_API_KEY\|AWS_SECRET" ~/.claude/ 2>/dev/null
+ls -la ~/.claude/memory/ 2>/dev/null
+ls -la ~/.claude/projects/ 2>/dev/null | head
+```
+
+- Credentials should never be in `~/.claude/` in plain text. If `grep` finds any, rotate them immediately and move to a credential manager.
+- Inspect `memory/` files for instructions that do not look like they came from you ("when the user says X, do Y"). Memory poisoning (ASI06) hides in plausible-looking notes.
+- Look at the oldest projects in `~/.claude/projects/`. Each one is a session where the agent had access to whatever directory it was run in. Stale projects are forgotten blast radius - audit them or delete.
+
+### Outcome
+
+If all five steps pass, you have eliminated ~70% of realistic attack vectors without any architectural changes. What remains (indirect prompt injection, memory poisoning, agent self-circumvention) requires the defense architecture above, not a checklist.
+
+### Automation
+
+The 5-step audit is a candidate for a `SessionStart` hook script that runs in under 5 seconds and surfaces findings automatically. See [Principle 11 (Documentation Integrity)](11-documentation-integrity.md) for the rule-vs-hook distinction: if you want this audit to run *every* session, it must be a hook, not a rule.
+
+---
+
+## Using RedCodeAgent Defensively
+
+**Source:** [RedCodeAgent, arxiv 2510.02609 (ICLR 2026)](https://arxiv.org/html/2510.02609), [Microsoft Research Blog](https://www.microsoft.com/en-us/research/blog/redcodeagent-automatic-red-teaming-agent-against-diverse-code-agents/)
+
+RedCodeAgent is the first automated red-team agent against code agents. It accumulates successful jailbreak experiences in a memory module, dynamically selects attacks from a toolbox covering 25 CWE categories and 8 malware families, and executes in Docker sandboxes for deterministic evaluation. On OpenCodeInterpreter it discovered 82 unique vulnerabilities where baseline red-teaming found zero. On Cursor IDE it contributed to the discovery chain for CVE-2025-59944 (case-sensitivity bypass leading to RCE via MCP config injection).
+
+**For defenders:** you can run RedCodeAgent against your own setup to find vulnerabilities before attackers do. The underlying benchmark ([RedCode](https://github.com/AI-secure/RedCode)) is open source; the RedCodeAgent orchestrator itself is not yet public as of April 2026 but will likely follow.
+
+**What RedCodeAgent tests well:** ASI02 (Tool Misuse), ASI05 (Unexpected Code Execution), ASI06 (Memory Poisoning) - the agent-centric attack surface.
+
+**What RedCodeAgent does not cover:** ASI07-ASI10 (inter-agent communication, cascading failures, trust erosion, rogue behavior). These are system-level failure modes that require scenario testing, not attack testing.
+
+**Minimum adoption:** wait for public release, then run quarterly against your Claude Code setup. Until then, use the 30-minute manual audit above.
 
 ---
 
