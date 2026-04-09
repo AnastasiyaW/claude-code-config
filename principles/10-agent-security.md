@@ -290,6 +290,50 @@ Research from Microsoft (arxiv:2505.23643) and others proposes attaching confide
 3. Sandbox enforcement (filesystem + network isolation)
 4. Runtime permission prompts (user confirmation)
 
+**Hierarchical Permission Overrides (Claw Code pattern):**
+
+The most auditable design for a single-user agent is a **default policy + per-tool overrides**. Claw Code's [rust/crates/runtime](https://github.com/ultraworkers/claw-code) implements it as:
+
+```rust
+pub enum PermissionMode { Allow, Deny, Prompt }
+
+pub struct PermissionPolicy {
+    per_tool_overrides: BTreeMap<String, PermissionMode>,
+    default_mode: PermissionMode,
+}
+```
+
+Three enforcement layers compose into one data structure:
+
+1. **Deny lists (fastest)** - match tool names or prefixes, immediate block. Zero runtime cost.
+2. **Per-tool policy (scoped)** - the typical configuration: "bash = Prompt, file_write = Allow, web_search = Deny". Resolution is a single BTreeMap lookup.
+3. **Runtime constraints (deepest)** - the Bash tool has destructive command detection, file I/O tools enforce workspace boundary + symlink escape checks. These live inside the tool implementation, not in the policy.
+
+**Why this beats flat allow/deny lists:**
+
+- You can reason about the policy without running the agent. "What will the agent do when it tries to call `bash`?" reads the map and returns an answer.
+- Auditing is a BTreeMap dump, not a code review of the tool loop.
+- Changing policy does not require changing tool code - you flip `Allow` to `Prompt` in one place.
+- The same struct works for per-session configuration (one `PermissionPolicy` per session) and per-project defaults (loaded from config files).
+
+**What it does not solve:**
+
+- **No RBAC.** This is single-user. Multi-user (team or tenant) setups need roles, groups, and a real policy engine (OPA, Cedar). For a local Claude Code setup, single-user is fine.
+- **No resource quotas.** You cannot say "bash can run for max 30s, file_write can allocate max 100MB." Add these as runtime constraints inside the tool itself.
+- **No provenance.** The policy does not track who granted the permission or when. Add an audit log separately if you need that.
+
+**Minimum viable adoption for Claude Code:** if you are building a harness, copy the three-mode enum, the BTreeMap override structure, and the default-mode fallback. That is ~30 lines of Rust or Python. For config-file-driven setups, express the policy as YAML or TOML that maps to the same structure:
+
+```toml
+[permissions]
+default = "prompt"
+
+[permissions.overrides]
+bash = "prompt"
+file_write = "allow"
+web_search = "deny"
+```
+
 ### Layer 4: Output Filtering and Exfiltration Prevention
 
 Even if the agent gets injected, prevent data from leaving:

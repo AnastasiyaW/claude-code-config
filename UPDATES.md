@@ -4,6 +4,37 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-09 (night)
+
+### Updated: Principle 06 - DeerFlow 2.0 three-layer isolation deep dive
+
+Expanded "Pattern B: Sandbox Isolation (DeerFlow 2.0)" from a brief overview to a full architectural walkthrough. Research source: deep dive into [bytedance/deer-flow](https://github.com/bytedance/deer-flow) README, architecture docs, and DeepWiki analysis.
+
+New content:
+- **Layer 1: Virtual Path Translation** (`ThreadDataMiddleware`) - per-thread directories with transparent `/mnt/user-data/*` mapping
+- **Layer 2: Docker Container Isolation** (AioSandboxProvider / Kubernetes) - three provisioner modes, 5-10s cold start cost, seccomp/cgroup transparency gap flagged
+- **Layer 3: LangGraph State Channel Isolation** - separate `ThreadState` per sub-agent, fan-out/fan-in pattern, unidirectional communication
+- **Data flow walkthrough:** `task()` tool -> `SubagentExecutor` -> 3-worker pool -> SSE result, `MAX_CONCURRENT_SUBAGENTS=3`, 15-min timeout
+- **Memory weakness** documented: global `memory.json` contamination reintroduces leakage that the isolation layers prevent. Mitigation: per-session memory sharding or append-only with provenance
+
+### Added: Principle 04 - Tool Registry Pattern (Claw Code)
+
+New section citing Claw Code's `rust/crates/tools/` as a reference implementation of declarative tool definitions. `ToolSpec { name, description, input_schema }` struct separates tool definition (data) from dispatch (runtime) from execution (side effect). Three benefits: tiny audit surface, isolated tool tests, new tools without prompt changes. Warning against shipping 200 tools "just in case" (each degrades LLM decision quality) - Claw Code ships 19 as the baseline.
+
+### Added: Principle 10 - Hierarchical Permission Overrides (Claw Code)
+
+New subsection under "Layer 3: Permission Boundaries" showing the Claw Code `PermissionPolicy { default_mode, per_tool_overrides }` structure with a `PermissionMode { Allow, Deny, Prompt }` enum. Cleaner than flat allow/deny lists for single-user setups. Explicit acknowledgment of what it does NOT solve: no RBAC, no resource quotas, no provenance - those require additional mechanisms. Includes a minimal TOML config example for adoption.
+
+### Added: scripts/kvcache_stats.py
+
+Working Python script to measure KV-cache hit rate across Claude Code sessions. Parses `~/.claude/projects/*/*.jsonl` session logs, aggregates `cache_creation_input_tokens` / `cache_read_input_tokens` / `input_tokens` / `output_tokens` from assistant messages, computes per-session and overall hit rate, estimates cost in USD using Claude Opus 4.6 pricing, and shows savings vs a no-cache baseline. Includes percentile distribution, top-N by tokens, worst hit rate detection. Supports filtering by project substring and time window.
+
+Real-world results on a single workspace: 96.9% overall hit rate across 83 sessions in 7 days, $10,929 actual cost vs $78,160 without caching ($67,231 / 86% savings). Median per-session 89.7%. Validates Manus's claim that KV-cache is the dominant production metric.
+
+Run: `python scripts/kvcache_stats.py --days 7 --project <substring>`
+
+---
+
 ## 2026-04-09 (evening)
 
 ### Updated: Principle 10 - OWASP ASI01-ASI10 + fresh CVEs + 30-minute audit
