@@ -155,6 +155,73 @@ This means:
 
 ---
 
+## Coordination Patterns: Two Real-World Implementations
+
+There are two distinct production-tested approaches to sub-agent coordination, each with a different tradeoff profile. Both validate our "coordination via artifacts, not conversation history" principle, but they diverge on whether sub-agents share context or stay isolated.
+
+### Pattern A: Shared Workspace (Paperclip)
+
+**Real-world implementation:** [Paperclip](https://github.com/paperclipai/paperclip) - 43K+ stars in 3 weeks, CEO -> managers -> workers hierarchy built on file-based coordination.
+
+**How it works:**
+- Coordinator writes task assignments to `/assignments/<task-id>/`
+- Sub-agents read from assignments, write results to `/results/<task-id>/`
+- All communication through shared filesystem - no message queues, no shared conversation context
+- Agents run in discrete "heartbeats" (triggered by task availability), not continuous loops
+- Atomic task checkout prevents duplicate work (claim + allocate budget + return assignment in one transaction)
+
+**Strengths:**
+- Scales to 50+ agents without context window collapse
+- Any agent can be replaced or restarted mid-task - state is durable on disk
+- Coordinator reads progress by scanning files, not by remembering conversations
+- Conflict detection is cheap (two results in the same file = visible diff)
+
+**Weaknesses:**
+- No security isolation - malicious code in one agent sees results from others
+- Requires deterministic task IDs and directory discipline
+- Agents must all trust the same filesystem
+
+**Use when:** You are coordinating many trusted agents on loosely-coupled work. Typical case: documentation pipeline (researcher -> writer -> editor -> publisher), where each agent has a clear handoff format.
+
+### Pattern B: Sandbox Isolation (DeerFlow 2.0)
+
+**Real-world implementation:** [DeerFlow 2.0](https://github.com/bytedance/deer-flow) - ByteDance, 44K+ stars, LangGraph-based with per-agent Docker sandboxes.
+
+**How it works:**
+- Lead planner breaks task into N subtasks, spawns N sub-agents in parallel
+- Each sub-agent runs in an isolated Docker container: own filesystem, terminal, browser, MCP server
+- Sub-agents CANNOT see the parent context or each other's context
+- Lead planner synthesizes structured outputs (not raw conversation) back into a single result
+- Virtual path translation prevents sub-agents from reading host paths
+
+**Strengths:**
+- Security first: a compromised sub-agent cannot corrupt others or the host
+- Context isolation forces clean decomposition - if a sub-agent needs data from a sibling, that becomes an explicit parent-mediated call
+- Native Kubernetes path for enterprise deployment
+- Prevents "context pollution" where one agent's exploration degrades another's focus
+
+**Weaknesses:**
+- Docker overhead (100-500MB per agent) limits parallelism to ~10-15 agents
+- Coordination logic must live in the parent planner, which becomes a bottleneck
+- Harder to debug - you cannot `grep` across all sub-agents' state
+
+**Use when:** You are running untrusted code, processing sensitive data, or the task requires strict blast-radius control. Typical case: code execution for user-submitted tasks, security analysis, or sub-agents using third-party MCP tools of unknown provenance.
+
+### Choosing Between Them
+
+| Dimension | Shared Workspace (Paperclip) | Sandbox (DeerFlow) |
+|---|---|---|
+| **Max agents** | 50+ | 10-15 |
+| **Trust model** | All agents trusted | No agent trusted |
+| **Setup cost** | Zero (just filesystem) | Docker + orchestration |
+| **Debugging** | Easy (grep all files) | Hard (isolated containers) |
+| **Coordination overhead** | Distributed (each agent checks for new work) | Centralized (parent planner) |
+| **Best for** | Pipelines, documentation, research | Code execution, security, untrusted input |
+
+**Hybrid pattern:** Nothing prevents using both. Run a shared-workspace coordinator (trusted) that spawns sandboxed sub-agents (untrusted) when a task requires running unknown code. Results flow back into the shared workspace for downstream consumption.
+
+---
+
 ## Relationship to Harness Design
 
 Multi-Agent Decomposition extends the Generator-Evaluator pattern from [Harness Design (01)](01-harness-design.md):

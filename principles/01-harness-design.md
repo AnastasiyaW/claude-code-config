@@ -57,6 +57,54 @@ The sprint contract is the bridge between "what the user wants" and "what the co
 
 ---
 
+## Escalation via Trace Similarity (SEMAG Extension)
+
+**Source:** [SEMAG: Self-Evolutionary Multi-Agent Code Generation, arxiv 2603.15707](https://arxiv.org/abs/2603.15707)
+
+The vanilla Generator-Evaluator loop assumes a fixed number of iterations or runs until the evaluator is satisfied. SEMAG adds a third signal: **execution trace similarity**. When consecutive attempts produce near-identical runtime behavior (not just near-identical code), the loop has stagnated and should escalate rather than retry.
+
+### The Mechanism
+
+For each generation attempt, capture the **execution trace** - the sequence of runtime states, variable values, or output diffs observed when running the generated code. Compare to the previous trace:
+
+```
+rho(t, t-1) = 1 - EditDistance(trace_t, trace_{t-1}) / max(|trace_t|, |trace_{t-1}|)
+```
+
+When `rho` exceeds a threshold (SEMAG uses an adaptive `delta_0 = 0.85` decaying with iteration count), the generator is stuck. Two more loops will not help. Escalate.
+
+### Escalation Levels
+
+SEMAG defines three levels, from cheapest to most expensive:
+
+1. **Single-shot regeneration** (cheap) - default Generator-Evaluator loop
+2. **Trace-guided debugging** (medium) - pass the failing execution trace to the generator as additional context
+3. **Multi-agent discussion-decision** (expensive) - spawn multiple debater agents, each proposes a different approach, aggregate via weighted voting based on historical performance
+
+### Discussion-Decision Phase
+
+When Level 2 stalls, spawn N independent debaters (typically 3-5). Each sees the full history and the current stalled state, then proposes a solution along with their reasoning. Aggregation is NOT majority vote - it is weighted by each debater's historical success rate:
+
+```
+weight_j = softmax(eta_j / tau_w)
+final = argmax sum(weight_j * proposal_j)
+```
+
+This is **orthogonal** to the original Generator-Evaluator pattern - debaters are generators, aggregation is evaluation, but they run in parallel instead of sequentially. Use it when sequential regeneration has demonstrably stopped helping.
+
+### When to Use This
+
+- You have an iterative loop (Generator-Evaluator, autoresearch, or similar)
+- You can capture a trace signal (test output, runtime behavior, diff, error messages)
+- You are wasting budget on retries that produce near-identical failures
+- SEMAG reports a +3.3% improvement on CodeContests with same backbone; the automatic model selector pushes this to 52.6% overall
+
+### What We Explicitly Do NOT Adopt
+
+SEMAG's full Automatic Model Selector (which swaps LLM backbones mid-task based on task complexity) is powerful but task-specific. Without a measurable task-difficulty signal, model switching becomes guesswork. Adopt the escalation mechanism; keep the backbone fixed unless you have independent difficulty measurements.
+
+---
+
 ## Context Management
 
 Long-running agent tasks face three context challenges:

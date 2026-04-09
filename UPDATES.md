@@ -4,6 +4,38 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-09
+
+### Added: AGENTS.md at repo root
+
+Linux Foundation / Agentic AI Foundation standard file. 70 lines, under the 150-line best-practice limit from the GitHub analysis of 2500+ repositories. Hybrid with CLAUDE.md: AGENTS.md is the universal entry point for any agent (Codex, Cursor, Claude Code), CLAUDE.md remains the Claude Code-specific overlay. Future-proofs the repo for when Claude Code adds native AGENTS.md support (issue anthropics/claude-code#6235).
+
+### Updated: Principle 01 - SEMAG trace-similarity escalation
+
+Added a new section on execution trace similarity as a stagnation signal for Generator-Evaluator loops. Based on [arxiv 2603.15707](https://arxiv.org/abs/2603.15707). When consecutive attempts produce near-identical runtime traces (rho > 0.85), the loop has stalled and should escalate through three levels: single-shot -> trace-guided debugging -> multi-agent discussion-decision with weighted voting. Explicitly rejects SEMAG's full Automatic Model Selector as too task-specific without difficulty measurements.
+
+### Updated: Principle 02 - Reliability metrics + OpenClaw paid note
+
+Added a new section on reliability as a distinct dimension from accuracy, based on [arxiv 2602.16666](https://arxiv.org/html/2602.16666v1). Extends the single PASS/FAIL verdict with a four-dimensional tuple (consistency, robustness, predictability, safety). Minimum viable adoption: multi-run consistency + prompt paraphrase robustness. Also added a note at the top: OpenClaw is now a paid third-party tool as of April 4, 2026, but the arxiv paper and the pattern remain freely usable.
+
+### Updated: Principle 06 - Coordination Patterns (Paperclip vs DeerFlow)
+
+Added a new section comparing two production-tested coordination approaches: Paperclip's shared-workspace pattern (43K stars, file-based handoff, scales to 50+ trusted agents) vs DeerFlow 2.0's sandbox-isolation pattern (44K stars, per-agent Docker, 10-15 agents with strict blast-radius control). Includes a decision table and a hybrid pattern.
+
+### Updated: Principle 03 - Autoresearch scope limitations
+
+Added SICA v2 findings from [arxiv 2504.15228](https://arxiv.org/abs/2504.15228). Three failure modes: base model saturation, reasoning interruption, path dependency. Revised scope guidance and a "signal to stop" rule: three consecutive iterations without improvement means stop.
+
+### Updated: alternatives/context-management.md - Manus KV-cache insights
+
+Comprehensive section on KV-cache hit rate as THE production metric. Four rules for cache-friendly context: stable prefixes, mask tools instead of swapping, filesystem as extended context, preserve errors. Includes the todo.md recitation trick (exploiting recency bias). Cross-table showing how KV-cache interacts with each of the four context management approaches.
+
+### Updated: Principle 09 - Sapphire Sleet attribution + native installer note
+
+Added Microsoft's Sapphire Sleet attribution alongside Google's UNC1069 attribution (same DPRK actor, different vendor naming). Added explicit Claude Code recommendation: use the native installer instead of npm to eliminate transitive dependency attack vectors entirely.
+
+---
+
 ## 2026-04-08 (night update)
 
 ### Updated: Principle 12 - Added Trap 7 (Loss Asymmetry on Bipolar Residuals)

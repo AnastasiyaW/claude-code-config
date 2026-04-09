@@ -80,7 +80,7 @@ Package age gating is one layer. Combine with:
 
 ## Real-World Case: axios@1.14.1 (March 31, 2026)
 
-The `axios` npm package (~100M weekly downloads) was compromised via maintainer account hijack. Attributed to **UNC1069** (DPRK-nexus threat actor) by Google Threat Intelligence.
+The `axios` npm package (~100M weekly downloads) was compromised via maintainer account hijack. Attributed to **UNC1069** by Google Threat Intelligence, and tracked independently as **Sapphire Sleet** by Microsoft Threat Intelligence - both refer to the same DPRK-nexus actor.
 
 **Timeline (UTC):**
 - **Mar 30 05:57** - Attacker publishes `plain-crypto-js@4.2.0` (clean decoy, establishes npm history)
@@ -111,7 +111,9 @@ The `axios` npm package (~100M weekly downloads) was compromised via maintainer 
 
 **Key takeaway:** The decoy package was pre-staged 18 hours before the attack to build npm history. Even a 24-hour age gate might not be enough if attackers plan ahead. **7 days is the right buffer.**
 
-Sources: Elastic Security Labs, Snyk, Wiz, Google Cloud Blog (GTIG attribution), GitHub Advisory GHSA-fw8c-xr5c-95f9.
+**Claude Code users:** If you installed Claude Code via npm (`@anthropic-ai/claude-code`) during the exposure window, verify your machine is clean. Anthropic recommends the native installer (`curl -fsSL https://claude.ai/install.sh | bash`) which is a standalone binary and does not pull transitive npm dependencies - eliminating this attack vector entirely.
+
+Sources: Elastic Security Labs, Snyk, Wiz, Google Cloud Blog (GTIG attribution), Microsoft Threat Intelligence (Sapphire Sleet attribution), GitHub Advisory GHSA-fw8c-xr5c-95f9.
 
 ---
 
