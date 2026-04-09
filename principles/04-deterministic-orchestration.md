@@ -186,6 +186,52 @@ This is better than "review security of the whole project" (too broad) or "check
 
 ---
 
+## Tool Registry Pattern (Claw Code)
+
+**Source:** [Claw Code](https://github.com/ultraworkers/claw-code) - clean-room Python+Rust reimplementation of Claude Code architecture (April 2026, 100K+ GitHub stars in days). Specifically the `rust/crates/tools/` crate.
+
+### The pattern
+
+Instead of hard-coding tool invocation inside the agent loop, define tools as **declarative data**:
+
+```rust
+pub struct ToolSpec {
+    pub name: String,
+    pub description: String,         // For the LLM to decide when to use it
+    pub input_schema: serde_json::Value,  // JSON Schema object
+}
+```
+
+The runtime dispatches tools generically by reading the registry, validating input against `input_schema`, consulting the permission policy, and executing. The tool itself does not know about the agent loop; the agent loop does not know about specific tools.
+
+### Why this is deterministic orchestration
+
+The separation is the whole point. Three pieces that used to be entangled are now independent:
+
+1. **Tool definition** - declarative schema (data)
+2. **Tool dispatch** - generic runtime logic (shell-bypassable)
+3. **Tool execution** - the actual side-effect (often shell-bypassable)
+
+Adding a new tool becomes a pure data change - write a new `ToolSpec`, drop it in the registry, done. The agent loop does not need modification. The LLM discovers the new tool via the description in the prompt. The dispatch layer validates inputs deterministically (JSON Schema validation is not an LLM call).
+
+### The three benefits
+
+1. **Audit surface is tiny.** To know "which tools exist and what can they do," you read the registry. You do not trace through agent code.
+2. **Tool tests are isolated.** You can unit-test a tool's side effect without spinning up the full agent. Schema validation is a separate test from execution.
+3. **Tool additions do not require LLM prompt changes.** As long as descriptions follow the same conventions, the LLM handles new tools automatically.
+
+### What to avoid
+
+Do **not** treat this as an excuse to ship 200 tools "just in case." Each tool definition adds to every prompt, which both costs tokens and degrades LLM decision quality (more choices = worse choices). Keep the registry lean - 15-25 well-chosen tools that compose, not 200 narrow ones. Claw Code ships 19 built-in tools, which is a reasonable baseline.
+
+### How this relates to our other principles
+
+- **Deterministic Orchestration (this principle):** dispatch logic is a shell-bypassable mechanism, not an LLM reasoning step
+- **Skills Best Practices (08):** skill descriptions are model triggers; tool descriptions in a registry work the same way and must follow the same rules
+- **Agent Security (10):** the registry is a natural place to attach permission policies - see the Hierarchical Permission Overrides section there
+
+---
+
 ## Relationship to Other Principles
 
 | Principle | Relationship |

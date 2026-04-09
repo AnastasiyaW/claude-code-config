@@ -187,25 +187,84 @@ There are two distinct production-tested approaches to sub-agent coordination, e
 
 **Real-world implementation:** [DeerFlow 2.0](https://github.com/bytedance/deer-flow) - ByteDance, 44K+ stars, LangGraph-based with per-agent Docker sandboxes.
 
-**How it works:**
-- Lead planner breaks task into N subtasks, spawns N sub-agents in parallel
-- Each sub-agent runs in an isolated Docker container: own filesystem, terminal, browser, MCP server
-- Sub-agents CANNOT see the parent context or each other's context
-- Lead planner synthesizes structured outputs (not raw conversation) back into a single result
-- Virtual path translation prevents sub-agents from reading host paths
+DeerFlow enforces isolation at **three distinct layers**, each handling a different boundary. Understanding all three is necessary to evaluate whether the pattern fits your problem.
+
+#### Layer 1: Virtual Path Translation (ThreadDataMiddleware)
+
+Every HTTP request gets a unique `thread_id`. The `ThreadDataMiddleware` creates per-thread directories on disk:
+
+```
+backend/.deer-flow/threads/{thread_id}/user-data/{workspace,uploads,outputs}
+```
+
+Sub-agents see the virtual path `/mnt/user-data/{workspace,uploads,outputs}` which is transparently mapped at tool-invocation time to the thread-specific physical directory. Two concurrent requests (even for the same session) get different `thread_id` values and therefore different physical directories, so their files never overlap even when opening the same filename.
+
+This is **logical isolation** - it would fail against an attacker who knows thread IDs, but it cleanly separates honest concurrent work.
+
+#### Layer 2: Docker Container Isolation (AioSandboxProvider / Kubernetes)
+
+Each sub-agent runs in a separate Docker container (the "All-in-One Sandbox") bundling:
+
+- Isolated OS filesystem (container namespaces)
+- Bash shell
+- Headless browser instance
+- Dedicated MCP server
+- VSCode server
+- cgroup and seccomp restrictions (the exact profiles are not documented publicly - this is a transparency gap)
+
+The sandbox is managed by the `SandboxMiddleware`, which acquires a container from the provisioner before agent execution. DeerFlow ships three provisioner modes:
+
+| Mode | Use case | Isolation |
+|---|---|---|
+| **LocalSandbox** | Dev mode on host | Logical (thread dirs only), no kernel isolation |
+| **AioSandboxProvider** | Production Docker | Full container isolation |
+| **Kubernetes provisioner** | Enterprise scale | Pod-per-sandbox, production-proven at ByteDance |
+
+Docker cold-start is 5-10s per container in typical setups. For a 12-sub-agent research task spawned sequentially, this adds 60-120s of overhead. Pre-warmed container pools can reduce this but are not the default.
+
+#### Layer 3: LangGraph State Channel Isolation
+
+The lead agent and each sub-agent maintain separate `ThreadState` objects in LangGraph. The state schema includes:
+
+- `messages` - conversation history
+- `sandbox` - active container info
+- `thread_data` - metadata (thread_id, timestamps)
+- `artifacts`, `todos`, `uploaded_files`, `viewed_images`
+
+When a sub-agent spawns, it does **not** inherit the lead agent's state. It gets a fresh state channel. This is enforced by `SubagentExecutor` in the background thread pool.
+
+#### Data flow: spawning and collecting results
+
+1. **Lead agent calls `task()` tool** with a description and an agent type: `task(description="Research X", agent_type="general-purpose")`
+2. **SubagentExecutor** checks `SubagentLimitMiddleware` (`MAX_CONCURRENT_SUBAGENTS=3`, clamped `[2,4]`), creates a new `SubagentTask` with a fresh `thread_id` (not inherited), submits to a `_scheduler_pool` (3 workers), returns a task ID immediately (non-blocking)
+3. **Sub-agent runs in isolation.** The `_execution_pool` (3 workers) acquires a Docker sandbox and spawns the sub-agent LangGraph node. The sub-agent cannot read the parent's or a sibling's `/mnt/user-data/workspace/` because each has a different `thread_id`. Timeout is 900 seconds (15 minutes).
+4. **Parent polls result via SSE** (Server-Sent Events). When the sub-agent completes, it returns `{task_id, status, result, artifacts}`. The parent never sees the sub-agent's internal messages or scratch work.
+5. **Parent reads artifacts** - the result field is embedded in the SSE message (pass-by-value), not by path reference. This is important: **cross-boundary file paths would defeat the isolation**, so DeerFlow avoids path-based artifact sharing.
+
+**Communication is strictly unidirectional.** Sub-agents cannot request additional context from the parent mid-execution. If a sub-agent needs more data, it must fail gracefully and report to the parent, which retries with richer input. Siblings cannot talk to each other. This is a "fan-out, fan-in" pattern enforced at every layer.
+
+#### Memory is the weak spot
+
+DeerFlow persists memory in a single `memory.json` file that is **global across all threads**. If Agent A extracts "API key = 12345" and Agent B runs later, Agent B can see Agent A's facts. There is no per-session isolation of memory, no audit trail, no provenance tracking.
+
+This is a **fundamental tension**: the isolation layers prevent context leakage during execution, but the global memory.json re-introduces leakage across sessions. If you adopt DeerFlow's isolation model, you should shard `memory.json` per-session manually or treat persistent memory as append-only with a provenance column.
 
 **Strengths:**
 - Security first: a compromised sub-agent cannot corrupt others or the host
 - Context isolation forces clean decomposition - if a sub-agent needs data from a sibling, that becomes an explicit parent-mediated call
-- Native Kubernetes path for enterprise deployment
+- No race conditions because there is no shared filesystem
+- Native Kubernetes path for enterprise deployment, production-proven at ByteDance scale
 - Prevents "context pollution" where one agent's exploration degrades another's focus
 
 **Weaknesses:**
-- Docker overhead (100-500MB per agent) limits parallelism to ~10-15 agents
+- Docker cold-start (5-10s per agent) limits to ~10-15 agents for latency-sensitive workloads
 - Coordination logic must live in the parent planner, which becomes a bottleneck
 - Harder to debug - you cannot `grep` across all sub-agents' state
+- **Global `memory.json` contamination** - sub-agents can still pollute parent session memory via the shared memory file
+- No clear checkpoint/restore mechanism documented - if a sub-agent container crashes, the task fails (with timeout requeue)
+- Security profile (seccomp, AppArmor, cgroups) not documented publicly - transparency gap
 
-**Use when:** You are running untrusted code, processing sensitive data, or the task requires strict blast-radius control. Typical case: code execution for user-submitted tasks, security analysis, or sub-agents using third-party MCP tools of unknown provenance.
+**Use when:** You are running untrusted code, processing sensitive data, or the task requires strict blast-radius control. Typical case: code execution for user-submitted tasks, security analysis, or sub-agents using third-party MCP tools of unknown provenance. Do NOT use when sub-agents legitimately need to coordinate in-place or when latency below a few seconds matters.
 
 ### Choosing Between Them
 
