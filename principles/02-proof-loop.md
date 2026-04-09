@@ -2,6 +2,8 @@
 
 **Source:** OpenClaw-RL paper (arxiv 2603.10165) + DenisSergeevitch/repo-task-proof-loop
 
+> **Note on OpenClaw:** As of April 4, 2026, Anthropic subscriptions (Claude Pro/Max) no longer cover third-party harness tools including the OpenClaw CLI. The **pattern described here is independent of the tool** - the arxiv paper and the protocol are freely usable. If you want to run OpenClaw as a product, you now need a direct API key or a pay-as-you-go bundle. The Proof Loop pattern itself works with any agent infrastructure.
+
 ## Overview
 
 The Proof Loop pattern ensures that AI agents cannot self-certify task completion. Instead of trusting an agent's claim that "it works," the pattern requires durable, verifiable artifacts -- test outputs, log files, verdict documents -- as evidence. A separate verifier in a fresh session (one that never witnessed the build process) examines the repository state and renders a verdict.
@@ -225,6 +227,62 @@ A structured format for the Verifier's problem reports:
 - **Smallest safe fix:** Change threshold constant from 10 to 5
 - **Root cause:** Default imported from config that uses a different rate limit context
 ```
+
+---
+
+## Reliability Metrics: Accuracy Is Not Enough
+
+**Source:** [Towards a Science of AI Agent Reliability, arxiv 2602.16666](https://arxiv.org/html/2602.16666v1)
+
+Standard benchmarks measure **accuracy** - did the agent pass this task once? Proof Loop historically has measured the same: did the AC list pass verification once? But recent evaluation of 14 agentic models across OpenAI, Google, and Anthropic shows a sobering pattern: **reliability grows slower than accuracy**. Frontier models climb steadily on accuracy benchmarks while showing only small reliability improvements on structured tasks and nearly flat progress on open-ended tasks.
+
+The practical implication: a PASS verdict on a single proof loop run is weaker evidence than it appears.
+
+### The Reliability Dimensions
+
+The paper operationalizes reliability across four dimensions. Add at least one check from each to your Proof Loop verdict:
+
+**Consistency** - does the agent succeed repeatedly?
+- Outcome consistency: run the verifier on the same AC set 3-5 times. Variance in pass rate exposes flaky builds.
+- Trajectory consistency: record the action sequence. Repeated runs should produce similar traces, not random wanders.
+
+**Robustness** - does the agent survive small perturbations?
+- Prompt robustness: paraphrase the AC list and re-run. A truly passing build handles paraphrased requirements.
+- Environment robustness: re-run with a cleared cache, different CWD, or reordered inputs.
+
+**Predictability** - is the agent calibrated?
+- Calibration: ask the agent for its confidence before verification. Compare confidence to actual pass rate. Overconfident agents are dangerous.
+- AUROC: can the agent distinguish its own successes from failures?
+
+**Safety** - does the agent stay within boundaries?
+- Compliance: count constraint violations per run.
+- Harm severity: classify violations by consequence magnitude.
+
+### Concrete Extension to the Proof Loop
+
+Replace the single PASS/FAIL verdict with a tuple:
+
+```markdown
+## verdict.json
+{
+  "accuracy": "PASS",
+  "consistency": {"runs": 5, "pass_count": 5, "variance": 0.0},
+  "robustness": {"paraphrased_pass": true, "clean_cache_pass": true},
+  "calibration": {"builder_confidence": 0.92, "actual_pass_rate": 1.0},
+  "safety": {"violations": 0, "severity": "none"}
+}
+```
+
+A verdict with `accuracy=PASS` but `consistency.variance > 0.2` is not a passing verdict - it is an unstable build that happened to pass once. Treat it as FAIL and loop again.
+
+### Minimum Viable Adoption
+
+If adding all four dimensions feels expensive, start with two:
+
+1. **Multi-run consistency** - run the verifier 3x. If any run FAILS, the build is unstable.
+2. **Prompt paraphrase** - rewrite the AC list in a second phrasing. If the paraphrased run fails, the build is accuracy-brittle.
+
+These two checks alone expose most "lucky pass" builds that single-run verification misses.
 
 ---
 

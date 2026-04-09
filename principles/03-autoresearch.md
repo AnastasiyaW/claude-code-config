@@ -202,3 +202,43 @@ Key properties:
 - Tasks where the scoring rubric is ambiguous or contested
 - One-off tasks that will not be repeated (the overhead is not justified)
 - Tasks where the search space is so small that manual tuning is faster
+
+---
+
+## Scope Limitations (SICA v2 Findings)
+
+**Source:** [A Self-Improving Coding Agent v2, arxiv 2504.15228](https://arxiv.org/abs/2504.15228)
+
+SICA demonstrated autoresearch at its extreme: an agent modifying its own Python codebase across ~14 improvement iterations, lifting SWE-Bench Verified from 17% to 53% without gradient training. The v2 update adds experiments on reasoning-heavy benchmarks (AIME, GPQA) that expose where autoresearch plateaus. Three failure modes are now documented:
+
+### Failure Mode 1: Base model saturation
+
+On AIME and GPQA, autoresearch barely moves the needle because the base model (o3-mini) is already near-optimal. Autoresearch refines scaffolding and tooling; it cannot push past what the underlying model fundamentally can do. When your metric is bottlenecked by raw model capability, autoresearch will grind without progress.
+
+**Signal to stop:** Three consecutive iterations with no metric improvement. Do not assume the next mutation will break through.
+
+### Failure Mode 2: Reasoning interruption
+
+When the agent delegates reasoning to a strong sub-model, its own scaffolding often **interrupts the reasoning chain** with orchestration overhead. The paper calls this "crude reasoning-inducing components." Practically: if your autoresearch target is a system that wraps a reasoning model, you may be making things worse by adding more orchestration layers. The base model's chain-of-thought is more fragile than the autoresearch loop assumes.
+
+**Signal to watch:** If your autoresearch target involves delegating to a reasoning model, benchmark the model alone (no scaffolding) as a baseline. If scaffolding is below that baseline, strip it - do not optimize it.
+
+### Failure Mode 3: Path dependency and ideation difficulty
+
+Early bad mutations anchor later ones. The agent's "ideation difficulty" means it tends to refine existing directions rather than propose genuinely new approaches. If the first few iterations head down a dead end, the later iterations refine the dead end rather than escape it.
+
+**Mitigation:** Run multiple autoresearch branches from the same starting point with different seed mutations. Keep the best trajectory. This is the HyperAgent version-graph approach - which is why we added it to this principle.
+
+### Revised scope guidance
+
+Autoresearch works well when:
+- **Task structure is stable** - the success signal does not change across iterations
+- **Base model has headroom** - the metric is not already saturated
+- **Architecture aligns with task** - coding tasks benefit from tool/code refinement; pure reasoning tasks do not
+
+Autoresearch fails when:
+- You are optimizing a system that wraps a strong reasoning model (the scaffolding interferes)
+- The metric is already at or near the base model's ceiling
+- The search space has ideation difficulty (rare successful paths the agent will not propose)
+
+The 17 -> 53% jump is real, but it is **task-specific** (coding benchmarks with clear success signals, model with headroom, architecture aligned with task). Do not extrapolate to "autoresearch will improve anything measurable."

@@ -148,6 +148,76 @@ rules -> state -> JIT retrieval -> pruning -> compaction policy -> re-inject -> 
 
 ---
 
+## KV-Cache as the Production Metric (Manus Insight)
+
+**Source:** [Context Engineering for AI Agents: Lessons from Building Manus](https://manus.im/blog/Context-Engineering-for-AI-Agents-Lessons-from-Building-Manus) by Yichao 'Peak' Ji
+
+All four approaches above focus on "what fits in the window." Manus's production experience (fourth framework rewrite, averaging 100:1 input:output token ratio) shows this is the wrong frame. The right metric is **KV-cache hit rate**, and the right optimization is **prefix stability**.
+
+### Why KV-cache dominates
+
+On cached tokens, Claude API pricing is roughly 10x cheaper than uncached (~$0.30/M vs ~$3.00/M). On a 50-tool-call task with 100:1 input:output ratio, the cache hit rate is not a minor optimization - it is **the** cost and latency driver. Production Claude Code sessions routinely hit 92-99% cache rates when prefixes are stable. When a regression drops cache hits to 36% (as happened in Claude Code v2.1.62), users felt the equivalent of reprocessing the entire context every turn.
+
+### The four rules for cache-friendly context
+
+1. **Stable prefixes.** Put the most stable content first. Timestamps, random IDs, or "current time" values in the cached section invalidate the cache on every call. If you need a timestamp, put it at the end.
+
+2. **Mask tools, do not swap them.** Resist the temptation to "add tools when needed, remove them when done." Every tool definition swap rewrites the prompt prefix and burns the cache. Instead, define all tools once in the cached section, and use a state machine + logit masking at decode time to make disallowed tools have probability -infinity. Same prompt, different behavior.
+
+3. **Filesystem as extended context.** When the context would grow large, write intermediate results to files (`.agent/state.json`, `notes.md`, `findings/`), and keep the in-prompt reference to a pointer. The file is read on demand via a tool call, not embedded. This matches our Proof Loop artifacts pattern.
+
+4. **Preserve errors in context.** Counterintuitively, failed actions and stack traces should stay in the prompt, not be hidden. The model sees its mistake and does not repeat it. Context cost is small (~5% overhead); recovery benefit is large (~40% fewer retry cycles in Manus measurements).
+
+### The todo.md recitation trick (attention hack)
+
+LLMs suffer from "lost in the middle" - information at the midpoint of a context window is ~30% less likely to be used than information at the start or end. Manus exploits this with a **self-updating todo.md** at the end of the context:
+
+```markdown
+# Current Task Progress [updated every 5 tool calls]
+
+## Goal
+[unchanged, high-level]
+
+## Completed
+- [x] Step 1
+- [x] Step 2
+
+## In Progress
+- [ ] Step 3 (blocked on X)
+
+## Next 3 Steps
+1. ...
+2. ...
+3. ...
+```
+
+The agent rewrites this file every 5-10 tool calls. Because it lives at the end of the context, it benefits from "recency bias" - the model actually attends to it. The refresh is small and cache-friendly (~300 tokens). Side benefit: it is also a natural audit trail for session handoff.
+
+### Interaction with the four approaches above
+
+| Approach | KV-cache interaction |
+|---|---|
+| **A: JIT Loading** | Compatible. Files loaded on demand are cached for the rest of the session. The trick is loading them at stable, predictable points so the prefix structure is repeatable. |
+| **B: Full Context Upfront** | Highest cache hit rate initially, but the large prefix is brittle - any edit invalidates everything. Best for short, focused tasks where no edits are expected. |
+| **C: Compaction + Re-injection** | Compaction rewrites the prefix, which always invalidates the cache. Use only when the cache hit was already declining from context bloat - compaction trades cache for capacity. |
+| **D: Fresh Sessions** | Each new session rebuilds the cache from scratch. This is a cost, but the benefit is a known-clean prefix. Amortizes well if handoff artifacts are stable across sessions. |
+
+### Measuring KV-cache in your own sessions
+
+- Claude API returns cache hit metrics in the response object (`cache_creation_input_tokens` vs `cache_read_input_tokens`)
+- Claude Code dashboards expose per-session cache statistics
+- Third-party observability: LangSmith, Helicone have cache tracking
+- Rule of thumb: below 80% hit rate on a multi-call session, something is wrong with your prefix stability
+
+### What not to do
+
+- Do **not** add current timestamps at the top of CLAUDE.md or AGENTS.md - it invalidates cache on every session
+- Do **not** dynamically inject tool definitions based on task state - use masking instead
+- Do **not** dump raw tool outputs verbatim - truncate or summarize before adding to context
+- Do **not** reorder sections in CLAUDE.md unless you are also willing to take the cache hit
+
+---
+
 ## Recommendation
 
 **Choose based on expected session duration:**
