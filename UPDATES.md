@@ -4,6 +4,28 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-10
+
+### Fixed: Principle numbering conflict
+
+Two files had number 11: `11-documentation-integrity.md` and `11-research-pipeline.md`. Renumbered research-pipeline to `13-research-pipeline.md`. Now 13 principles with clean sequential numbering.
+
+### Updated: Principles README
+
+Added entries for Principles 11 (Documentation Integrity), 12 (Low-Signal Residual Training), 13 (Research Pipeline) to the README overview and decision matrix. Updated principle count from 10 to 13.
+
+### Added: alternatives/managed-agents.md
+
+Comprehensive comparison of Claude Managed Agents (launched Apr 8, 2026) vs Agent SDK vs Claude Code CLI. Covers:
+- Brain/Hands/Session architecture and lazy provisioning (p50 TTFT -60%, p95 -90%+)
+- Pricing: $0.08/session-hour + standard API tokens. Break-even analysis vs self-hosted
+- Vendor lock-in assessment (HIGH for Managed Agents)
+- Self-hosted alternatives table (CrewAI, Docker Agent, Hermes, tama)
+- Decision matrix and recommendations for teams already using Claude Code
+- Real-world cost data: ~$20/week for native Claude Review in GitHub at moderate usage
+
+---
+
 ## 2026-04-09 (night)
 
 ### Updated: Principle 06 - DeerFlow 2.0 three-layer isolation deep dive
