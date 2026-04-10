@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Stop hook: remind to write a handoff when closing a long session.
 
-Checks if the session has been running long enough to warrant a handoff.
-Prints a reminder message that the agent sees before closing.
+Blocks the agent from ending a turn (via JSON response) if the session
+has been running long enough and no fresh handoff exists. Only reminds
+once per session to avoid infinite loops.
+
+Supports both old (.claude/HANDOFF.md) and new (.claude/handoffs/*.md) formats.
 
 Register in ~/.claude/settings.json:
 {
@@ -17,74 +20,89 @@ Register in ~/.claude/settings.json:
   }
 }
 """
+from __future__ import annotations
 
+import json
 import os
 import sys
 import time
 from pathlib import Path
 
-# Minimum session duration (seconds) before reminding about handoff
-MIN_SESSION_MINUTES = 15
+# Tunables
+SESSION_MIN_MINUTES = 15          # don't remind on short sessions
+HANDOFF_STALE_MINUTES = 30        # consider stale after this
+REMINDER_MARKER_NAME = ".handoff-reminded"
 
 
-def has_recent_handoff(cwd: str, max_age_minutes: int = 30) -> bool:
-    """Check if a handoff file was written recently."""
-    handoff_dirs = [
-        os.path.join(cwd, ".claude", "handoffs"),
-        os.path.join(cwd, ".claude"),
-    ]
-
-    now = time.time()
-
-    for hdir in handoff_dirs:
-        if not os.path.isdir(hdir):
-            continue
-        for f in os.listdir(hdir):
-            if "handoff" in f.lower() and f.endswith(".md"):
-                fpath = os.path.join(hdir, f)
-                mtime = os.path.getmtime(fpath)
-                age_minutes = (now - mtime) / 60
-                if age_minutes < max_age_minutes:
-                    return True
-
-    return False
+def session_age_minutes(marker: Path) -> float:
+    """Estimate session age by looking at SessionStart marker mtime."""
+    if marker.exists():
+        age_sec = time.time() - marker.stat().st_mtime
+        return age_sec / 60
+    return 0
 
 
-def main():
-    cwd = os.getcwd()
+def main() -> int:
+    cwd = Path.cwd()
+    claude_dir = cwd / ".claude"
+    if not claude_dir.exists():
+        return 0  # not a Claude Code project
 
-    # Check session start time from environment or estimate
-    # Claude Code doesn't expose session start time, so we check
-    # if there's been significant work (proxy: many recent file changes)
-    recent_changes = 0
-    cutoff = time.time() - (MIN_SESSION_MINUTES * 60)
+    # Support both old (HANDOFF.md) and new (handoffs/*.md) formats
+    handoff_old = claude_dir / "HANDOFF.md"
+    handoffs_dir = claude_dir / "handoffs"
+    reminder = claude_dir / REMINDER_MARKER_NAME
+    session_marker = claude_dir / ".session-start"
 
-    for root, dirs, files in os.walk(cwd):
-        # Skip hidden dirs and node_modules
-        dirs[:] = [d for d in dirs if not d.startswith(".") and d != "node_modules"]
-        for f in files:
-            fpath = os.path.join(root, f)
-            try:
-                if os.path.getmtime(fpath) > cutoff:
-                    recent_changes += 1
-            except OSError:
-                pass
-        if recent_changes > 10:
-            break
+    # Skip if we already reminded this session
+    if reminder.exists():
+        return 0
 
-    if recent_changes <= 5:
-        # Short session, no reminder needed
-        return
+    # Create session marker if not present (first Stop of session)
+    if not session_marker.exists():
+        session_marker.touch()
 
-    if has_recent_handoff(cwd):
-        # Already has a fresh handoff
-        return
+    age = session_age_minutes(session_marker)
+    if age < SESSION_MIN_MINUTES:
+        return 0  # short session, no handoff needed
 
-    print("[session-handoff] This looks like a substantial session.")
-    print("Consider writing a handoff before closing:")
-    print('  Say "prepare handoff" or "write handoff"')
-    print("  This saves context for your next session.")
+    # Check if handoff is fresh - either format counts
+    fresh = False
+    # Old format: single HANDOFF.md
+    if handoff_old.exists():
+        if (time.time() - handoff_old.stat().st_mtime) / 60 < HANDOFF_STALE_MINUTES:
+            fresh = True
+    # New format: any .md in handoffs/ (except INDEX.md)
+    if not fresh and handoffs_dir.exists():
+        for p in handoffs_dir.glob("*.md"):
+            if p.name == "INDEX.md":
+                continue
+            if (time.time() - p.stat().st_mtime) / 60 < HANDOFF_STALE_MINUTES:
+                fresh = True
+                break
+    if fresh:
+        return 0  # already recent
+
+    # Mark that we've reminded so we don't loop
+    reminder.touch()
+
+    # Block the stop and ask Claude to write handoff
+    response = {
+        "decision": "block",
+        "reason": (
+            f"This session has been active for ~{int(age)} minutes and no fresh "
+            f"handoff exists. Before ending, please write a handoff file in "
+            f".claude/handoffs/ following the format in .claude/rules/session-handoff.md. "
+            f"File name: YYYY-MM-DD_HH-MM_<session-short-id>.md. "
+            f"Keep it under 1500 tokens. Must include: goal, what was done, "
+            f"what did NOT work (with reasons), current state, key decisions, "
+            f"single next step. Update .claude/handoffs/INDEX.md (append). "
+            f"After writing, you may end the session normally."
+        ),
+    }
+    print(json.dumps(response))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
