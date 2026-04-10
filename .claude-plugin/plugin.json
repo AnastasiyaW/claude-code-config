@@ -1,0 +1,24 @@
+{
+  "name": "claude-code-config",
+  "version": "2.0.0",
+  "description": "Battle-tested architectural principles, security hardening, hook examples, and decision frameworks for Claude Code agents. 15 principles, 11 alternatives, 11 skills, ready-to-use hooks.",
+  "author": {
+    "name": "AnastasiyaW",
+    "url": "https://github.com/AnastasiyaW"
+  },
+  "homepage": "https://github.com/AnastasiyaW/claude-code-config",
+  "repository": "https://github.com/AnastasiyaW/claude-code-config",
+  "license": "MIT",
+  "keywords": [
+    "principles",
+    "security",
+    "hooks",
+    "multi-agent",
+    "context-engineering",
+    "supply-chain",
+    "code-review",
+    "session-handoff",
+    "autoresearch",
+    "harness-design"
+  ]
+}
