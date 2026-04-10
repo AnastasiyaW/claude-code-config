@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 10 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 13 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -106,6 +106,36 @@ Comprehensive defense against prompt injection, tool poisoning, memory poisoning
 
 ---
 
+### [11 - Documentation Integrity](11-documentation-integrity.md)
+
+Validates documentation references at session start, not after failure. File paths, function names, and config values in CLAUDE.md and rules/ decay as the codebase evolves. A SessionStart hook runs a validator that catches drift before the agent acts on stale pointers.
+
+**When to use:** Any project with CLAUDE.md or rules/ files that reference specific paths. Teams with multiple contributors. Projects where stale docs caused agent errors.
+
+**Source:** Fiberplane drift-linter, Redis context rot patterns, Qt architecture-as-code
+
+---
+
+### [12 - Low-Signal Residual Training](12-low-signal-residual-training.md)
+
+Patterns and traps for training ML models on subtle residual data (dodge & burn, frequency separation, retouching overlays). Documents 7 specific failure modes and solutions for training on low-signal targets where most pixels are near-zero.
+
+**When to use:** Training LoRAs or models on edit residuals, overlay maps, or any target where signal is sparse and subtle. Image editing ML pipelines.
+
+**Source:** Production LoRA training experiments on FLUX.2 Klein 9B
+
+---
+
+### [13 - Research Pipeline](13-research-pipeline.md)
+
+After any research task, structured results go to a dedicated incoming folder - not just conversation history. Creates a persistent knowledge pipeline that feeds into the knowledge base, preventing repeat research.
+
+**When to use:** After deep research sessions, security analyses, technology comparisons. Any structured analysis that produces reusable knowledge.
+
+**Source:** Production workflow for a public knowledge base
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -130,6 +160,9 @@ Use this table to pick the right principle for your situation:
 | "MCP server might be malicious" | 10 Agent Security | 04 Deterministic Orchestration |
 | "Agent disabled its own security controls" | 10 Agent Security | 04 Deterministic Orchestration |
 | "Multi-agent system needs trust boundaries" | 10 Agent Security | 06 Multi-Agent Decomposition |
+| "Agent followed stale docs and broke things" | 11 Documentation Integrity | 07 Codified Context |
+| "Training on subtle edit residuals fails" | 12 Low-Signal Residual Training | 03 Autoresearch |
+| "Keep re-researching the same topics" | 13 Research Pipeline | 07 Codified Context |
 
 ### Composition Patterns
 
