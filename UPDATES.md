@@ -4,6 +4,17 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-10 (v2.0.1 - Multi-session Handoff Fix)
+
+### Fixed: handoff scripts now support multi-session format
+
+- `session-handoff-reminder.py` (Stop hook) - now tells agent to write to `.claude/handoffs/` instead of old `.claude/HANDOFF.md`
+- Added `session-handoff-check.py` (SessionStart hook) - reads from `.claude/handoffs/` directory, shows recent handoffs, falls back to old format
+
+The old single-file HANDOFF.md format had race conditions when multiple Claude sessions ran in parallel. The new format uses `.claude/handoffs/YYYY-MM-DD_HH-MM_<session-id>.md` with an append-only INDEX.md.
+
+---
+
 ## 2026-04-10 (v2.0.0 - Plugin Format)
 
 ### BREAKING: Converted to Claude Code plugin format
