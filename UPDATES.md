@@ -4,6 +4,71 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-10 (v2.0.0 - Plugin Format)
+
+### BREAKING: Converted to Claude Code plugin format
+
+Added `.claude-plugin/plugin.json` manifest. The repo can now be installed with `claude plugin install` instead of manual file copying. Version bumped to 2.0.0 to reflect this structural change.
+
+### Added: hooks/ directory with 4 ready-to-use scripts
+
+| Script | Event | Purpose |
+|---|---|---|
+| `session-drift-validator.py` | SessionStart | Validates file path references in CLAUDE.md and rules/ |
+| `session-handoff-reminder.py` | Stop | Reminds to write handoff before closing long sessions |
+| `destructive-command-guard.py` | PreToolUse | Blocks rm -rf, git push --force, DROP TABLE, etc. |
+| `secret-leak-guard.py` | PreToolUse | Prevents writing API keys/tokens into tracked files |
+
+Each script includes setup instructions and works standalone. README covers hook events reference, conditional hooks (v2.1.89+), matcher patterns, and hook response format.
+
+### Added: Principle 14 - Managed Agents
+
+Separate the brain (planning) from the hands (execution). Covers:
+- Anthropic Managed Agents API (April 8, 2026): `execute(name, input) -> string` interface
+- Brain/Hands/Session architecture with lazy provisioning (p50 TTFT -60%)
+- Claude Code Agent Teams (TeamCreateTool behind feature flag - found via Chinese community analysis of 510K LOC TypeScript source)
+- HiClaw pattern (Alibaba/AgentScope): Matrix protocol, worker tokens, permission scoping
+- Self-hosted alternatives table (CrewAI, Docker Agent SDK, Hermes, tama)
+- Cost analysis: $0.08/session-hour + tokens
+
+### Added: Principle 15 - Red Lines (红线)
+
+Absolute prohibitions inspired by Chinese engineering community pattern:
+- Red lines vs regular rules: priority, enforcement, incident anchoring
+- Three implementation patterns: CLAUDE.md section, separate REDLINES.md, hook enforcement
+- Red line categories: data safety, system integrity, external actions, agent-specific
+- Lifecycle: incident -> root cause -> draft -> implement -> quarterly review
+- Hook > Rule > Hope enforcement hierarchy
+
+### Added: templates/ directory
+
+Starter configurations for common project types:
+- `CLAUDE-web-app.md` - React/Vue/Next.js web applications
+- `CLAUDE-ml-project.md` - ML/AI training and inference projects
+- `CLAUDE-library.md` - npm/PyPI/crates.io packages
+- `REVIEW.md` - Code review guidelines (drop-in for any project)
+
+All templates under 150 lines (KV-cache efficient), with `{{placeholder}}` format for customization.
+
+### Updated: Principle 08 - $ARGUMENTS documentation
+
+Added new section on parameterized skills: how `$ARGUMENTS` works, invocation examples, best practices (always handle empty, natural language not CLI flags, scope not behavior).
+
+### Updated: README.md - bilingual sections
+
+Added Chinese (中文简介) and Russian (описание на русском) sections. Not full translations, but navigational summaries for non-English speakers. Includes: feature list, structure overview, installation command.
+
+### Updated: README.md, AGENTS.md, principles/README.md
+
+- Principle count updated from 13 to 15 across all index files
+- Added hooks and templates to structure listings
+- Added Managed Agents to L3 maturity level
+- Added Red Lines to Cross-cutting level
+- Added 3 new entries to Decision Matrix
+- Added hooks table and templates link to main README
+
+---
+
 ## 2026-04-10
 
 ### Fixed: Principle numbering conflict

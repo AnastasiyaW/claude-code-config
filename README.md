@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**11 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**15 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -26,6 +26,19 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Supply chain attack?** Two config lines block packages younger than 7 days ([Supply Chain Defense](principles/09-supply-chain-defense.md))
 - **Prompt injection via repo/MCP/web?** Six-layer defense with real CVEs ([Agent Security](principles/10-agent-security.md))
 - **Docs reference files that no longer exist?** SessionStart hook validates every reference ([Documentation Integrity](principles/11-documentation-integrity.md)) - ships with a working validator script
+- **Multi-agent infrastructure overhead?** Separate brain from hands with lazy provisioning ([Managed Agents](principles/14-managed-agents.md))
+- **Agent cuts corners on critical rules?** Absolute prohibitions with incident history ([Red Lines](principles/15-red-lines.md))
+
+**Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
+
+| Hook | Event | What It Does |
+|---|---|---|
+| [session-drift-validator](hooks/session-drift-validator.py) | `SessionStart` | Validates file references in CLAUDE.md at session start |
+| [destructive-command-guard](hooks/destructive-command-guard.py) | `PreToolUse` | Blocks `rm -rf`, `git push --force`, `DROP TABLE` |
+| [secret-leak-guard](hooks/secret-leak-guard.py) | `PreToolUse` | Prevents committing API keys, tokens, passwords |
+| [session-handoff-reminder](hooks/session-handoff-reminder.py) | `Stop` | Reminds to write handoff before closing long sessions |
+
+**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md).
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -44,9 +57,12 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 **For the agent (you):** When this repo is connected to your project, you get access to all principles and skills automatically. Use them as decision frameworks - when facing a choice (one agent vs many? how to verify? how to manage context?), check the relevant principle or alternative comparison.
 
 **Structure:**
-- `principles/` - 10 standalone architectural principles. Read the one that matches your current problem.
+- `principles/` - 15 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
+- `hooks/` - ready-to-use Python scripts for session management and safety guards.
+- `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
 - `skills/` - domain-specific knowledge (AI/ML, frontend, iOS, code review). Loaded on demand.
+- `scripts/` - diagnostic utilities (config validator, KV-cache stats).
 - `CLAUDE.md` - compact summary of all principles for global config.
 
 ---
@@ -59,8 +75,8 @@ Start with L1 for any project. Add L2 when tasks repeat and optimization matters
 |---|---|---|
 | **L1: Foundational** | Single agent, planning, tool use | Deterministic Orchestration, Structured Reasoning, Skills Best Practices |
 | **L2: Self-Evolving** | Feedback loops, memory, optimization | Autoresearch, Codified Context, Proof Loop |
-| **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition |
-| **Cross-cutting** | Security + Integrity | Supply Chain Defense, Agent Security, Documentation Integrity |
+| **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition, Managed Agents |
+| **Cross-cutting** | Security + Integrity | Supply Chain Defense, Agent Security, Documentation Integrity, Red Lines |
 
 Based on three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678).
 
@@ -155,6 +171,40 @@ Principles are updated with new research findings, real-world incidents, and com
 2. Add/improve a skill (`skills/<category>/<name>/SKILL.md`) or principle (`principles/`)
 3. Skill descriptions = triggers for the model, not human summaries. Include `## Gotchas` from real failures
 4. For principles or alternatives: open an issue first
+
+---
+
+---
+
+## 中文简介
+
+面向 Claude Code 智能体的实战配置系统。包含 15 个架构原则、11 个对比方案、11 个技能、即用型 Hook 脚本和项目模板。
+
+**核心功能:**
+- `principles/` - 15 个独立架构原则，每个解决一个具体失败模式
+- `alternatives/` - 每个问题 2-5 种方案对比，附决策表
+- `hooks/` - 即用型 Hook 脚本（漂移检测、安全防护、会话交接）
+- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板
+- `skills/` - 领域技能（AI/ML、前端、iOS、代码审查）
+
+**安装:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` 或直接复制所需文件。
+
+**灵感来源:** 部分设计理念受到中国工程社区的启发，包括红线(红线)模式、规范驱动开发(OpenSpec)、经验库模式。
+
+---
+
+## Описание на русском
+
+Система конфигурации для Claude Code агентов. 15 архитектурных принципов, 11 сравнений подходов, 11 навыков, готовые hook-скрипты и шаблоны проектов.
+
+**Что внутри:**
+- `principles/` - 15 принципов, каждый предотвращает конкретный тип отказа
+- `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
+- `hooks/` - готовые скрипты (валидация drift, защита от деструктивных команд, утечка секретов)
+- `templates/` - стартовые CLAUDE.md для web-app, ML, library проектов
+- `skills/` - доменные навыки (AI/ML, фронтенд, iOS, код-ревью)
+
+**Установка:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` или копирование нужных файлов.
 
 ---
 

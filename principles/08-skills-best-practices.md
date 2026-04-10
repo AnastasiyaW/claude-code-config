@@ -246,6 +246,55 @@ When creating or reviewing a skill, verify:
 
 ---
 
+## Parameterized Skills with $ARGUMENTS
+
+Skills can accept arguments from the user via `$ARGUMENTS`. When a user invokes `/my-skill some text here`, the `some text here` part is available as `$ARGUMENTS` inside the skill.
+
+### Usage in SKILL.md
+
+```markdown
+---
+name: review
+description: Code review with configurable focus. Use when asked to review code.
+---
+
+Review the code changes with focus on: $ARGUMENTS
+
+If no specific focus given, do a general review covering security, performance, and correctness.
+```
+
+### Invocation
+
+```
+/review security          -> $ARGUMENTS = "security"
+/review PR #42            -> $ARGUMENTS = "PR #42"
+/review                   -> $ARGUMENTS = "" (empty)
+```
+
+### Best Practices
+
+1. **Always handle empty arguments.** Not everyone will pass them. Provide sensible defaults.
+2. **Document expected arguments** in the skill description, not just in the body.
+3. **Keep argument parsing simple.** Natural language, not CLI flags. The model interprets it.
+4. **Use arguments for scope, not behavior.** Good: `/review security` (narrows focus). Bad: `/review --format=json --strict` (CLI-style flags confuse the model).
+
+### Examples
+
+```markdown
+# Skill: /investigate
+Investigate the issue: $ARGUMENTS
+
+If $ARGUMENTS is empty, ask the user what to investigate.
+
+# Skill: /ship
+Ship the changes. Additional instructions: $ARGUMENTS
+
+Default behavior: merge base, test, review, PR.
+If $ARGUMENTS includes "hotfix", skip non-critical checks.
+```
+
+---
+
 ## Relationship to Other Principles
 
 | Principle | Relationship |

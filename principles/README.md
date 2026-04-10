@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 13 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 15 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -136,6 +136,26 @@ After any research task, structured results go to a dedicated incoming folder - 
 
 ---
 
+### [14 - Managed Agents](14-managed-agents.md)
+
+Infrastructure pattern for multi-agent systems: separate the brain (planning) from the hands (execution). Managed sub-agents get sandboxed environments with lazy provisioning. Covers Anthropic's Managed Agents API, Claude Code Agent Teams, and self-hosted alternatives.
+
+**When to use:** Building multi-agent workflows. Deciding between managed vs self-hosted agent infrastructure. Designing brain/hands separation for complex tasks.
+
+**Source:** Anthropic Engineering - "Managed Agents" (April 8, 2026), HiClaw/AgentScope (Alibaba)
+
+---
+
+### [15 - Red Lines (红线)](15-red-lines.md)
+
+Absolute prohibitions that cannot be violated regardless of context. Separate from regular rules, higher priority, each anchored to a real incident. Enforcement hierarchy: hooks (mechanical) > rules (probabilistic) > nothing.
+
+**When to use:** After any incident where an agent did something harmful with good intentions. Defining non-negotiable boundaries for your project. Choosing between rule-based and hook-based enforcement.
+
+**Source:** Chinese engineering community (红线 pattern), OWASP ASI09
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -163,6 +183,9 @@ Use this table to pick the right principle for your situation:
 | "Agent followed stale docs and broke things" | 11 Documentation Integrity | 07 Codified Context |
 | "Training on subtle edit residuals fails" | 12 Low-Signal Residual Training | 03 Autoresearch |
 | "Keep re-researching the same topics" | 13 Research Pipeline | 07 Codified Context |
+| "Multi-agent infra is too complex" | 14 Managed Agents | 06 Multi-Agent Decomposition |
+| "Agent cut corners on a critical rule" | 15 Red Lines | 04 Deterministic Orchestration |
+| "Need absolute prohibitions, not guidelines" | 15 Red Lines | 10 Agent Security |
 
 ### Composition Patterns
 
