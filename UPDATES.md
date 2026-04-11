@@ -4,6 +4,26 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-11 (v2.1.0 - Video Production Skills)
+
+### Added: Complete video production skill suite (`skills/video-production/`)
+
+5 new skills for creating product demo videos, ads, and presentations:
+
+- **product-meaning-extractor** - Deep product analysis before creating content. "So What?" test, JTBD, StoryBrand, April Dunford positioning, customer language bank. Outputs structured brief with: core insight, enemy, transformation, unique mechanism, proof, emotional hooks, customer voice bank.
+
+- **video-narrative-arc** - 5 proven narrative templates (10s-90s): Pattern Interrupt, Problem-Solution Flash, Hook-Pain-Demo-Proof-CTA, Apple Keynote Mini, Full Story Arc. Each with beat-by-beat timing, emotional arc mapping, and hook formulas.
+
+- **script-evaluator** - Flatness detector. Scores 6 dimensions (tension, specificity, emotional arc, hook strength, customer voice, visual variety) on 1-10 scale. Identifies 5 common flatness patterns with specific fixes.
+
+- **remotion-production-guide** - Complete Remotion reference: project setup, animation library (fadeIn/slideUp/scalePop/stagger/countTo), spring presets, typography rules, easing reference, color palettes, pacing tables, 3D integration (@remotion/three, Lottie, Spline), export settings for all platforms.
+
+- **video-post-production** - FFmpeg patterns for audio mastering, captions, color correction, platform export (YouTube/TikTok/Reels/Shorts), concatenation, speed changes, GIF creation. Includes volume levels table, BPM guide for music selection, and quality checklist.
+
+Built from deep research: 2500+ lines of rules from Apple HIG, Material Design 3, Disney's 12 Principles, motion design best practices, and analysis of 28 existing Claude Code video/marketing skills.
+
+---
+
 ## 2026-04-11 (v2.0.2 - Memory Cross-Links)
 
 ### Added: wiki-links graph pattern for memory files
