@@ -4,6 +4,18 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-11 (v2.0.2 - Memory Cross-Links)
+
+### Added: wiki-links graph pattern for memory files
+
+- `rules/memory-crosslinks.md` - guide for adding `[[wiki-links]]` between memory files
+- `templates/memory-project.md` - structured project memory with Activity log, Open Items, Key Decisions, Related links
+- `templates/memory-reference.md` - structured reference memory with Gotchas and Related links
+
+Inspired by Rowboat knowledge graph approach. Memory files linked via `[[filename]]` create a navigable graph without any database. Five relationship clusters: infrastructure, projects, methodology, tools, feedback.
+
+---
+
 ## 2026-04-10 (v2.0.1 - Multi-session Handoff Fix)
 
 ### Fixed: handoff scripts now support multi-session format
