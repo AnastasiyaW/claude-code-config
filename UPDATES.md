@@ -4,6 +4,32 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-11 (v2.2.0 - Project Chronicles)
+
+### Added: Principle 16 - Project Chronicles
+
+Long-running projects that span weeks/months need more than handoffs. Handoffs answer "what's next?" but not "how did we get here?" Chronicles solve this with a condensed timeline per project.
+
+- `principles/16-project-chronicles.md` - full pattern: chronicle vs handoff vs documentation comparison, entry format, integration with handoffs, when to add entries, scaling strategies
+- `templates/chronicle.md` - starter template for new project chronicles
+- `rules/session-handoff.md` - updated with chronicle connection: `Project:` field in handoffs, auto-append to chronicle on handoff write
+
+**Key design decisions:**
+- Chronicle entry = 3-7 lines of strategic digest (decisions, pivots, results, dead ends), NOT a handoff copy
+- One file per project in `.claude/chronicles/`, append-only
+- Entries added at milestones (phase completion, pivots, dead ends confirmed), NOT every session
+- Chronicles complement handoffs: strategic context (months) + tactical context (days) = full picture
+
+**Maturity level:** L2 (Self-Evolving) - project memory that accumulates across sessions.
+
+### Updated: README, principles/README
+
+- Principle count: 15 → 16
+- New maturity row: "Cross-cutting: Session + Project Continuity" (Codified Context, Project Chronicles, Research Pipeline)
+- Decision matrix: 2 new entries for project history scenarios
+
+---
+
 ## 2026-04-11 (v2.1.0 - Video Production Skills)
 
 ### Added: Complete video production skill suite (`skills/video-production/`)

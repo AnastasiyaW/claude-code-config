@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**15 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**16 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -28,6 +28,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Docs reference files that no longer exist?** SessionStart hook validates every reference ([Documentation Integrity](principles/11-documentation-integrity.md)) - ships with a working validator script
 - **Multi-agent infrastructure overhead?** Separate brain from hands with lazy provisioning ([Managed Agents](principles/14-managed-agents.md))
 - **Agent cuts corners on critical rules?** Absolute prohibitions with incident history ([Red Lines](principles/15-red-lines.md))
+- **Long-running project lost its history?** Condensed timeline per project, alongside handoffs ([Project Chronicles](principles/16-project-chronicles.md))
 
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
 
@@ -57,7 +58,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 **For the agent (you):** When this repo is connected to your project, you get access to all principles and skills automatically. Use them as decision frameworks - when facing a choice (one agent vs many? how to verify? how to manage context?), check the relevant principle or alternative comparison.
 
 **Structure:**
-- `principles/` - 15 standalone architectural principles. Read the one that matches your current problem.
+- `principles/` - 16 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
@@ -77,6 +78,7 @@ Start with L1 for any project. Add L2 when tasks repeat and optimization matters
 | **L2: Self-Evolving** | Feedback loops, memory, optimization | Autoresearch, Codified Context, Proof Loop |
 | **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition, Managed Agents |
 | **Cross-cutting** | Security + Integrity | Supply Chain Defense, Agent Security, Documentation Integrity, Red Lines |
+| **Cross-cutting** | Session + Project Continuity | Codified Context, Project Chronicles, Research Pipeline |
 
 Based on three-level agentic reasoning taxonomy (arxiv 2601.12538, 2504.19678).
 

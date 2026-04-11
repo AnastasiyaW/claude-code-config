@@ -99,3 +99,25 @@ handoff for very long sessions.
 See [alternatives/session-handoff.md](../alternatives/session-handoff.md) for
 all 5 approaches (manual, hook, journal, framework, memory-only) compared
 with pros, cons, and when-to-choose guidance.
+
+## Connection to Project Chronicles
+
+For long-running projects (spanning weeks/months with 3+ handoffs), handoffs
+alone don't tell the story of how a project evolved. **Project chronicles**
+solve this by maintaining a single condensed timeline per project.
+
+When writing a handoff for a long-running project:
+1. Add `**Project:** <slug>` to the handoff header
+2. After writing the handoff, append a 3-7 line entry to
+   `.claude/chronicles/<slug>.md`
+3. Chronicle entry = strategic digest (decisions, turns, results), NOT a
+   handoff copy
+
+When starting a session on a long-running project:
+1. Read `.claude/chronicles/<slug>.md` for strategic context
+2. Read the latest handoff for tactical context
+3. Together they answer both "how did we get here?" and "what's next?"
+
+See [principles/16-project-chronicles.md](../principles/16-project-chronicles.md)
+for the full pattern and [templates/chronicle.md](../templates/chronicle.md)
+for the file template.
