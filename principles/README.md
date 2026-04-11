@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 15 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 16 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -156,6 +156,16 @@ Absolute prohibitions that cannot be violated regardless of context. Separate fr
 
 ---
 
+### [16 - Project Chronicles](16-project-chronicles.md)
+
+A condensed timeline per long-running project that captures decisions, pivots, results, and dead ends. Sits between handoffs (tactical, session-scoped) and documentation (static). Each entry is 3-7 lines of strategic digest, not a handoff copy.
+
+**When to use:** Any project spanning weeks/months with 3+ handoffs. Projects where multiple sessions contribute without a clear end date. When new sessions need to understand project history, not just "what's next."
+
+**Source:** Production experience managing 10+ concurrent long-running projects with Claude Code
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -185,6 +195,8 @@ Use this table to pick the right principle for your situation:
 | "Keep re-researching the same topics" | 13 Research Pipeline | 07 Codified Context |
 | "Multi-agent infra is too complex" | 14 Managed Agents | 06 Multi-Agent Decomposition |
 | "Agent cut corners on a critical rule" | 15 Red Lines | 04 Deterministic Orchestration |
+| "Long-running project lost its history" | 16 Project Chronicles | 07 Codified Context |
+| "Can't understand why past decisions were made" | 16 Project Chronicles | 05 Structured Reasoning |
 | "Need absolute prohibitions, not guidelines" | 15 Red Lines | 10 Agent Security |
 
 ### Composition Patterns
