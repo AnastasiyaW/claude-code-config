@@ -4,6 +4,21 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-12 (v2.2.1 - DBS Skill Creation Framework)
+
+### Added: Principle 12 - DBS Framework
+
+When creating skills from research, split content into three categories:
+- **Direction** (-> SKILL.md): logic, decision trees, error handling
+- **Blueprints** (-> references/): templates, guidelines, taxonomies
+- **Solutions** (-> scripts/): deterministic code, API calls, calculations
+
+This prevents monolithic SKILL.md files where logic, data, and code are mixed. The model loads Direction into context, fetches Blueprints on demand, and executes Solutions without reasoning.
+
+Source: @hooeem's NotebookLM integration guide (April 2026).
+
+---
+
 ## 2026-04-11 (v2.2.0 - Project Chronicles)
 
 ### Added: Principle 16 - Project Chronicles
