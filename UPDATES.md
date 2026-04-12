@@ -4,9 +4,34 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-12 (v2.2.2 - Freshness audit)
+
+### Fixed: Principle numbering conflict (two #12s)
+
+`12-dbs-skill-creation.md` conflicted with `12-low-signal-residual-training.md`. Renumbered DBS to `17-dbs-skill-creation.md`. Low-Signal Training keeps #12 (was published first, already referenced in UPDATES and README).
+
+### Updated: All index files for accuracy
+
+Comprehensive freshness audit of README.md, AGENTS.md, principles/README.md:
+- Principle count: 16 -> 17 across all files
+- Skills Catalog: added 6 missing skills (5 video-production + humanize-russian), now 16 total
+- Hooks table: added missing `session-handoff-check.py` (SessionStart), now 5 total
+- Templates: added `chronicle.md`, `memory-project.md`, `memory-reference.md` to listing
+- Session Handoff section: updated from old `.claude/HANDOFF.md` to multi-session `.claude/handoffs/` format
+- Chinese (中文) and Russian sections: updated all counts
+- Maturity table: added DBS to L1 Foundational
+- Decision matrix: added DBS entry
+
+### Added: 2 new alternatives (previously untracked)
+
+- `alternatives/agent-mailbox-system.md` - inter-agent communication patterns
+- `alternatives/kb-code-sync.md` - keeping knowledge base in sync with code
+
+---
+
 ## 2026-04-12 (v2.2.1 - DBS Skill Creation Framework)
 
-### Added: Principle 12 - DBS Framework
+### Added: Principle 17 - DBS Framework (was incorrectly numbered 12)
 
 When creating skills from research, split content into three categories:
 - **Direction** (-> SKILL.md): logic, decision trees, error handling
