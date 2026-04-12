@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**16 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**17 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -29,6 +29,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Multi-agent infrastructure overhead?** Separate brain from hands with lazy provisioning ([Managed Agents](principles/14-managed-agents.md))
 - **Agent cuts corners on critical rules?** Absolute prohibitions with incident history ([Red Lines](principles/15-red-lines.md))
 - **Long-running project lost its history?** Condensed timeline per project, alongside handoffs ([Project Chronicles](principles/16-project-chronicles.md))
+- **Skill is a monolithic wall of text?** Split into Direction, Blueprints, Solutions ([DBS Framework](principles/17-dbs-skill-creation.md))
 
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
 
@@ -38,8 +39,9 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 | [destructive-command-guard](hooks/destructive-command-guard.py) | `PreToolUse` | Blocks `rm -rf`, `git push --force`, `DROP TABLE` |
 | [secret-leak-guard](hooks/secret-leak-guard.py) | `PreToolUse` | Prevents committing API keys, tokens, passwords |
 | [session-handoff-reminder](hooks/session-handoff-reminder.py) | `Stop` | Reminds to write handoff before closing long sessions |
+| [session-handoff-check](hooks/session-handoff-check.py) | `SessionStart` | Shows recent handoffs from previous sessions |
 
-**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md).
+**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md).
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -58,7 +60,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 **For the agent (you):** When this repo is connected to your project, you get access to all principles and skills automatically. Use them as decision frameworks - when facing a choice (one agent vs many? how to verify? how to manage context?), check the relevant principle or alternative comparison.
 
 **Structure:**
-- `principles/` - 16 standalone architectural principles. Read the one that matches your current problem.
+- `principles/` - 17 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
@@ -74,7 +76,7 @@ Start with L1 for any project. Add L2 when tasks repeat and optimization matters
 
 | Level | Focus | Principles |
 |---|---|---|
-| **L1: Foundational** | Single agent, planning, tool use | Deterministic Orchestration, Structured Reasoning, Skills Best Practices |
+| **L1: Foundational** | Single agent, planning, tool use | Deterministic Orchestration, Structured Reasoning, Skills Best Practices, DBS Skill Creation |
 | **L2: Self-Evolving** | Feedback loops, memory, optimization | Autoresearch, Codified Context, Proof Loop |
 | **L3: Collective** | Multi-agent coordination | Harness Design, Multi-Agent Decomposition, Managed Agents |
 | **Cross-cutting** | Security + Integrity | Supply Chain Defense, Agent Security, Documentation Integrity, Red Lines |
@@ -113,7 +115,7 @@ When a Claude Code session gets long, or you want to continue tomorrow on a diff
 - `write handoff`
 - `handoff this session`
 
-The agent writes `.claude/HANDOFF.md` with:
+The agent writes a handoff file to `.claude/handoffs/` (one file per session, collision-free) with:
 - What was the goal
 - What got done
 - **What did NOT work** (the most valuable part - prevents repeating dead ends)
@@ -146,7 +148,13 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Frontend | `frontend-design` | Production-grade interfaces, not template defaults |
 | Architecture | `harness-design` | Multi-agent patterns: Generator-Evaluator, Sprint Contracts |
 | iOS | `ios-development` | Swift, SwiftUI, UIKit, MVVM/TCA, Metal/GPU |
-| Writing | `humanize-english` | Transform AI text into natural prose |
+| Video | `product-meaning-extractor` | Deep product analysis: JTBD, StoryBrand, positioning, customer voice bank |
+| Video | `video-narrative-arc` | 5 narrative templates (10s-90s) with beat-by-beat timing and emotional arcs |
+| Video | `script-evaluator` | Score scripts on 6 dimensions, detect flatness patterns |
+| Video | `remotion-production-guide` | Complete Remotion reference: animations, springs, typography, 3D, export |
+| Video | `video-post-production` | FFmpeg patterns for audio, captions, color, platform export |
+| Writing | `humanize-english` | Transform AI text into natural English prose |
+| Writing | `humanize-russian` | Transform AI text into natural Russian prose |
 
 ---
 
@@ -180,14 +188,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 15 个架构原则、11 个对比方案、11 个技能、即用型 Hook 脚本和项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 17 个架构原则、12+ 对比方案、16 个技能、5 个即用型 Hook 脚本和 7 个项目模板。
 
 **核心功能:**
-- `principles/` - 15 个独立架构原则，每个解决一个具体失败模式
+- `principles/` - 17 个独立架构原则，每个解决一个具体失败模式
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 即用型 Hook 脚本（漂移检测、安全防护、会话交接）
-- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板
-- `skills/` - 领域技能（AI/ML、前端、iOS、代码审查）
+- `hooks/` - 5 个即用型 Hook 脚本（漂移检测、安全防护、会话交接）
+- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 记忆和项目编年史模板
+- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查）
 
 **安装:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` 或直接复制所需文件。
 
@@ -197,14 +205,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 15 архитектурных принципов, 11 сравнений подходов, 11 навыков, готовые hook-скрипты и шаблоны проектов.
+Система конфигурации для Claude Code агентов. 17 архитектурных принципов, 12+ сравнений подходов, 16 навыков, 5 hook-скриптов и 7 шаблонов.
 
 **Что внутри:**
-- `principles/` - 15 принципов, каждый предотвращает конкретный тип отказа
+- `principles/` - 17 принципов, каждый предотвращает конкретный тип отказа
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - готовые скрипты (валидация drift, защита от деструктивных команд, утечка секретов)
-- `templates/` - стартовые CLAUDE.md для web-app, ML, library проектов
-- `skills/` - доменные навыки (AI/ML, фронтенд, iOS, код-ревью)
+- `hooks/` - 5 готовых скриптов (валидация drift, защита от деструктивных команд, утечка секретов, handoff)
+- `templates/` - стартовые CLAUDE.md для web-app, ML, library + шаблоны memory и хроник
+- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью)
 
 **Установка:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` или копирование нужных файлов.
 

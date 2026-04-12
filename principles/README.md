@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 16 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 17 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -166,6 +166,16 @@ A condensed timeline per long-running project that captures decisions, pivots, r
 
 ---
 
+### [17 - DBS Skill Creation Framework](17-dbs-skill-creation.md)
+
+Split skill content into Direction (logic, decision trees -> SKILL.md), Blueprints (templates, taxonomies -> references/), and Solutions (deterministic code -> scripts/). Prevents monolithic SKILL.md files where logic, data, and code are mixed.
+
+**When to use:** Creating skills from research material. Structuring any complex skill with both reasoning and mechanical components.
+
+**Source:** @hooeem's NotebookLM integration guide (April 2026)
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -198,6 +208,7 @@ Use this table to pick the right principle for your situation:
 | "Long-running project lost its history" | 16 Project Chronicles | 07 Codified Context |
 | "Can't understand why past decisions were made" | 16 Project Chronicles | 05 Structured Reasoning |
 | "Need absolute prohibitions, not guidelines" | 15 Red Lines | 10 Agent Security |
+| "Skill is a monolithic wall of text" | 17 DBS Skill Creation | 08 Skills Best Practices |
 
 ### Composition Patterns
 
