@@ -59,6 +59,8 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 **For the agent (you):** When this repo is connected to your project, you get access to all principles and skills automatically. Use them as decision frameworks - when facing a choice (one agent vs many? how to verify? how to manage context?), check the relevant principle or alternative comparison.
 
+**New:** [HOW-IT-WORKS.md](HOW-IT-WORKS.md) - technical deep dive into how each technology actually works, with real measurements.
+
 **Structure:**
 - `principles/` - 17 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
