@@ -4,6 +4,20 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-14 (v2.3.4 - HOW-IT-WORKS expanded with 3 more deep-dives)
+
+### Added: Proof Loop, Autoresearch, Documentation Integrity sections in HOW-IT-WORKS.md
+
+The "humans-friendly technical deep-dive" file covered Rules, Memory, Handoffs, Hooks, KV-Cache, Context Fill, Chronicles, Skills, Supply Chain, and Multi-Session, but three of the most important principles had no technical explainer:
+
+- **Proof Loop** - why the agent cannot sign its own completion. Explains the 4-role protocol (Spec-freezer / Builder / Verifier / Fixer), fresh-session verification, durable artifacts vs claims, and the anti-fabrication verify-after-action rule.
+- **Autoresearch** - iterative self-optimization mechanics. Covers the 5-step READ-CHANGE-TEST-DECIDE-REPEAT loop, the 3 preconditions (numerical score / automated eval / single-file mutation), git-as-memory, guard mechanism with 3-6 binary assertions, CORAL heartbeat for stagnation, and HyperAgent upgrade path via Contree microVMs.
+- **Documentation Integrity** - how SessionStart hook catches drift before the agent acts on stale paths. Explains multi-strategy path resolution, the rule-vs-hook distinction ("rules are hopes, hooks are executions"), and the Rust compile-time analogy for why validation at session start beats post-failure detection.
+
+Each section follows the same structure as existing deep-dives: problem statement, mechanism, concrete details, links to the full principle file. Meant for readers who read README and thought "okay but HOW does this work mechanically?"
+
+---
+
 ## 2026-04-14 (v2.3.3 - Principle 18 coverage audit)
 
 ### Fixed: principle 18 was silently missing from most index files
