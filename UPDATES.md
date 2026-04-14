@@ -4,6 +4,30 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-14 (v2.3.1 - Handoff rule catches up with multi-session mode)
+
+### Fixed: `rules/session-handoff.md` was stuck on single-file `.claude/HANDOFF.md`
+
+The rule file still recommended the old single-file pattern even though:
+- `alternatives/session-handoff.md` already documented 5 approaches including multi-session
+- README (v2.2.2 audit) already mentioned `.claude/handoffs/` in handoff section
+- Both hooks (`session-handoff-check.py`, `session-handoff-reminder.py`) already support both formats
+- Principle 18 (added earlier today) explicitly invokes the multi-session invariant
+
+This left the main rule inconsistent with its own ecosystem. Now the rule:
+- Offers **two modes** up front: single-file (simpler, default for most users) vs multi-session (opt-in when parallel chats happen)
+- Gives clear switch criteria: "use multi-session only if you've actually hit last-writer-wins data loss"
+- Keeps both protocols side-by-side so a user can read whichever fits their workflow
+- References principle 18 for the architectural theory behind multi-session
+
+Updated files: `rules/session-handoff.md`, `README.md` (handoff section now shows the two-mode table).
+
+### Note: this repo is maintained separately from any internal workflow
+
+The skills/principles/rules here are a curated set meant to be copy-pasteable into any Claude Code project. Personal workflow evolutions (e.g. project-specific memory files, absolute paths, custom rules) are intentionally excluded. When an internal pattern proves itself and can be generalized, it gets ported here - but the round-trip is manual, not automatic. That's why the public rule lagged: the internal multi-session pattern evolved over weeks before the generalized version was ported.
+
+---
+
 ## 2026-04-14 (v2.3.0 - Multi-Session Coordination)
 
 ### Added: Principle 18 - Multi-Session Coordination
