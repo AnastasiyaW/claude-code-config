@@ -1,3 +1,8 @@
+---
+related_principles: [16, 18]
+last_reviewed: 2026-04-14
+---
+
 # Session Handoff: Seamless Transitions Between Sessions
 
 ## Problem

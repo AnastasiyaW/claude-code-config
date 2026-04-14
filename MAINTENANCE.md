@@ -49,10 +49,36 @@ python scripts/cross_reference_check.py
 python scripts/cross_reference_check.py --strict
 ```
 
-**What the script does NOT catch** (still manual):
-- Semantic inconsistency between a principle and a rule
-- Outdated trade-off tables (a principle added later may invalidate an alternative's "winner")
-- Links to concepts that should exist but don't (missing principle number in a recommendation)
+**Automated checks the script performs:**
+1. All markdown links resolve to existing files
+2. Principle numbering has no gaps or duplicates
+3. Text references to "principle N" resolve to an actual `principles/NN-*.md`
+4. Every principle is linked from at least one index (warning)
+5. Every hook is mentioned in README (warning)
+6. **Alternatives freshness** (warning) - if an `alternatives/*.md` declares `related_principles: [N, M]` + `last_reviewed: YYYY-MM-DD` in frontmatter, the script flags it when any of those principles was modified on a day after `last_reviewed`. Forces a re-audit before stale trade-off tables ship.
+7. **Anti-pattern propagation** (warning) - principles with `warns_against: [phrase1, phrase2]` frontmatter cause the script to grep rules/ and alternatives/ for those phrases and warn if they appear, catching cases where a new principle bans pattern X but an existing rule still recommends X.
+
+**Opt-in via frontmatter:** checks 6 and 7 are opt-in - a file is only audited when it declares the relevant frontmatter keys. Files without frontmatter are ignored. This lets the system grow as patterns mature, rather than forcing retrofit on day one.
+
+**Example frontmatter:**
+```yaml
+---
+related_principles: [16, 18]
+last_reviewed: 2026-04-14
+---
+```
+
+```yaml
+---
+warns_against: ["single file .claude/HANDOFF.md", "mock the database in integration tests"]
+---
+```
+
+**What the script still does NOT catch** (narrower scope than before):
+- Deep semantic inconsistency that isn't captured by any `warns_against` phrase - still needs a human read-through on new principle introduction
+- Trade-off tables that became outdated because the *ecosystem* shifted (not our own principle) - e.g. a competitor library improved. Requires external awareness, no file mtime signals it.
+
+Whenever you notice a class of drift the script missed, **add it as a new automated check** instead of leaving it in this "not caught" list. The goal is to shrink this list over time.
 
 ---
 
