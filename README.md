@@ -117,7 +117,7 @@ When a Claude Code session gets long, or you want to continue tomorrow on a diff
 - `write handoff`
 - `handoff this session`
 
-The agent writes a handoff file to `.claude/handoffs/` (one file per session, collision-free) with:
+The agent writes a handoff file with:
 - What was the goal
 - What got done
 - **What did NOT work** (the most valuable part - prevents repeating dead ends)
@@ -126,6 +126,15 @@ The agent writes a handoff file to `.claude/handoffs/` (one file per session, co
 - The single next step
 
 Then it stops. Close the chat. Open a new one in the same directory. The new session reads the handoff automatically (if you set up the `SessionStart` hook) or you can paste the file as your first message.
+
+**Two storage modes - pick one:**
+
+| Mode | When to use | Storage |
+|---|---|---|
+| **Single-file** (default, simpler) | One chat at a time | `.claude/HANDOFF.md` |
+| **Multi-session** (opt-in) | You run multiple Claude Code chats simultaneously on the same project | `.claude/handoffs/<unique>.md` + append-only `INDEX.md` |
+
+Single-file works for ~80% of users. Switch to multi-session only if you've actually hit last-writer-wins data loss from parallel chats. See [rule file](rules/session-handoff.md) for both protocols and [principle 18](principles/18-multi-session-coordination.md) for the theory behind the multi-session append-only invariant.
 
 **Why a phrase and not a button:** the trigger lives in `.claude/rules/session-handoff.md` as plain markdown. No plugin install, no settings file, no hook. Works in any Claude Code session immediately. This is essential for migrating *existing* sessions that were started before you configured anything.
 
