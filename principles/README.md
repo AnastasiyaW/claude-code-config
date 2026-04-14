@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 17 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 18 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -176,6 +176,16 @@ Split skill content into Direction (logic, decision trees -> SKILL.md), Blueprin
 
 ---
 
+### [18 - Multi-Session Coordination](18-multi-session-coordination.md)
+
+Pattern for coordinating shared state between parallel Claude Code sessions in the same workspace. Distinguishes append-only shared state (handoffs - per-session files, conflict-free) from mutable shared state (GPU/port/container locks - require heartbeats and stale-reclaim with external verification). Fills an ecosystem gap: isolation solutions are well-covered, live resource coordination is not.
+
+**When to use:** When multiple Claude Code chats run simultaneously on the same project and contend for the same resources (GPUs, ports, containers, exclusive write access). Not needed if you work one chat at a time.
+
+**Source:** Distributed systems coordination primitives (Chubby, ZooKeeper) + Anthropic Agent Teams + claude_code_agent_farm + Issues anthropics/claude-code#19364 and #29217 as cautionary data
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -209,6 +219,8 @@ Use this table to pick the right principle for your situation:
 | "Can't understand why past decisions were made" | 16 Project Chronicles | 05 Structured Reasoning |
 | "Need absolute prohibitions, not guidelines" | 15 Red Lines | 10 Agent Security |
 | "Skill is a monolithic wall of text" | 17 DBS Skill Creation | 08 Skills Best Practices |
+| "Parallel chats overwrite each other's handoffs" | 18 Multi-Session Coordination | 07 Codified Context |
+| "Multiple sessions fight over the same GPU/port" | 18 Multi-Session Coordination | 04 Deterministic Orchestration |
 
 ### Composition Patterns
 

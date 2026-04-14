@@ -102,6 +102,46 @@ def check_principle_numbering() -> list[str]:
     return errors
 
 
+def check_principle_count_claims() -> list[str]:
+    """Index files claiming 'N principles' must match the actual principle count."""
+    errors: list[str] = []
+    pdir = ROOT / "principles"
+    if not pdir.exists():
+        return errors
+    actual = sum(1 for p in pdir.glob("*.md") if p.name != "README.md")
+    # Match claims: "N principles", "N принципов", "N 个架构原则", "N 个独立架构原则"
+    claim_re = re.compile(
+        r"\b(\d+)\s*(principle[s]?|принципов|архитектурных принципов|"
+        r"个架构原则|个独立架构原则|battle-tested principle[s]?|"
+        r"standalone principle[s]?|architectural principle[s]?)\b",
+        re.IGNORECASE,
+    )
+    # UPDATES.md records historical counts that were accurate at the time -
+    # don't audit it for current-count consistency.
+    HISTORICAL = {"UPDATES.md"}
+    targets: list[Path] = []
+    for name in SCAN_ROOT_FILES:
+        if name in HISTORICAL:
+            continue
+        p = ROOT / name
+        if p.exists():
+            targets.append(p)
+    targets.append(ROOT / "principles" / "README.md")
+    for t in targets:
+        if not t.exists():
+            continue
+        text = t.read_text(encoding="utf-8", errors="replace")
+        for m in claim_re.finditer(text):
+            claimed = int(m.group(1))
+            if claimed != actual:
+                rel = t.relative_to(ROOT)
+                line_no = text[:m.start()].count("\n") + 1
+                errors.append(
+                    f"{rel}:{line_no}: claims '{m.group(0)}' but actual count is {actual}"
+                )
+    return errors
+
+
 def check_principle_coverage() -> list[str]:
     """Every principle file should be linked from README.md or principles/README.md."""
     warnings: list[str] = []
@@ -301,6 +341,9 @@ def main(argv: list[str]) -> int:
 
     # 3. Text references to principle numbers must resolve
     errors.extend(check_principle_number_references())
+
+    # 3b. Claims like "N principles" must match actual file count
+    errors.extend(check_principle_count_claims())
 
     # 4. Principle coverage (warning)
     warnings.extend(check_principle_coverage())

@@ -4,6 +4,34 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-14 (v2.3.3 - Principle 18 coverage audit)
+
+### Fixed: principle 18 was silently missing from most index files
+
+After adding principle 18 (Multi-Session Coordination) in v2.3.0, the counts and references across the repo lagged:
+
+- `README.md`: still said "17 principles" in 3 places (English heading, 中文 and Russian sections, Structure list), and the principle-by-problem bulleted list didn't include 18
+- `AGENTS.md`: referenced "17 principles"
+- `principles/README.md`: said "collection of 17 battle-tested principles", had no entry for principle 18 at all, and missed decision-matrix rows for multi-session scenarios
+- `HOW-IT-WORKS.md`: had no technical deep-dive section for the new principle, and the scripts table was missing the new cross-reference checker
+
+All fixed in this release. Principle 18 now appears:
+- Counted in all three language sections of README.md
+- Listed in the "What This Gives You" bulleted principle list
+- Full entry in `principles/README.md` with two decision-matrix rows
+- Technical section in `HOW-IT-WORKS.md` explaining append-only vs mutable shared state with the Anthropic `.claude.json` corruption incident as cautionary data
+- Brief mention in `CLAUDE.md` (global config summary)
+
+### Root cause
+
+When a principle is added, there is no automated check that "every principle is counted in every index". The `cross_reference_check.py` script catches broken links and numbering gaps, but a lagging count like "17" when the reality is 18 reads as valid prose. Added this class of drift as an open concern in MAINTENANCE.md red-flags section.
+
+Extended the script immediately with `check_principle_count_claims`: counts `principles/NN-*.md` files and greps index files (README, AGENTS, principles/README, CLAUDE, MAINTENANCE, HOW-IT-WORKS) for claims like "N principles" / "N принципов" / "N 个架构原则" / "N battle-tested principles" - any mismatch is an error. UPDATES.md is excluded because changelog entries record historical counts that were accurate at the time.
+
+Also added principle 18 sections to `HOW-IT-WORKS.md` (append-only vs mutable shared state explainer with the Anthropic #29217 incident as cautionary data) and `CLAUDE.md` (global config summary with convention-before-automation guidance).
+
+---
+
 ## 2026-04-14 (v2.3.2 - Maintenance infrastructure)
 
 ### Added: MAINTENANCE.md

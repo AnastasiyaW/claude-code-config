@@ -151,7 +151,7 @@ Watch for these in code review or self-review:
 - A rule references `<file>.md` that doesn't exist
 - A hook registers an event that doesn't exist in Claude Code current version
 - UPDATES.md mentions v2.N.M but no commit bumps version numbers anywhere
-- README.md counts don't match file counts (e.g. "17 principles" when `principles/` has 18)
+- README.md counts don't match file counts (e.g. claims "N principles" when the actual count differs). The `check_principle_count_claims` in `cross_reference_check.py` catches this automatically.
 - Dead link to an external GitHub repo that moved or archived
 
 The cross-reference check catches most of these mechanically. Pair with periodic human read-through.
