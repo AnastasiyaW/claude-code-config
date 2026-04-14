@@ -4,6 +4,39 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-14 (v2.3.2 - Maintenance infrastructure)
+
+### Added: MAINTENANCE.md
+
+Governance doc covering how this repo stays consistent with itself and in sync with personal/internal workflows. Six sections:
+
+1. **Rule audit on new principle** - re-read all rules when adding a principle, catch contradictions in the same PR (this is exactly the check that would have caught the principle-18 vs handoff-rule inconsistency fixed in v2.3.1)
+2. **Cross-reference check (automated)** - run `scripts/cross_reference_check.py` before commit
+3. **Bi-weekly sync checkpoint** - diff local `.claude/rules/` vs public `rules/`, classify each file as generalizable / local-only / already-ported
+4. **Local → public generalization workflow** - 9-step procedure for porting a pattern: strip project context, add prior art, place in right location, verify indexes, grep for personal data leakage
+5. **Versioning policy** - major/minor/patch definitions
+6. **Red flags** - drift indicators that warrant attention
+
+### Added: scripts/cross_reference_check.py
+
+Automated consistency check. Validates:
+- All markdown links resolve to existing files (principles, rules, hooks, templates, skills)
+- Principle numbering has no gaps or duplicates
+- Every principle is linked from at least one index file
+- Every hook is mentioned in README.md
+
+Skips fenced code blocks and inline code so illustrative examples aren't validated. Strict mode (`--strict`) promotes warnings to errors for CI.
+
+**First run result:** 4 false-positive "broken links" in `alternatives/memory-strategies.md` - links like `[rules](feedback_*.md)` inside a markdown code block showing how to format MEMORY.md entries. Fixed by adding code-block stripping to the script. All checks now pass.
+
+### Why this matters
+
+The principle-18-vs-handoff-rule inconsistency (fixed in v2.3.1) was caught by manual review only after commit. The user asked "why didn't we notice?" - because there was no mechanical check for it. The script catches link-level drift. The MAINTENANCE.md workflows catch semantic drift that still needs human reading.
+
+Neither alone is enough. Together they bound how far the repo can drift from its own claims.
+
+---
+
 ## 2026-04-14 (v2.3.1 - Handoff rule catches up with multi-session mode)
 
 ### Fixed: `rules/session-handoff.md` was stuck on single-file `.claude/HANDOFF.md`
