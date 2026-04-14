@@ -331,3 +331,20 @@ This reinforces the Context Engineering pipeline:
 ```
 rules -> state -> JIT retrieval -> pruning -> compaction policy -> re-inject -> isolation
 ```
+
+## Multi-Session Coordination -- When Parallel Chats Share a Workspace
+
+Source: Distributed systems coordination primitives + Anthropic Issues #19364 and #29217 (cautionary)
+
+**Problem:** Multiple Claude Code chats running on the same project contend for shared state (GPUs, ports, containers) or overwrite each other's handoffs.
+
+**Two types of shared state need two different mechanisms** -- mixing them loses data.
+
+- **Append-only** (handoffs, logs, findings): each session writes its own file with a unique name. Conflict-free by construction. Index file is append-only too -- never edit old lines.
+- **Mutable** (GPU/port/container ownership): exactly one session can hold the resource. Use a lock file per resource with a heartbeat timestamp. Before reclaiming a stale lock, verify externally (nvidia-smi, ps, lsof) that the process is dead.
+
+**Why not one shared table:** concurrent writes race on every update. Anthropic's own `.claude.json` hit this bug -- 8+ reports of corruption from concurrent writes, hotfixed in v2.1.61. Per-resource files keep the conflict window tiny.
+
+**Convention before automation:** document the protocol in `.claude/rules/`, follow it manually. Only add a hook once a repetitive pattern stabilizes -- regex-based auto-detection of SSH/docker commands becomes a tarpit.
+
+**Most users do not need this.** If you run one chat at a time, single-file `.claude/HANDOFF.md` is enough. Switch only after hitting last-writer-wins data loss.

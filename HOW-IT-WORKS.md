@@ -393,6 +393,41 @@ exclude-newer = "7 days"
 
 ---
 
+## Multi-Session Coordination: When Parallel Chats Share a Workspace
+
+**The problem:** You open two Claude Code chats in the same project. Chat 1 starts training a model on GPU 2. Chat 2, not knowing, starts its own training on GPU 2. One crashes with an out-of-memory error. Or worse: both save their handoff to `.claude/HANDOFF.md` and the later one silently wipes the earlier one.
+
+**The mechanism:** Two different kinds of shared state need two different mechanisms, and mixing them loses data.
+
+**Type 1 - Append-only (handoffs, logs, findings):** each session writes its own file with a unique name. No session ever reads-then-writes another session's file. Conflict-free by construction.
+```
+.claude/handoffs/
+  2026-04-09_14-32_373d1618.md    # chat 1
+  2026-04-09_15-01_b858f500.md    # chat 2
+  INDEX.md                         # append-only log of who wrote what
+```
+
+**Type 2 - Mutable (GPU/port/container ownership):** exactly one session can hold the resource. Others must see "taken" and back off. Uses a lock file per resource with a heartbeat timestamp.
+```
+.claude/locks/
+  gpu_host-a_3.lock    # session_id, task, started, heartbeat
+```
+
+**Why not one shared table for both:** two sessions editing one file race on every write. Anthropic's own `.claude.json` hit this exact bug - 8+ reports of corrupted state from concurrent writes, hotfixed in v2.1.61. Per-resource files keep the conflict window tiny.
+
+**Take protocol for a lock:**
+1. Check if the lock file exists and heartbeat is fresh (< N hours ago)
+2. If stale, verify the process is actually dead before reclaiming (nvidia-smi, ps, lsof)
+3. Write the lock file with your session_id and started timestamp
+4. Update heartbeat every 30-60 min while working
+5. On release: `rm` the file and verify it's gone
+
+**When this matters:** only if you run multiple Claude Code chats simultaneously on the same project. Most users work one chat at a time - they need nothing beyond a single `.claude/HANDOFF.md`. The multi-session mode is opt-in, documented in the [handoff rule](rules/session-handoff.md) and the [principle](principles/18-multi-session-coordination.md).
+
+**Ecosystem context:** isolation solutions (git worktrees, sandboxes, Anthropic Agent Teams) are well-covered. Shared-state coordination across interactive chats is a gap - [Issue #19364](https://github.com/anthropics/claude-code/issues/19364) proposed a `session.lock` primitive but it is not implemented. The principle fills this gap using 40-year-old distributed-systems patterns (heartbeats, canonical resource names, append-only logs).
+
+---
+
 ## All Scripts in This Repo
 
 | Script | What It Measures | Run |
@@ -400,6 +435,7 @@ exclude-newer = "7 days"
 | [`kvcache_stats.py`](scripts/kvcache_stats.py) | KV-cache hit rate, cost savings | `python scripts/kvcache_stats.py --days 7` |
 | [`context_degradation.py`](scripts/context_degradation.py) | Context fill vs quality metrics | `python scripts/context_degradation.py --days 14` |
 | [`validate_config.py`](scripts/validate_config.py) | Broken file references in configs | `python scripts/validate_config.py` |
+| [`cross_reference_check.py`](scripts/cross_reference_check.py) | Internal consistency: links, numbering, anti-pattern leaks | `python scripts/cross_reference_check.py` |
 
 ---
 
