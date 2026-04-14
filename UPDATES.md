@@ -4,6 +4,31 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-14 (v2.3.0 - Multi-Session Coordination)
+
+### Added: Principle 18 - Multi-Session Coordination
+
+Pattern for coordinating state between parallel Claude Code sessions that share a single workspace. Addresses a real gap in the ecosystem: isolation solutions (worktrees, sandboxes, Agent Teams) are well-covered, but live shared-state resource locks are not.
+
+- `principles/18-multi-session-coordination.md` - full pattern:
+  - Two types of shared state: append-only (handoffs) vs mutable (locks) require different mechanisms
+  - Lock-file pattern with heartbeats + external stale verification
+  - Convention-first evolution (hooks come later, when patterns stabilize)
+  - Per-resource files (not one shared table) to minimize conflict windows
+  - Take / Heartbeat / Release protocol with anti-fabrication verify-after-delete
+  - Prior art table: Anthropic Agent Teams, claude_code_agent_farm, parallel-cc, Kmux, issue #19364 (proposed session.lock), issue #29217 (`.claude.json` concurrent-write corruption - cautionary data)
+  - Why this is a 40-year-old distributed systems problem: translate, don't invent
+
+**Key design decisions:**
+- Canonical resource names (`<server>_gpu<N>.lock`) - one resource = one file name, no variants
+- Heartbeat obligatory for long tasks (>2h); stale reclaim requires external process verification before taking over
+- INDEX.md is append-only (log of TAKE/HEARTBEAT/RELEASE events), lock files are the single source of current state
+- Session identity via short task name or session-id prefix, not globally unique UUIDs
+
+**Maturity level:** L2 (Self-Evolving) - live state that accumulates within and across sessions.
+
+---
+
 ## 2026-04-12 (v2.2.2 - Freshness audit)
 
 ### Fixed: Principle numbering conflict (two #12s)
