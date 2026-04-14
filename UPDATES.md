@@ -27,13 +27,26 @@ Automated consistency check. Validates:
 
 Skips fenced code blocks and inline code so illustrative examples aren't validated. Strict mode (`--strict`) promotes warnings to errors for CI.
 
-**First run result:** 4 false-positive "broken links" in `alternatives/memory-strategies.md` - links like `[rules](feedback_*.md)` inside a markdown code block showing how to format MEMORY.md entries. Fixed by adding code-block stripping to the script. All checks now pass.
+**First run result:** 4 real broken links in `alternatives/memory-strategies.md` - inside a markdown code block showing MEMORY.md entry format, pattern examples used markdown link syntax with placeholder filenames (e.g. square-brackets-text-parens-placeholder-md) that didn't resolve to any real file. Even though the enclosing code block made them illustrative, the syntax was misleading: a reader skimming the doc could assume these were real links, and anyone copying the template into their own MEMORY.md would inherit broken links. Fixed by dropping the link syntax for pattern examples (plain `pattern_NAME.md` text). All checks now pass.
 
 ### Why this matters
 
 The principle-18-vs-handoff-rule inconsistency (fixed in v2.3.1) was caught by manual review only after commit. The user asked "why didn't we notice?" - because there was no mechanical check for it. The script catches link-level drift. The MAINTENANCE.md workflows catch semantic drift that still needs human reading.
 
 Neither alone is enough. Together they bound how far the repo can drift from its own claims.
+
+### Follow-up: expanded script to shrink the "not caught" list
+
+The original script left three classes of drift to humans: semantic contradictions, outdated trade-off tables, and broken concept references. That framing was wrong - automation should handle everything it can.
+
+Added checks:
+- **Principle number references** (error): text mentions of "principle N" must resolve to an actual `principles/NN-*.md` file, not a hallucinated number
+- **Alternatives freshness** (warning): opt-in via `related_principles: [N, M]` + `last_reviewed: YYYY-MM-DD` frontmatter. Flags when any referenced principle was modified on a day after the review date. Compares at date precision to avoid same-day false positives.
+- **Anti-pattern propagation** (warning): opt-in via `warns_against: [phrase, phrase]` frontmatter on principles. Greps rules/ and alternatives/ for those phrases and warns if they appear - catches cases where a new principle bans X but existing rules still recommend X.
+
+Applied frontmatter to `alternatives/session-handoff.md` as first adopter. Future alternatives should follow the same pattern. MAINTENANCE.md section 2 updated to document all 7 checks and the opt-in frontmatter format.
+
+The "not caught" list is now two items (deep semantics without warns_against phrases, ecosystem shifts external to the repo) instead of three. Every new drift class observed in the future should be added as an automated check rather than left to humans.
 
 ---
 

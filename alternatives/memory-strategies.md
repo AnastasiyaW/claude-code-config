@@ -64,12 +64,12 @@ Extraction-based системы (Mem0, Zep) = ~85%. Разница = 11.6%.
 Layered loading через MEMORY.md:
 ```markdown
 ## Always Load (L0+L1)
-- [user_profile](user_profile.md) — identity
-- [rules](feedback_*.md) — критичные правила
+- user_profile.md — identity
+- feedback_*.md — критичные правила
 
 ## On Demand (L2+L3)
-- [projects](project_*.md) — загружать когда тема релевантна
-- [articles](article_*.md) — справочно
+- project_*.md — загружать когда тема релевантна
+- article_*.md — справочно
 ```
 
 ### С vector DB (для >200 memory записей)
