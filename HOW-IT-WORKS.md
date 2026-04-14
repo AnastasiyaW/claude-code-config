@@ -365,6 +365,100 @@ skills/ai-ml/flux2-lora-training/
 
 ---
 
+## Proof Loop: Why the Agent Cannot Sign Its Own Completion
+
+**The problem:** Ask an LLM "did you finish?" and it will say yes. Models are trained to be agreeable and to produce plausible outputs; they hallucinate completions confidently. When an agent writes tests AND runs them AND judges the result, the error modes compound - a bug in the test is invisible to the same mind that wrote the bug.
+
+**The mechanism:** a rigid execution protocol where **completion requires durable artifacts that a fresh session verifies** - not the agent's own claim. Four roles with hard boundaries:
+
+1. **Spec-freezer** reads the repo and freezes acceptance criteria (AC1, AC2, ...) before any code is written. Does not touch code.
+2. **Builder** implements the minimal safe changeset, then **switches to read-only mode** and collects evidence: test outputs, logs, benchmark results. All artifacts live in the repo at `.agent/tasks/<task-id>/evidence/`.
+3. **Verifier** runs in a **fresh session** that never saw the build process. Reads the current repo state + evidence, writes `verdict.json` (PASS or FAIL per AC).
+4. **Fixer** reads `problems.md` from a failed verdict and makes minimal corrections. Cannot sign final approval - that goes back to the Verifier.
+
+The loop repeats: `spec freeze → build → evidence → fresh verify → fix → verify again` until every AC is PASS.
+
+**Why "fresh session" matters:** context poisoning is real. If the same agent that wrote the code evaluates it, shared context biases the evaluation. A fresh session sees only `evidence/*.json`, `test-output.log`, the commit diff - not the reasoning that produced the code. It can only judge what is **observable**.
+
+**Durable artifacts, not claims:** "the tests pass" is a claim. `pytest-output.log` showing `15 passed in 3.42s` is an artifact. Always prefer the artifact; never let a claim substitute for one.
+
+**When to use:** any task where "works on my machine" is not acceptable. Critical deployments. Multi-agent handoffs. Audit-trail requirements.
+
+**Anti-fabrication extension:** after destructive actions (deleting a file, releasing a lock, dropping a table), **verify the action completed** - don't trust the shell's exit code. `rm file; ls file` - if `ls` finds it, the delete didn't happen, regardless of what `rm` returned. See [principle 02](principles/02-proof-loop.md) for the full protocol.
+
+---
+
+## Autoresearch: Iterative Self-Optimization Without a Human in the Loop
+
+**The problem:** You have an artifact with a measurable score - a prompt with a pass rate, a SQL query with a latency, a bundle with a byte count. You want to improve it. The classical approach is "think hard, edit, re-test." This is slow, subjective, and does not compose with automation.
+
+**The mechanism:** a mechanical loop that treats optimization as a search problem.
+
+```
+1. READ   - load the current artifact + its score
+2. CHANGE - mutate exactly one thing (single-variable experiment)
+3. TEST   - run the evaluation script, get a new score
+4. DECIDE - keep if better, discard (git revert) if worse
+5. REPEAT - until convergence or budget exhausted
+```
+
+Three conditions must hold for this to work:
+1. **Numerical scoring** - subjective "better" is not computable. Convert to a number.
+2. **Automated evaluation** - a human in the loop defeats the point.
+3. **Single-file mutation** - one artifact changes at a time, so causality is unambiguous.
+
+**Git as memory:** every experiment is a commit (`experiment: X → Y, score 0.82 → 0.87`). Successful experiments stay; failed ones get `git revert`. The commit log becomes the optimization history.
+
+**Guard mechanism:** two checks per iteration:
+- **Verify** - did the target metric actually improve?
+- **Guard** - did nothing else break? (re-run the full test suite, check no regression elsewhere)
+
+**3-6 binary assertions in the guard:** fewer than 3 and the agent finds loopholes (optimize the metric by breaking something uncaught); more than 6 and the agent games the checklist instead of genuinely improving.
+
+**CORAL heartbeat for stagnation:** if 5 consecutive iterations don't improve the score, the protocol **forces a strategy pivot** instead of grinding. The agent writes what it learned, reassesses the mutation space, tries a different direction. Without this, autoresearch degenerates into infinite local-minimum thrashing.
+
+**HyperAgent upgrade path:** for bigger budgets, replace the linear loop with a **version graph** - branch experiments in parallel, later `select_next_parent` to continue from the best branch. Execution infrastructure for this: Contree microVMs give immutable `result_image` UUIDs as version graph nodes, `disposable=false` saves branches, parallel `wait=false` calls explore 3-5 mutations simultaneously.
+
+**Cost at typical scale:** ~$0.10 per iteration. $5-25 per overnight run (50-100 experiments). Cheap enough to let it run on any artifact with a scriptable score. See [principle 03](principles/03-autoresearch.md) for the full protocol.
+
+---
+
+## Documentation Integrity: Catching Drift Before the Agent Acts on It
+
+**The problem:** CLAUDE.md says "run `foo.py` for the benchmark." A month later, `foo.py` was renamed to `benchmark.py`. The agent reads CLAUDE.md, tries to run `foo.py`, fails. Or worse - guesses confidently based on the now-stale reference. This failure mode compounds: for a human, "oh right, it's `benchmark.py` now" is a two-second correction; for an agent following stale docs as ground truth, it's a confidently wrong execution.
+
+**The mechanism:** a SessionStart hook that validates every file reference in config before the agent reads them.
+
+```
+Session starts
+  ↓
+Hook: scripts/validate_config.py runs
+  ↓
+Scan CLAUDE.md + .claude/rules/*.md for file paths
+  ↓
+For each path: does it exist? (multi-strategy lookup)
+  ↓
+Print drift report to stdout
+  ↓
+Harness injects report into agent context
+  ↓
+Agent now knows which references are stale BEFORE acting on them
+```
+
+**Multi-strategy path resolution:** the script distinguishes real paths (absolute, `~/`, multi-segment like `scripts/validate_config.py`) from conceptual mentions (a bare `foo.py` in prose). For real paths, it tries resolution against: the file's own directory → relative to cwd → known workspace roots. This avoids false positives on illustrative mentions while catching actual stale pointers.
+
+**Rule vs Hook distinction - important:**
+- **Rule:** instruction in markdown, lives in the system prompt. The agent "should" follow it. Under context pressure it may be forgotten.
+- **Hook:** shell process triggered on an event. Runs **every time**, no exceptions.
+
+If you need a guarantee that X happens when Y occurs, it has to be a hook. Rules are hopes; hooks are executions. Documentation validation is too important to leave to hope, so it is a hook.
+
+**Why at session start, not after failure:** the Rust analogy applies. Memory errors can be caught at runtime (crash + fix + retry) or at compile time (program won't build). The session start check is the compile-time version - drift is detected **before** the agent commits to an action based on stale info. Post-hoc detection would already mean the agent burned tokens and confused its own reasoning.
+
+**Ships working:** `scripts/validate_config.py` + `hooks/session-drift-validator.py`. Drop both into a project, wire the hook in `~/.claude/settings.json`, and drift reports start appearing automatically. See [principle 11](principles/11-documentation-integrity.md) for setup.
+
+---
+
 ## Supply Chain Defense: One Line That Blocked a Nation-State Attack
 
 **The mechanism:** One configuration line:
