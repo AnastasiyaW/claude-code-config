@@ -42,6 +42,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 | [secret-leak-guard](hooks/secret-leak-guard.py) | `PreToolUse` | Prevents committing API keys, tokens, passwords |
 | [session-handoff-reminder](hooks/session-handoff-reminder.py) | `Stop` | Reminds to write handoff before closing long sessions |
 | [session-handoff-check](hooks/session-handoff-check.py) | `SessionStart` | Shows recent handoffs from previous sessions |
+| [stop-phrase-guard](hooks/stop-phrase-guard.py) | `Stop` | Detects behavioral-regression phrases (ownership dodging, permission-seeking, premature stopping) |
 
 **Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md).
 
@@ -54,6 +55,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 | [Iterative optimization](alternatives/optimization.md) | Autoresearch, HyperAgent, Manual, Eval-driven |
 | [Context in long sessions](alternatives/context-management.md) | JIT Loading, Full Context Upfront, Compaction, Fresh Sessions |
 | [Session transitions](alternatives/session-handoff.md) | Manual HANDOFF.md, Auto hooks, Session Journal, ContextHarness, Memory |
+| [Reasoning-quality regression](alternatives/reasoning-regression-debugging.md) | Config reset, Stop-phrase guard, Metric monitoring, Fresh-session A/B, Proof Loop |
 
 ---
 

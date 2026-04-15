@@ -4,6 +4,43 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-15 (v2.5.0 - Reasoning regression debugging)
+
+### Added: alternatives/reasoning-regression-debugging.md
+
+Full playbook for detecting and mitigating agent reasoning-quality regression. Based on the Stella Laurenzo (AMD) investigation of the Feb-Apr 2026 Claude Code degradation ([issue #42796](https://github.com/anthropics/claude-code/issues/42796)), which analyzed 6,852 sessions and Boris Cherny's Hacker News response with official workarounds.
+
+Five approaches compared:
+- **A: Config reset** - `CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=1`, `MAX_THINKING_TOKENS=32000`, `/effort high`/`max`, `ULTRATHINK` keyword, settings.json options
+- **B: Stop-phrase guard hook** - blocks session end on five phrase categories (ownership dodging, permission-seeking, premature stopping, known-limitation labeling, session-length excuses)
+- **C: Metric monitoring** - weekly Read:Edit ratio, Research:Mutation ratio, Edits-without-prior-Read %, loop rate, user-interrupt rate, write%
+- **D: Fresh-session A/B** - minimal-context comparison to isolate vendor vs user-side regression
+- **E: Proof Loop** (principle 02) - structural immunity to regression via fresh-session verifier
+
+Full effort scale reference (0/30/85/95/100), complete list of environment variables and settings.json options, phrase categories with representative patterns, decision matrix for when to use which approach.
+
+### Added: hooks/stop-phrase-guard.py
+
+Implements approach B from the alternatives doc. Scans the final assistant message from the Stop hook's transcript input against five regex-grouped phrase categories. Uses meta-discussion markers to suppress false positives on legitimate anti-pattern references. Touches `.claude/.stop-phrase-guard-fired` marker to avoid re-blocking same session.
+
+### Added: scripts/reasoning_metrics.py
+
+Computes all six regression metrics from `~/.claude/projects/*.jsonl` session files. Supports `--days N` lookback, `--project` filter, `--json` / `--csv` output modes, per-session plus median-aggregated summary with healthy/transition/degraded status flags.
+
+**First-run validation:** when run against our own last 7 days of sessions, the script produced Read:Edit ratio = 2.0 (exact number from the AMD investigation's degraded population), Research:Mutation = 1.05, Write% = 42.9%. The tool works and confirms the regression is affecting our own workflow. Remediation via approach A applies.
+
+### Updated: principle 02 (Proof Loop) - added regression case study
+
+The principle now includes a "Why this matters: the April 2026 regression case study" subsection explaining why Proof Loop is structurally immune: the fresh-session verifier does not care whether the builder's reasoning was sharp, only whether evidence proves the AC. Output quality becomes bounded by the spec, not by the model's current capacity. Cross-links to the new alternatives doc for cases where full Proof Loop is too heavy.
+
+### Updated: indexes
+
+- `README.md`: added stop-phrase-guard to hooks table, added reasoning-quality-regression to alternatives table
+- `HOW-IT-WORKS.md`: added reasoning_metrics.py to scripts table
+- `hooks/README.md`: added session-handoff-check and stop-phrase-guard to Session Management table with full descriptions
+
+---
+
 ## 2026-04-15 (v2.4.0 - Inter-Agent Communication principle)
 
 ### Added: Principle 19 - Inter-Agent Communication
