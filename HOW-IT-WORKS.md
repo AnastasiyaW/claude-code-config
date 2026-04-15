@@ -574,6 +574,7 @@ exclude-newer = "7 days"
 | [`context_degradation.py`](scripts/context_degradation.py) | Context fill vs quality metrics | `python scripts/context_degradation.py --days 14` |
 | [`validate_config.py`](scripts/validate_config.py) | Broken file references in configs | `python scripts/validate_config.py` |
 | [`cross_reference_check.py`](scripts/cross_reference_check.py) | Internal consistency: links, numbering, anti-pattern leaks | `python scripts/cross_reference_check.py` |
+| [`reasoning_metrics.py`](scripts/reasoning_metrics.py) | Read:Edit ratio, loop rate, behavioral metrics from session JSONLs | `python scripts/reasoning_metrics.py --days 7` |
 
 ---
 

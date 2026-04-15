@@ -10,6 +10,14 @@ The Proof Loop pattern ensures that AI agents cannot self-certify task completio
 
 **Core principle:** Next-state signals are universal proof. Test results, tool outputs, user reactions -- these are all verification evidence. An agent cannot simply declare completion; it must produce artifacts that an independent party can verify.
 
+### Why this matters: the April 2026 regression case study
+
+Between February and April 2026, Claude Code underwent a quiet reasoning-quality regression: the ratio of `Read` calls to `Edit` calls dropped from 6.6 to 2.0 across 6,852 analyzed sessions. Agents stopped exploring code before modifying it. Edits-without-prior-Read rose from 6.2% to 33.7%. This was only visible because [one investigator](https://github.com/anthropics/claude-code/issues/42796) measured it with rigor - most users felt "something was off" but couldn't articulate what.
+
+The Proof Loop pattern is structurally **immune** to this class of regression: the fresh-session verifier does not care whether the builder's reasoning was sharp, only whether the evidence proves every acceptance criterion. A regressed agent produces broken code; the verifier writes `verdict: FAIL`; the fixer iterates. Output quality is bounded by the spec, not by the model's current capacity.
+
+Vendor-side regressions are inevitable across any agent's lifetime. Make correctness **structural** rather than depending on the model being sharp on any given day. See [alternatives/reasoning-regression-debugging.md](../alternatives/reasoning-regression-debugging.md) for detection and mitigation approaches when you cannot afford full Proof Loop everywhere.
+
 ---
 
 ## Execution Protocol
