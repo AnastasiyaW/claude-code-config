@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 18 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 19 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -186,6 +186,16 @@ Pattern for coordinating shared state between parallel Claude Code sessions in t
 
 ---
 
+### [19 - Inter-Agent Communication](19-inter-agent-communication.md)
+
+Directed asynchronous messaging between parallel Claude sessions using classical email semantics (inbox-per-recipient, threading via in-reply-to, sent folder as audit trail, delivery receipts, filter rules). Complements principle 18: where 18 covers shared-state ownership (nouns - who holds what), 19 covers directed messaging (verbs - who tells whom). Two coordination axes × two primitives: shared state can be broadcast (handoffs) or exclusive (locks); messages can be broadcast (`mailbox/all/`) or directed (`mailbox/<name>/`).
+
+**When to use:** When one session needs to address a specific other session with a question, task, or architecture decision. Not needed for simple broadcast announcements (use handoffs) or for resource claims (use locks).
+
+**Source:** 40+ years of SMTP/IMAP semantics, aydensmith/mclaude, retouch-app production deployment with 3 named agents
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -221,6 +231,9 @@ Use this table to pick the right principle for your situation:
 | "Skill is a monolithic wall of text" | 17 DBS Skill Creation | 08 Skills Best Practices |
 | "Parallel chats overwrite each other's handoffs" | 18 Multi-Session Coordination | 07 Codified Context |
 | "Multiple sessions fight over the same GPU/port" | 18 Multi-Session Coordination | 04 Deterministic Orchestration |
+| "One chat needs to ask another a specific question" | 19 Inter-Agent Communication | 18 Multi-Session Coordination |
+| "Need to broadcast an architectural decision to all running sessions" | 19 Inter-Agent Communication | 07 Codified Context |
+| "Sender wants to know if recipient actually processed the message" | 19 Inter-Agent Communication | 02 Proof Loop |
 
 ### Composition Patterns
 

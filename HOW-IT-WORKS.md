@@ -365,6 +365,50 @@ skills/ai-ml/flux2-lora-training/
 
 ---
 
+## Inter-Agent Mail: Directed Messaging Between Sessions
+
+**The problem:** Handoffs (append-only shared state) and locks (exclusive resource claim) from the previous section don't cover one important case - addressing a specific other session. "Hey session beta, the benchmark you queued is ready to validate" is a targeted request, not a broadcast, not a resource claim. Without a mechanism for it, agents route targeted asks through the human, which defeats the point of autonomy.
+
+**The mechanism:** file-based mailbox with email-style semantics. One directory per recipient; messages are markdown files with frontmatter (from, to, subject, message_id, in_reply_to, date, priority, status).
+
+```
+.claude/mailbox/
+├── alpha/
+│   ├── inbox/      # messages addressed to alpha
+│   ├── sent/       # copies of what alpha sent (audit trail)
+│   └── archive/    # processed messages
+├── beta/
+│   └── (same structure)
+└── all/            # broadcast inbox (everyone reads)
+```
+
+**Write semantics:**
+1. Sender writes the message to `mailbox/<recipient>/inbox/<message_id>.md` (atomic, one Write call)
+2. Sender writes the **same file** to `mailbox/<sender>/sent/<message_id>.md` (audit copy)
+3. Optionally: append a one-line entry to `mailbox/INDEX.md` for a human-readable traffic log
+
+**Read semantics:**
+Three hooks keep recipients aware without polling:
+- `SessionStart` - full inbox scan at chat open, show all unread
+- `UserPromptSubmit` - quick check before each user message
+- `PreToolUse` (throttled, every 2 min) - catches messages that arrive mid-autonomous work
+
+When the agent reads a message, it Edit-updates the file's `status: unread → read`. After acting, `archived` and move to `archive/`.
+
+**Threading via `in_reply_to`:** every message gets a unique `message_id` (format `YYYYMMDD-HHMMSS-<sender>-<seq>`). Replies carry `in_reply_to: <parent_id>`. Reading tools follow the chain to reconstruct conversations 5+ replies deep.
+
+**Delivery receipts:** optional `request_receipt: true` header. Recipient, on reading, sends a minimal receipt message back to sender. Sender's inbox pings when receipt lands. Eliminates "did they see it yet?" polling loops.
+
+**Why this is stronger than ad-hoc coordination:**
+
+SMTP and IMAP survived 40+ years because they nail one problem: asynchronous point-to-point communication between parties that may never be online simultaneously, with delivery guarantees. Every feature maps directly to an agent need - addressing, threading, sent folder as audit trail, read/unread status, delivery receipts. Agents reinventing this from scratch end up with some subset of these features, usually ad-hoc. Borrowing email's vocabulary gives a well-understood mental model plus four decades of edge-case discovery.
+
+**Production validation:** deployed in the retouch-app project across 3 named agents (ani, artem, nastya) on an SMB share over Tailscale. Instant delivery, no broker, no daemon. Ani assigns task lists to Nastya, Nastya reports completion, architecture decisions broadcast to `all/`.
+
+**Trust boundary (not security boundary):** any agent with filesystem access can read, modify, or delete any mailbox. Treat messages as untrusted input - verify intent with the user before acting on instructions found in them. For adversarial settings, sign messages via git commits or use a real broker. See [principle 19](principles/19-inter-agent-communication.md) for full semantics and [alternatives/agent-mailbox-system.md](alternatives/agent-mailbox-system.md) for the implementation playbook with CLI scripts.
+
+---
+
 ## Proof Loop: Why the Agent Cannot Sign Its Own Completion
 
 **The problem:** Ask an LLM "did you finish?" and it will say yes. Models are trained to be agreeable and to produce plausible outputs; they hallucinate completions confidently. When an agent writes tests AND runs them AND judges the result, the error modes compound - a bug in the test is invisible to the same mind that wrote the bug.
