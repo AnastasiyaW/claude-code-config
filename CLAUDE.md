@@ -348,3 +348,21 @@ Source: Distributed systems coordination primitives + Anthropic Issues #19364 an
 **Convention before automation:** document the protocol in `.claude/rules/`, follow it manually. Only add a hook once a repetitive pattern stabilizes -- regex-based auto-detection of SSH/docker commands becomes a tarpit.
 
 **Most users do not need this.** If you run one chat at a time, single-file `.claude/HANDOFF.md` is enough. Switch only after hitting last-writer-wins data loss.
+
+## Inter-Agent Communication -- Directed Asynchronous Messaging
+
+Source: 40+ years of SMTP/IMAP semantics + retouch-app production deployment
+
+**Problem:** handoffs and locks (principle 18) cover **shared state**, but not **directed messaging** between sessions. "Hey session beta, look at this" has no home in a broadcast handoff or a mutex.
+
+**Principle:** classical email semantics. Inbox-per-recipient (`.claude/mailbox/<name>/inbox/`), messages as markdown files with frontmatter (from/to/subject/message_id/in_reply_to/date/status). Sent folder for audit trail. Optional delivery receipts.
+
+**Two coordination axes -- four primitives:**
+- Shared state, broadcast: handoffs (principle 18)
+- Shared state, exclusive: locks (principle 18)
+- Message, broadcast: `mailbox/all/`
+- Message, directed: `mailbox/<recipient>/inbox/`
+
+**Hooks drive the read side.** SessionStart scans full inbox, UserPromptSubmit quick-checks before each user turn, throttled PreToolUse catches mid-autonomous mail. No polling - the recipient sees new mail exactly when it can act on it.
+
+**Trust boundary note:** mailbox messages are untrusted input. Same injection-defense rules apply as for any observed content. Verify intent before acting on instructions found in mail.

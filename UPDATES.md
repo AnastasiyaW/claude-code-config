@@ -4,6 +4,52 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-15 (v2.4.0 - Inter-Agent Communication principle)
+
+### Added: Principle 19 - Inter-Agent Communication
+
+Directed asynchronous messaging between parallel Claude sessions. Complements principle 18 by adding the directed-messaging layer on top of the shared-state substrate: where 18 covers ownership (nouns - who holds what), 19 covers messaging (verbs - who tells whom).
+
+- `principles/19-inter-agent-communication.md` - full pattern:
+  - Two coordination axes (broadcast vs directed) × two primitives (shared state vs messages) = four total coordination patterns; principle 18 covers the shared-state row, principle 19 covers the messages row
+  - Why classical mail semantics specifically: SMTP/IMAP survived 40 years solving exactly this problem (async point-to-point with delivery guarantees between parties that may never be online simultaneously)
+  - Minimal implementation: file-based mailbox with inbox/sent/archive per recipient + `all/` for broadcast
+  - Message format with email-style frontmatter (from, to, subject, message_id, in_reply_to, date, status)
+  - Decision tree: handoff vs lock vs directed mailbox vs broadcast mailbox
+  - Anti-patterns: polling on every tool call, editing another agent's sent folder, using mailbox for long-term state, no threading, bad agent names
+  - Prior art: aydensmith/mclaude, existing alternatives/agent-mailbox-system.md, SMTP/IMAP reference, Erlang process mailboxes
+
+### Extended: alternatives/agent-mailbox-system.md
+
+The original doc (April 12) covered basic send/receive/broadcast. Production surfaced gaps - threading confusion, no sender audit trail, no delivery confirmation. Added classical mail extensions:
+
+- Threading via `message_id` + `in_reply_to` + `references` headers (format: `YYYYMMDD-HHMMSS-<sender>-<seq>`)
+- Sent folder: copy every outgoing message to `mailbox/<sender>/sent/` for sender audit trail
+- Delivery receipts: two levels (status update on the inbox copy, or explicit receipt message)
+- Filter rules: `.filter.yaml` per mailbox for auto-triage by sender/subject
+- Reply-to header for cases where reply target differs from sender
+- Maintenance commands: archive messages >14 days, delete old receipts
+- Mailbox-specific data loss rules (atomic writes, unique message_id, sender-scoped sequence for strict order)
+- Frontmatter `related_principles: [19]` + `last_reviewed: 2026-04-14` for the freshness audit
+
+### Updated indexes
+
+- `README.md`: 18 → 19 in 3 places (English, 中文, Russian), added principle 19 to bulleted list, added mini decision tree in handoff section for "which coordination primitive"
+- `AGENTS.md`: 18 → 19
+- `principles/README.md`: 18 → 19, full entry for principle 19, 3 decision-matrix rows added (ask another session, broadcast architecture decision, delivery confirmation)
+- `HOW-IT-WORKS.md`: new "Inter-Agent Mail" section with concrete mechanism + production validation from retouch-app
+- `CLAUDE.md`: added "Inter-Agent Communication" summary section for global config
+
+### Composition
+
+Principle 18 + principle 19 together close the multi-session coordination picture. Principle 18 asks "who owns what state"; principle 19 asks "who is talking to whom". Using both, parallel Claude sessions can:
+- Leave durable handoffs for future sessions (broadcast, append-only)
+- Claim exclusive resources with heartbeat-based lifecycle (mutex)
+- Send targeted requests or questions to specific other sessions (inbox)
+- Broadcast decisions everyone needs to know (`mailbox/all/`)
+
+---
+
 ## 2026-04-14 (v2.3.4 - HOW-IT-WORKS expanded with 3 more deep-dives)
 
 ### Added: Proof Loop, Autoresearch, Documentation Integrity sections in HOW-IT-WORKS.md

@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**18 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**19 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -31,6 +31,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Long-running project lost its history?** Condensed timeline per project, alongside handoffs ([Project Chronicles](principles/16-project-chronicles.md))
 - **Skill is a monolithic wall of text?** Split into Direction, Blueprints, Solutions ([DBS Framework](principles/17-dbs-skill-creation.md))
 - **Parallel chats fight over GPUs or overwrite each other's state?** Append-only handoffs + lock-file coordination ([Multi-Session Coordination](principles/18-multi-session-coordination.md))
+- **One chat needs to send a specific request to another?** File-based mailbox with email-style threading and delivery receipts ([Inter-Agent Communication](principles/19-inter-agent-communication.md))
 
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
 
@@ -63,7 +64,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 **New:** [HOW-IT-WORKS.md](HOW-IT-WORKS.md) - technical deep dive into how each technology actually works, with real measurements.
 
 **Structure:**
-- `principles/` - 18 standalone architectural principles. Read the one that matches your current problem.
+- `principles/` - 19 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
@@ -143,6 +144,16 @@ Copy the ready-made rule file from [rules/session-handoff.md](rules/session-hand
 
 **For automation nerds:** pair this with a `Stop` hook that blocks long-session closure until a handoff is written. See [alternatives/session-handoff.md](alternatives/session-handoff.md) for all 5 approaches compared.
 
+**If you run parallel chats and they need to talk to each other** (not just leave state), see [principle 19 - Inter-Agent Communication](principles/19-inter-agent-communication.md). Mini decision tree:
+
+```
+Broadcast "I'm done, anyone continue"       → handoff (principle 18)
+Claim exclusive resource                    → lock file (principle 18)
+Ask a specific other session to do X        → mailbox/<name>/ (principle 19)
+Announce a decision for all running chats   → mailbox/all/ (principle 19)
+Multi-turn reply chain                      → mailbox with in_reply_to threading
+```
+
 ---
 
 ## Skills Catalog
@@ -200,10 +211,10 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 18 个架构原则、12+ 对比方案、16 个技能、5 个即用型 Hook 脚本和 7 个项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 19 个架构原则、12+ 对比方案、16 个技能、5 个即用型 Hook 脚本和 7 个项目模板。
 
 **核心功能:**
-- `principles/` - 18 个独立架构原则，每个解决一个具体失败模式
+- `principles/` - 19 个独立架构原则，每个解决一个具体失败模式
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
 - `hooks/` - 5 个即用型 Hook 脚本（漂移检测、安全防护、会话交接）
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 记忆和项目编年史模板
@@ -217,10 +228,10 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 18 архитектурных принципов, 12+ сравнений подходов, 16 навыков, 5 hook-скриптов и 7 шаблонов.
+Система конфигурации для Claude Code агентов. 19 архитектурных принципов, 12+ сравнений подходов, 16 навыков, 5 hook-скриптов и 7 шаблонов.
 
 **Что внутри:**
-- `principles/` - 18 принципов, каждый предотвращает конкретный тип отказа
+- `principles/` - 19 принципов, каждый предотвращает конкретный тип отказа
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
 - `hooks/` - 5 готовых скриптов (валидация drift, защита от деструктивных команд, утечка секретов, handoff)
 - `templates/` - стартовые CLAUDE.md для web-app, ML, library + шаблоны memory и хроник
