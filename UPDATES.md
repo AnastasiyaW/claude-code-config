@@ -4,6 +4,20 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-16 (v2.9.0 - Security Tooling Guide)
+
+### Added: references/security-tooling-guide.md
+
+Practical guide to all available security tools for Claude Code:
+- **Anthropic /security-review** - install and usage (command + GitHub Action)
+- **Trail of Bits Skills** - 16 security-focused plugins from the 38-plugin marketplace (static-analysis, variant-analysis, entry-point-analyzer, fp-check, constant-time-analysis, zeroize-audit, supply-chain-risk-auditor, etc.)
+- **sast-skills** - 14-module SAST workspace pattern
+- **Our tools** - plan-swarm-review code mode + vulnerability KB
+
+Includes recommended pipelines for quick (1 min), standard (5-10 min), deep (30-60 min), and multi-session (1-2 hrs with mclaude) security audits.
+
+---
+
 ## 2026-04-16 (v2.8.0 - Vulnerability Knowledge Base)
 
 ### Added: skills/architecture/plan-swarm-review/references/vulnerability-kb.md
