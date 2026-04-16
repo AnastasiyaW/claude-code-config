@@ -4,6 +4,31 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-16 (v2.6.0 - Plan Swarm Review)
+
+### Added: skills/architecture/plan-swarm-review/SKILL.md
+
+New skill for iterative plan/code review using multisampling + focused decomposition. Inspired by deksden's "Plan Swarming" technique (April 2026) and backed by 5 academic papers.
+
+**Two modes:**
+- **Plan mode**: review design docs, specs, ADRs before implementation
+- **Code mode**: security audits, vulnerability hunting, bug detection
+
+**4 escalating rounds:**
+1. Broad review (single agent) - catch obvious issues
+2. Diverse multisampling (3-5 agents with different personas) - stochastic diversity
+3. Focused decomposition (one agent per aspect) - deep analysis
+4. Focused + multisampling (optional) - maximum depth
+
+**Key research-backed improvements over naive multisampling:**
+- Diverse perspectives instead of identical prompts ([2502.11027]: +10.8% reasoning accuracy)
+- Minority-correct finding preservation ([2602.09341] AgentAuditor: recovers 65-82% of findings majority voting misses)
+- Code vulnerability aspects based on MultiVer [2602.17875] (82.7% recall) and VulAgent [2509.11523] patterns
+
+**Empirical result** (deksden): 36 agent runs found ~30+ issues that a 2-3 hour single-agent planning session missed entirely.
+
+---
+
 ## 2026-04-15 (v2.5.0 - Reasoning regression debugging)
 
 ### Added: alternatives/reasoning-regression-debugging.md
