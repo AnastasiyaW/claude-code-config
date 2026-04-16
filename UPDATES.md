@@ -4,6 +4,20 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-16 (v2.8.0 - Vulnerability Knowledge Base)
+
+### Added: skills/architecture/plan-swarm-review/references/vulnerability-kb.md
+
+Condensed CWE Top 10 detection heuristics for agent consumption during `/plan-swarm-review` code mode. Each CWE entry: triggers, taint flow, false positive indicators. Covers: XSS, SQL injection, OOB write/read, use-after-free, file upload, deserialization, SSRF, integer overflow, resource consumption.
+
+Plan-swarm-review SKILL.md updated to reference this KB during code mode reviews.
+
+Based on Vul-RAG approach (ACM TOSEM 2025): knowledge-level entries outperform code-level RAG by +16-24% accuracy.
+
+Full Vul-RAG entries (10 articles with code examples, root cause analysis, fixing patterns): published to knowledge-vault/docs/security/cwe/ for happyin.space deployment.
+
+---
+
 ## 2026-04-16 (v2.7.0 - Vulnerability Detection Pipeline)
 
 ### Added: principles/20-vulnerability-detection-pipeline.md
