@@ -214,6 +214,10 @@ Based on the target content, select 3-7 aspects.
 
 ### Code mode aspects (for bug/vulnerability hunting)
 
+**Before launching agents:** read `references/vulnerability-kb.md` for condensed detection
+heuristics per CWE class. Feed the relevant CWE heuristics into each agent's prompt.
+Full Vul-RAG entries with code examples: `knowledge-vault/docs/security/cwe/`.
+
 Based on MultiVer [2602.17875] and VulAgent [2509.11523] patterns:
 
 | Aspect | What to trace |
