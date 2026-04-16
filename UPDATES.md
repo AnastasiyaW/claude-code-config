@@ -4,6 +4,23 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-16 (v2.7.0 - Vulnerability Detection Pipeline)
+
+### Added: principles/20-vulnerability-detection-pipeline.md
+
+New principle formalizing the 6-layer AI vulnerability detection pipeline: SAST scan -> LLM false-positive filter -> multi-agent diverse review -> knowledge-enriched RAG -> adversarial verification -> sandbox PoC.
+
+Backed by 15 papers and production evidence:
+- Claude Opus 4.6: 500+ confirmed zero-days in OSS (Anthropic, Feb 2026)
+- SAST-Genius: hybrid SAST+LLM reaches 89.5% precision vs 35.7% SAST alone
+- MAVUL: +600% detection vs single-agent
+- Vul-RAG: knowledge-level RAG adds +16-24%, found 6 CVE in Linux kernel
+- Chinese ecosystem: Qianxin #1 CyberSec-Eval, DeepAudit 48 CVE, Tencent A.S.E framework
+
+Includes practical implementation guide for Claude Code (built-in + skills), comparison of LLM strengths/weaknesses by vulnerability type, and references to Trail of Bits Skills and sast-skills.
+
+---
+
 ## 2026-04-16 (v2.6.0 - Plan Swarm Review)
 
 ### Added: skills/architecture/plan-swarm-review/SKILL.md
