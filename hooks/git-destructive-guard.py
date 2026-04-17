@@ -15,7 +15,7 @@ from safety_common import (  # noqa: E402
     any_match,
     bash_command,
     block,
-    bypass_env,
+    bypass,
     log,
     read_event,
 )
@@ -51,7 +51,7 @@ def main() -> None:
     if not hit:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_GIT_DESTRUCTIVE"):
+    if bypass("git-destructive", cmd, env_name="CLAUDE_ALLOW_GIT_DESTRUCTIVE"):
         log("WARN", "block_git_destructive", "bypass", hit, cmd)
         allow()
 

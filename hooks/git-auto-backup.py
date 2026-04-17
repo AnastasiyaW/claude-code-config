@@ -33,7 +33,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from safety_common import (  # noqa: E402
     allow,
     bash_command,
-    bypass_env,
+    bypass,
     log,
     read_event,
 )
@@ -101,7 +101,7 @@ def main() -> None:
 
     # This hook is the safety net - it only runs when the main git guard
     # has been bypassed. If bypass isn't set, the main guard already blocked.
-    if not bypass_env("CLAUDE_ALLOW_GIT_DESTRUCTIVE"):
+    if not bypass("git-destructive", cmd, env_name="CLAUDE_ALLOW_GIT_DESTRUCTIVE"):
         allow()
 
     cwd = event.get("cwd") or os.getcwd()

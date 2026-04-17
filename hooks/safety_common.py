@@ -70,9 +70,57 @@ def allow() -> None:
 
 
 def bypass_env(name: str) -> bool:
-    """Check CLAUDE_ALLOW_* override. Accepts 1/true/yes."""
+    """Check CLAUDE_ALLOW_* override. Accepts 1/true/yes.
+
+    NOTE: env vars set via `FOO=1 cmd` inline prefix are NOT visible to hooks,
+    because hooks run in a sibling process launched by the harness, not as
+    children of the bash command. To bypass via env, either `export FOO=1`
+    in the session, or use bypass markers in the command text (see below).
+    """
     val = os.environ.get(name, "").strip().lower()
     return val in {"1", "true", "yes", "on"}
+
+
+def bypass_marker(command_or_content: str, name: str) -> bool:
+    """Check in-command bypass marker.
+
+    Accepted forms (case-insensitive):
+        # claude-bypass: NAME
+        # claude-bypass: other, NAME, third
+        // claude-bypass: NAME   (for js/ts contexts)
+        <!-- claude-bypass: NAME -->  (for html/md)
+
+    This covers the case where the command itself carries the bypass,
+    which works around bash inline-env-var limitation.
+    """
+    if not command_or_content or not name:
+        return False
+    pattern = r"(?:#|//|<!--)\s*claude-bypass\s*:\s*([a-z0-9_, \-]+)"
+    for m in re.finditer(pattern, command_or_content, re.IGNORECASE):
+        names = [x.strip().lower() for x in m.group(1).split(",")]
+        if name.lower() in names or "all" in names:
+            return True
+    return False
+
+
+def bypass(
+    name: str,
+    command_or_content: str = "",
+    env_name: str | None = None,
+) -> bool:
+    """Unified bypass check. Returns True if either marker or env override set.
+
+    name: short bypass key (e.g. "injection", "destructive")
+    command_or_content: text to scan for marker
+    env_name: defaults to CLAUDE_ALLOW_<NAME_UPPER>
+    """
+    if env_name is None:
+        env_name = f"CLAUDE_ALLOW_{name.upper().replace('-', '_')}"
+    if bypass_env(env_name):
+        return True
+    if bypass_marker(command_or_content, name):
+        return True
+    return False
 
 
 def bash_command(tool_input: dict) -> str:
