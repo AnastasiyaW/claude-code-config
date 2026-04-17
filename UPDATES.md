@@ -4,6 +4,38 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-17 (KB enforcement pattern + drop-in skeleton)
+
+### New: principles/21-knowledge-base-enforcement.md
+
+The pattern **review finding -> regression test -> invariant -> cross-reference** as a durable triangle. Every accepted review finding gains three forms (fix, test, invariant); missing any form loses a guarantee.
+
+Covers structure (`AGENTS.md` + `docs/kb/` tree), the three forms concretely, validator role, bidirectional review-template cross-link, when-to-adopt criteria, and real numbers from a Phase 2 security sweep (123 findings -> 25 fixes -> 65 regression tests -> 25 invariants).
+
+### New: templates/kb-skeleton/
+
+Drop-in starter for the pattern. Copy into any repo, configure the top of `scripts/validate_kb.py`, start growing `INVARIANTS.md` from your first review.
+
+Contains:
+- `AGENTS.md` -- AAIF-standard entry, `<=150` lines, TODO markers
+- `docs/kb/README.md` -- meta-rules (how to use, when to update)
+- `docs/kb/INVARIANTS.md` -- format + example block
+- `docs/kb/conventions.md` -- section stubs (imports, async, errors, types, ...)
+- `docs/kb/patterns.md` -- recipe skeleton
+- `docs/kb/gotchas.md` -- symptom/cause/workaround skeleton
+- `docs/kb/decisions.md` -- ADR template
+- `docs/kb/modules/example.md` -- per-module contract template
+- `scripts/validate_kb.py` -- working validator, configurable `SOURCE_ROOTS` at top, multi-root path resolver, `(future)` / `(planned)` markers honored, stdlib-only, ASCII-safe output
+- `.github/workflows/kb.yml` -- CI gate
+
+Adoption time: ~15 minutes. First invariant can be added in under 5 minutes.
+
+### Why this exists
+
+Previous principles **07 - Codified Context** set the mindset ("context is infrastructure"). **11 - Documentation Integrity** generalized reference-validation-at-session-start. Principle 21 bridges the two with a concrete, adopt-able structure for projects that want the full loop from review to durable contract.
+
+---
+
 ## 2026-04-17 (Humanize Russian: 80/20 term russification rule)
 
 ### Updated: skills/writing/humanize-russian/SKILL.md

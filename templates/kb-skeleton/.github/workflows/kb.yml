@@ -1,0 +1,24 @@
+name: Validate KB
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-kb:
+    name: Knowledge base stays in sync with code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run validate_kb.py
+        run: python scripts/validate_kb.py
