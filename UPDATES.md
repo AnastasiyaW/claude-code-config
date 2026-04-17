@@ -4,6 +4,21 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-17 (Humanize skills: add vague intensifiers)
+
+### Updated: skills/writing/humanize-russian/SKILL.md + humanize-english/SKILL.md
+
+Added vague-intensifier LLM markers to Tier 1 banned words:
+
+- **Russian:** "кардинально / кардинальное / кардинальный" - usage without a measured scale. LLM loves these as universal amplifiers; humans name the scale with a number or concrete word ("в разы", "вдвое", "на 40%").
+- **English parallel:** "dramatically / significantly / drastically / substantially" - same failure mode. Replace with a concrete number or plain "fast/big/huge".
+
+Both skill checklists updated accordingly.
+
+Trigger: caught the pattern in actual production writing - an LLM draft used "кардинально эффективнее" / "кардинальная экономия" as stand-ins for what should have been "в ~8x быстрее" / "экономия на железе". The vague intensifier is a reliable AI signature because it optimizes for "sounds impressive" while specifically removing the measurement humans include when they know the scale.
+
+---
+
 ## 2026-04-16 (v2.9.0 - Security Tooling Guide)
 
 ### Added: references/security-tooling-guide.md
