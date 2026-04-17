@@ -4,6 +4,62 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-17 (Safety hooks: 4 PreToolUse guards + IAEA two-layer rules)
+
+### New: 4 PreToolUse hooks with shared common library
+
+Replaced earlier standalone `destructive-command-guard.py` + `secret-leak-guard.py` with cohesive set of 4 guards sharing `hooks/safety_common.py` utilities:
+
+- **`hooks/destructive-command-guard.py`** - blocks catastrophic shell commands: `rm -rf` on root/home/system dirs, SQL `DROP/TRUNCATE`, `docker prune --volumes`, `kubectl delete all/--all`, `mkfs`/`dd` on block devices, fork bombs. Bypass: `CLAUDE_ALLOW_DESTRUCTIVE=1`
+- **`hooks/secret-leak-guard.py`** - blocks reading/printing `.env*`, `*.key`, `*.pem`, `id_rsa/ed25519/ecdsa/dsa`, `~/.secrets/`, `~/.ssh/`, `~/.aws/`, `credentials.json`. Covers Read/Edit/Write/Grep tools + Bash `cat/less/head/tail/grep/bat/xxd/source`. Bypass: `CLAUDE_ALLOW_SECRETS=1`
+- **`hooks/git-destructive-guard.py`** - blocks `git reset --hard`, `git push --force` (without `--force-with-lease`), `git branch -D`, `git clean -fdx`, `git checkout -- .`, `git filter-branch/repo`, force delete of main/master/prod refs. Bypass: `CLAUDE_ALLOW_GIT_DESTRUCTIVE=1`
+- **`hooks/self-harm-guard.py`** - blocks actions that cut agent off from host: sshd config edits, `systemctl restart sshd`, `killall node|bun|python|claude`, `pkill -f claude`, `iptables -j DROP`, `ufw default deny`, `reboot/shutdown`. Bypass: `CLAUDE_ALLOW_SELF_HARM=1`
+- **`hooks/safety_common.py`** - shared utilities: stdin event parsing, JSONL audit logging to `~/.claude/logs/safety.log`, block/allow helpers, bypass env var check, utf-8 stdout reconfigure for Windows
+
+### New: 4 matching rules (IAEA two-layer principle)
+
+Each hook has a companion `rules/safety-*.md` documenting the advice layer + real-world failure examples + what the hook doesn't cover + tuning guidance:
+
+- `rules/safety-destructive.md`
+- `rules/safety-secrets.md`
+- `rules/safety-git-destructive.md`
+- `rules/safety-self-harm.md`
+
+Real-world examples gathered from AI-coding community (anonymized). Each rule explains why rule-only protection is insufficient: classic case is "не читай env" instruction that agent ignored in the same turn. Mechanical hook = second independent layer that can't be forgotten under context pressure.
+
+### Research base
+
+Pattern grounded in research/agentic/memory-priority-enforcement-convergence.md covering convergence across 8 domains (LLM, MemGPT, aviation, neuroscience, cognitive load, IAEA, syslog, K8s) on the same critical/reference + rule/hook architecture.
+
+### Settings.json registration example
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {"type": "command", "command": "python /abs/hooks/destructive-command-guard.py"},
+          {"type": "command", "command": "python /abs/hooks/git-destructive-guard.py"},
+          {"type": "command", "command": "python /abs/hooks/secret-leak-guard.py"},
+          {"type": "command", "command": "python /abs/hooks/self-harm-guard.py"}
+        ]
+      },
+      {
+        "matcher": "Read|Edit|Write|NotebookEdit|Grep",
+        "hooks": [
+          {"type": "command", "command": "python /abs/hooks/secret-leak-guard.py"},
+          {"type": "command", "command": "python /abs/hooks/self-harm-guard.py"}
+        ]
+      }
+    ]
+  }
+}
+```
+
+---
+
 ## 2026-04-17 (KB enforcement pattern + drop-in skeleton)
 
 ### New: principles/21-knowledge-base-enforcement.md

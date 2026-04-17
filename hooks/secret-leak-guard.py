@@ -1,123 +1,121 @@
 #!/usr/bin/env python3
-"""PreToolUse hook: block writes that would introduce secrets into tracked files.
+"""PreToolUse: prevent reading or exposing secret files.
 
-Scans Write and Edit tool calls for patterns that look like secrets:
-- API keys (sk-*, AKIA*, ghp_*, etc.)
-- Passwords in config files
-- Private keys
-- Connection strings with credentials
-- Bearer tokens
-
-Returns {"decision": "block", "reason": "..."} when a secret is detected.
-
-Register in ~/.claude/settings.json:
-{
-  "hooks": {
-    "PreToolUse": [{
-      "matcher": "Write|Edit",
-      "hooks": [{
-        "type": "command",
-        "command": "python path/to/secret-leak-guard.py",
-        "statusMessage": "Checking for secrets..."
-      }]
-    }]
-  }
-}
+Blocks Read/Edit/Write on .env, *.key, *.pem, ~/.ssh/id_*, ~/.secrets/*.
+Blocks Bash reads (cat/less/head/tail/grep) on same paths.
+Bypass: CLAUDE_ALLOW_SECRETS=1.
 """
+from __future__ import annotations
 
-import json
 import re
 import sys
+from pathlib import Path
 
-# Secret patterns: (regex, description)
-SECRET_PATTERNS = [
-    # API keys with known prefixes
-    (re.compile(r'\bsk-[a-zA-Z0-9]{20,}'), "OpenAI/Stripe API key (sk-...)"),
-    (re.compile(r'\bAKIA[A-Z0-9]{16}'), "AWS Access Key (AKIA...)"),
-    (re.compile(r'\bghp_[a-zA-Z0-9]{36}'), "GitHub Personal Access Token (ghp_...)"),
-    (re.compile(r'\bgho_[a-zA-Z0-9]{36}'), "GitHub OAuth Token (gho_...)"),
-    (re.compile(r'\bghs_[a-zA-Z0-9]{36}'), "GitHub App Token (ghs_...)"),
-    (re.compile(r'\bglpat-[a-zA-Z0-9\-]{20,}'), "GitLab Personal Access Token"),
-    (re.compile(r'\bnpm_[a-zA-Z0-9]{36}'), "npm token"),
-    (re.compile(r'\bpypi-[a-zA-Z0-9]{50,}'), "PyPI token"),
-    (re.compile(r'\bxox[bpars]-[a-zA-Z0-9\-]{10,}'), "Slack token"),
-    (re.compile(r'\bsq0[a-z]{3}-[a-zA-Z0-9\-]{22,}'), "Square token"),
+sys.path.insert(0, str(Path(__file__).parent))
+from safety_common import (  # noqa: E402
+    allow,
+    bash_command,
+    block,
+    bypass_env,
+    file_path,
+    log,
+    read_event,
+)
 
-    # Private keys
-    (re.compile(r'-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----'), "Private key"),
-    (re.compile(r'-----BEGIN\s+EC\s+PRIVATE\s+KEY-----'), "EC private key"),
+SECRET_PATH_REGEX = re.compile(
+    r"(?:^|/|\\)("
+    r"\.env(?:\.[a-z0-9]+)?"          # .env, .env.local, .env.production
+    r"|\.envrc"
+    r"|[^/\\]*\.key"                    # *.key (file tail)
+    r"|[^/\\]*\.pem"                    # *.pem
+    r"|id_(?:rsa|ed25519|ecdsa|dsa)(?:\.pub)?"  # ssh keys
+    r"|credentials(?:\.json)?"
+    r"|secrets?\.(?:json|yaml|yml|toml)"
+    r")(?:$|/|\\)",
+    re.IGNORECASE,
+)
 
-    # Generic patterns
-    (re.compile(r'(?i)password\s*[=:]\s*["\'][^"\']{8,}["\']'), "Hardcoded password"),
-    (re.compile(r'(?i)api[_-]?key\s*[=:]\s*["\'][a-zA-Z0-9]{20,}["\']'), "Hardcoded API key"),
-    (re.compile(r'(?i)secret\s*[=:]\s*["\'][a-zA-Z0-9]{20,}["\']'), "Hardcoded secret"),
-    (re.compile(r'(?i)bearer\s+[a-zA-Z0-9\-_.]{20,}'), "Bearer token"),
+SECRET_DIR_REGEX = re.compile(
+    r"(?:^|/|\\)(\.secrets?|\.aws|\.ssh)(?:$|/|\\)",
+    re.IGNORECASE,
+)
 
-    # Connection strings with credentials
-    (re.compile(r'://[^:]+:[^@]{8,}@'), "Connection string with embedded password"),
-]
-
-# Files where secrets are expected (don't flag these)
-ALLOWED_FILES = [
-    ".env.example",
-    ".env.template",
-    ".env.sample",
-    "docker-compose.example.yml",
-]
-
-
-def check_for_secrets(content: str) -> list[str]:
-    """Check content for secret patterns. Returns list of descriptions."""
-    found = []
-    for pattern, description in SECRET_PATTERNS:
-        if pattern.search(content):
-            found.append(description)
-    return found
+BASH_READ_VERBS = re.compile(
+    r"\b(cat|less|more|head|tail|grep|rg|ripgrep|bat|xxd|hexdump|source|\.)\s+\S",
+    re.IGNORECASE,
+)
 
 
-def main():
-    try:
-        input_data = json.loads(sys.stdin.read())
-    except (json.JSONDecodeError, EOFError):
-        return
+def path_is_secret(path: str) -> str | None:
+    if not path:
+        return None
+    m = SECRET_PATH_REGEX.search(path)
+    if m:
+        return m.group(1)
+    m = SECRET_DIR_REGEX.search(path)
+    if m:
+        return m.group(1) + "/"
+    return None
 
-    tool_input = input_data.get("tool_input", {})
-    tool_name = input_data.get("tool_name", "")
 
-    # Get content to check
-    content = ""
-    file_path = ""
+def bash_touches_secret(cmd: str) -> str | None:
+    """Detect reads/prints of secret-like paths inside a Bash command."""
+    if not cmd:
+        return None
+    # Split on common separators to test each token that looks path-ish.
+    tokens = re.split(r"[\s;&|<>()`]+", cmd)
+    for tok in tokens:
+        tok = tok.strip("\"'")
+        if not tok or tok.startswith("-"):
+            continue
+        hit = path_is_secret(tok)
+        if hit:
+            # Only block if the command seems to read/print, not edit via protected editor
+            if BASH_READ_VERBS.search(cmd) or "echo" in cmd.lower() or "printenv" in cmd.lower():
+                return hit
+            # Reading via redirection like `< .env` also leaks
+            if re.search(r"<\s*\S*" + re.escape(tok), cmd):
+                return hit
+    return None
 
-    if tool_name == "Write":
-        content = tool_input.get("content", "")
-        file_path = tool_input.get("file_path", "")
-    elif tool_name == "Edit":
-        content = tool_input.get("new_string", "")
-        file_path = tool_input.get("file_path", "")
 
-    if not content:
-        return
+def main() -> None:
+    event = read_event()
+    tool_name = event.get("tool_name", "")
+    tool_input = event.get("tool_input", {})
 
-    # Skip allowed files
-    import os
-    basename = os.path.basename(file_path)
-    if basename in ALLOWED_FILES:
-        return
+    hit: str | None = None
+    target = ""
 
-    secrets = check_for_secrets(content)
+    if tool_name in {"Read", "Edit", "Write", "NotebookEdit"}:
+        target = file_path(tool_input)
+        hit = path_is_secret(target)
+    elif tool_name == "Bash":
+        target = bash_command(tool_input)
+        hit = bash_touches_secret(target)
+    elif tool_name == "Grep":
+        # Grep takes a path; both path and pattern can touch secrets
+        gpath = str(tool_input.get("path", ""))
+        target = gpath
+        hit = path_is_secret(gpath)
 
-    if secrets:
-        result = {
-            "decision": "block",
-            "reason": (
-                f"Potential secret(s) detected in {file_path}: "
-                f"{', '.join(secrets)}. "
-                f"Use environment variables or a secrets manager instead. "
-                f"If this is intentional (e.g., test fixtures), "
-                f"ask the user to confirm."
-            )
-        }
-        print(json.dumps(result))
+    if not hit:
+        allow()
+
+    if bypass_env("CLAUDE_ALLOW_SECRETS"):
+        log("WARN", "block_secrets", "bypass", hit, target)
+        allow()
+
+    log("BLOCK", "block_secrets", "deny", hit, target)
+    block(
+        f"Secret file access blocked: {hit!r}.\n"
+        "Причина: секреты (.env, ключи, ~/.ssh/id_*, ~/.secrets/*) не читать без явной\n"
+        "пользовательской просьбы. Даже чтение для 'проверить' рискует утечкой в логи/контекст.\n"
+        "Если действительно нужно:\n"
+        "  1) подтверди у пользователя что именно и зачем\n"
+        "  2) запусти команду с CLAUDE_ALLOW_SECRETS=1\n"
+        "  3) после чтения не печатай содержимое в output"
+    )
 
 
 if __name__ == "__main__":
