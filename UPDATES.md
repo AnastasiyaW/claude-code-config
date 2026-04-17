@@ -4,6 +4,57 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-17 (Safety Phase 2: test muting + command injection + auto-backup)
+
+### New: `hooks/test-muting-guard.py`
+
+Blocks adding skip/xfail/ignore patterns to test files. Watches Edit/Write/NotebookEdit on `tests/`, `__tests__/`, `spec/`, `*_test.py`, `*.test.js` etc. Covers pytest, unittest, jest/mocha/vitest, JUnit, Go, Rust, RSpec patterns. Uses diff logic - only blocks patterns added by this edit, not already-existing ones. Bypass: `CLAUDE_ALLOW_TEST_MUTING=1`.
+
+Real case pattern: `.only()` left after debug → suite silently runs 1 test of 100. Classic production bug source.
+
+### New: `hooks/command-injection-guard.py`
+
+Detects suspicious `$(...)` and backtick substitutions inside Bash commands. Three tiers:
+- Trivial (pwd, date, whoami, basename, dirname, echo, etc) → pass
+- Destructive verb inside substitution (dropdb, rm -rf, killall, curl | sh) → hard block
+- Non-trivial (any other command) → advisory block
+
+Handles single-quote literal regions correctly (substitution inside `'...'` is literal).
+
+This catches the class of bugs where text meant as data becomes command via unescaped quotes - the Codex `gh issue create --body "...$(dropdb)..."` pattern from real AI-coding community reports. Bypass: `CLAUDE_ALLOW_INJECTION=1`.
+
+### New: `hooks/git-auto-backup.py`
+
+Safety net paired with `git-destructive-guard.py`. Only runs when bypass is granted - creates recovery point before the destructive op:
+- `git reset --hard *` → creates `claude-backup-{unix_ts}` branch pointing at HEAD
+- `git checkout -- .` → creates backup branch
+- `git clean -fdx` → `git stash push -u` working tree
+
+Emits recovery instructions to stderr so user sees them. Silent outside git repos.
+
+### New matching rules
+
+- `rules/safety-test-muting.md`
+- `rules/safety-command-injection.md`
+- `rules/safety-auto-backup.md`
+
+### Updated settings.json registration example
+
+Bash matcher now has 6 hooks (was 4): destructive / git-destructive / secrets / self-harm / command-injection / auto-backup. Edit/Write/NotebookEdit/Grep matcher has 3 hooks (was 2): secrets / self-harm / test-muting.
+
+### Real-world Phase 2 bug class coverage
+
+| Category | Phase 1 | Phase 2 |
+|---|---|---|
+| Destructive ops | destructive-command-guard | + auto-backup wraps with recovery |
+| Secret leaks | secret-leak-guard | (no change) |
+| Git catastrophes | git-destructive-guard | + auto-backup wraps with recovery |
+| Self-harm | self-harm-guard | (no change) |
+| Hidden muted tests | - | test-muting-guard |
+| Quoting injection | destructive-guard catches naked verbs | command-injection-guard catches verbs inside $() |
+
+---
+
 ## 2026-04-17 (Safety hooks: 4 PreToolUse guards + IAEA two-layer rules)
 
 ### New: 4 PreToolUse hooks with shared common library
