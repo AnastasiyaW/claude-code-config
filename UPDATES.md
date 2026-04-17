@@ -4,6 +4,28 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-17 (Humanize Russian: 80/20 term russification rule)
+
+### Updated: skills/writing/humanize-russian/SKILL.md
+
+Added new section "Русификация терминов - правило 80/20" between stylistic markers and conversational elements.
+
+**Rule:** in Russian text, 80% of technical terms should be written as Russian words or transliterations, not left as English. Persistent English terms in Russian prose are a strong signal of machine translation or LLM generation.
+
+**Detection mechanics:** native Russian speakers think "интерфейс" or "чекпоинт" first, then "UI" / "checkpoint". LLMs go the other way - the English term is the first statistical choice, so it stays untranslated. Output reads like a translation, not an original.
+
+**Replacement table** (20+ terms): UI→интерфейс, checkpoint→чекпоинт, backup→бекап, deploy→развернуть/выкатить, workflow→пайплайн/процесс, pipeline→пайплайн, cache→кэш, cluster→кластер, node→нода/узел, retention policy→политика хранения, etc.
+
+**Keep in English (20%):** library/brand names (PyTorch, MinIO, ControlNet, LoRA), standard acronyms (API, JSON, GPU, CPU, SSD), code and commands.
+
+**Composition rule:** no more than 1-2 non-russified English terms per sentence (excluding library/brand names).
+
+Checklist updated with two new items.
+
+Trigger: caught in an actual HR response draft - "обучила сотрудников UI" vs the natural "обучила сотрудников работе с интерфейсом". The first reads as translated, the second as native.
+
+---
+
 ## 2026-04-17 (Humanize skills: add vague intensifiers)
 
 ### Updated: skills/writing/humanize-russian/SKILL.md + humanize-english/SKILL.md
