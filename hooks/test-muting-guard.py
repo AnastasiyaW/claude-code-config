@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from safety_common import (  # noqa: E402
     allow,
     block,
-    bypass_env,
+    bypass,
     log,
     read_event,
 )
@@ -109,7 +109,7 @@ def main() -> None:
     if not hit:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_TEST_MUTING"):
+    if bypass("test-muting", new, env_name="CLAUDE_ALLOW_TEST_MUTING"):
         log("WARN", "block_test_muting", "bypass", hit, path)
         allow()
 

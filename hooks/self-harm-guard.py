@@ -20,7 +20,7 @@ from safety_common import (  # noqa: E402
     any_match,
     bash_command,
     block,
-    bypass_env,
+    bypass,
     file_path,
     log,
     read_event,
@@ -79,7 +79,7 @@ def main() -> None:
     if not hit:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_SELF_HARM"):
+    if bypass("self-harm", target, env_name="CLAUDE_ALLOW_SELF_HARM"):
         log("WARN", "block_self_harm", "bypass", hit, target)
         allow()
 

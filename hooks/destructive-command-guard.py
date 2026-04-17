@@ -15,7 +15,7 @@ from safety_common import (  # noqa: E402
     any_match,
     bash_command,
     block,
-    bypass_env,
+    bypass,
     log,
     read_event,
 )
@@ -70,7 +70,7 @@ def main() -> None:
     if not hit:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_DESTRUCTIVE"):
+    if bypass("destructive", cmd):
         log("WARN", "block_destructive", "bypass", hit, cmd)
         allow()
 

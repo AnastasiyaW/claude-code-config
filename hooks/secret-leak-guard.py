@@ -16,7 +16,7 @@ from safety_common import (  # noqa: E402
     allow,
     bash_command,
     block,
-    bypass_env,
+    bypass,
     file_path,
     log,
     read_event,
@@ -102,7 +102,7 @@ def main() -> None:
     if not hit:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_SECRETS"):
+    if bypass("secrets", target):
         log("WARN", "block_secrets", "bypass", hit, target)
         allow()
 

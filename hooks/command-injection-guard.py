@@ -28,7 +28,7 @@ from safety_common import (  # noqa: E402
     allow,
     bash_command,
     block,
-    bypass_env,
+    bypass,
     log,
     read_event,
 )
@@ -131,7 +131,7 @@ def main() -> None:
     if not destructive_hits and not nontrivial_hits:
         allow()
 
-    if bypass_env("CLAUDE_ALLOW_INJECTION"):
+    if bypass("injection", cmd):
         pattern = destructive_hits[0] if destructive_hits else nontrivial_hits[0]
         log("WARN", "block_command_injection", "bypass", pattern, cmd)
         allow()

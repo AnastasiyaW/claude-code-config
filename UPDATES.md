@@ -4,6 +4,61 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-18 (Safety Phase 3: marker bypass + backup retention + API key detection + docker sandbox)
+
+### Updated: `hooks/safety_common.py` - unified bypass API
+
+New function `bypass(name, text, env_name=None)` checks two sources:
+1. Env var `CLAUDE_ALLOW_<NAME>` (upper, dashes -> underscores)
+2. In-command marker: `# claude-bypass: <name>` (or `//` / `<!-- -->` variants)
+
+Marker bypass solves the real limitation of env-var bypass: bash inline prefix `FOO=1 cmd` does NOT propagate to hooks (hooks are sibling processes to the bash command, not children). Marker travels with the command text itself.
+
+Examples:
+```bash
+git commit -m "..."  # claude-bypass: injection
+rm -rf /tmp/legit-cleanup   # claude-bypass: destructive
+```
+
+All 7 Phase 1+2 hooks updated to call `bypass(name, text)` instead of `bypass_env()`. Old env-var bypass still works for hooks started with `export CLAUDE_ALLOW_X=1`.
+
+### New: `hooks/backup-retention-cleanup.py` (Stop event)
+
+Cleans up `claude-backup-*` branches and `claude-pre-clean-*` stashes older than 14 days. Runs on every session end. Silent in non-git directories. Idempotent.
+
+Solves the accumulation problem: `git-auto-backup.py` creates recovery points liberally, but without retention they pile up (50+ branches after a month of active dev).
+
+Register in settings.json alongside existing Stop hooks.
+
+### New: `hooks/api-key-leak-detector.py` (PostToolUse)
+
+Scans tool output for 13+ API key patterns: Anthropic, OpenAI, GitHub PAT/fine-grained, AWS access/secret, Stripe live/test, Slack, Google API, private key blocks, JWT, generic bearer tokens.
+
+This is a **detective** control (not preventive) - PostToolUse runs after output already returned to Claude context. Emits loud stderr warning with redacted snippet + rotation action items when a key is detected. Covers leakage paths that `secret-leak-guard.py` (preventive) can miss - hardcoded keys in code, env output, ps aux, cp .env followed by cat .env.backup.
+
+### New: `rules/safety-api-key-leak.md`, `rules/safety-backup-retention.md`
+
+Matching rules for the two new hooks.
+
+### New: `alternatives/docker-sandbox-claude-code.md`
+
+Architectural pattern documentation: running Claude Code inside Docker sandbox with explicit host boundaries. Based on the practitioner pattern of 5000+ agent-driven PRs with 1-2 incidents. Tradeoffs table vs hook-only protection, minimal compose file, Dockerfile, GitHub Actions CI/CD permissions example, breakout scenarios.
+
+### Phase 3 coverage summary
+
+| Dimension | Phase 1 | Phase 2 | Phase 3 |
+|---|---|---|---|
+| Destructive ops | destructive-command-guard | - | marker bypass added |
+| Secret leaks | secret-leak-guard | - | + api-key-leak-detector (post) |
+| Git catastrophes | git-destructive-guard | + git-auto-backup | + backup-retention-cleanup |
+| Self-harm | self-harm-guard | - | marker bypass added |
+| Hidden muted tests | - | test-muting-guard | marker bypass added |
+| Quoting injection | - | command-injection-guard | + heredoc whitelist, marker bypass |
+| Bypass friction | env var only (broken with inline prefix) | - | marker bypass working |
+| Architectural | - | - | docker-sandbox-claude-code.md |
+
+---
+
 ## 2026-04-17 (Safety Phase 2: test muting + command injection + auto-backup)
 
 ### New: `hooks/test-muting-guard.py`
