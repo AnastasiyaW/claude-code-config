@@ -1,4 +1,4 @@
-# 21 - Visual Context Pattern: When to Show, Not Tell
+# 22 - Visual Context Pattern: When to Show, Not Tell
 
 **Source:** Distilled from obra/superpowers visual-companion skill (2026-04) + our own experience with UI-heavy decisions.
 

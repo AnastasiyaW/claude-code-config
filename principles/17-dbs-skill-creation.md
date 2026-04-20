@@ -1,4 +1,4 @@
-# Principle 12: DBS Framework for Skill Creation
+# Principle 17: DBS Framework for Skill Creation
 
 ## Direction / Blueprints / Solutions
 
