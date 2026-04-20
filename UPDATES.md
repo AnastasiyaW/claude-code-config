@@ -4,6 +4,76 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-20 (Humanize skills update: 9 new AI markers + Habr feedback)
+
+### Updated: `skills/writing/humanize-russian/SKILL.md`
+
+Added 9 new AI text detection patterns from Russian Wikipedia "Признаки сгенерированности текста" article. These complement the existing Liang et al. research-backed markers:
+
+| New Pattern | Example | Fix |
+|---|---|---|
+| Rule of Three abuse | "яркий, богатый, разнообразный" | Keep one precise word |
+| Merism (fake ranges) | "от лёгкого до тяжёлого" | Concrete value |
+| Tautological synonym avoidance | "данный специалист" instead of repeating name | Just repeat the name |
+| Vague attributions | "по словам экспертов" | Specific source or remove |
+| Problem → vague optimism | "Несмотря на проблемы, перспективы..." | Concrete forecast or honest "не знаю" |
+| Title-as-definition opening | Starting with "X - это..." | Start with context/problem/story |
+| Promotional adjective clusters | "потрясающая природная красота" | Concrete fact |
+| English-style heading caps | "Как Правильно Настроить" | Only first word capitalized in Russian |
+
+Also added connector cleanup rules ("Честный нюанс" → remove, "Однако/Впрочем" → new sentence without connector) and "кардинальный" as a Tier 1 marker word with excess ratio data.
+
+**Source of these additions:** first Habr article (16K views, 17 comments) received direct feedback about AI text markers. Comments flagged: English-Russian language mixing, AI-slop perception, promotional tone. These new patterns specifically address the community's detection heuristics.
+
+### Updated: `skills/writing/humanize-english/SKILL.md`
+
+Synced with latest version from production use. Minor formatting improvements.
+
+---
+
+## 2026-04-20 (Harness tools research digest + two new principles + DESIGN.md alternative + security refresh)
+
+Everything in this update traces back to a week of research on three converging threads: (1) the obra/superpowers + pbakaus/impeccable skill ecosystem, (2) Anthropic's Claude Design launch and the DESIGN.md convention it popularized, (3) the April 2026 wave of agentic security disclosures.
+
+### New: `principles/22-visual-context-pattern.md`
+
+Distilled from the obra/superpowers `visual-companion` skill. Formalizes the workflow where an agent presents UI/design options as HTML fragments in a local browser and reads user feedback through a file-based event queue. Architecture: local HTTP server + `screen_dir/*.html` + append-only `events` JSON lines. The pattern is runtime-agnostic (works with Claude Code, Codex, Cursor, Gemini CLI) because it uses nothing but files + a stdlib HTTP server. Includes a minimum viable ~100-line implementation, decision rule ("would the user understand this better by seeing than reading?"), gotchas (Windows background-mode quirk, CSS class contract), and integration points with principles 01 / 02 / 04 / 07 / 08 / 23.
+
+### New: `principles/23-anti-pattern-as-config.md`
+
+Distilled from pbakaus/impeccable. Positive configuration ("use X") fails when the failure mode is a single attractor the model reverts to under pressure (Inter font, purple gradients, `SELECT *`, bare `except`). The principle codifies a three-layer enforcement stack:
+
+1. **Skill + anti-pattern reference file** — explicit forbidden patterns with rule IDs, rationale, exceptions, alternatives.
+2. **Slash commands** wrapping common checks (`/audit`, `/polish`).
+3. **Deterministic detector** — regex / linter / vision check that runs without LLM and fails build on match.
+
+Includes the "anti-attractor procedure" (name reflex → reject if listed → enumerate alternatives → justify pick), a rule-writing template, and examples extending beyond frontend to security, SQL, Dockerfiles, Python idioms, and tests. Links to Principle 10 (whose Attack Taxonomy is structurally the same thing for AppSec).
+
+### New: `alternatives/design-md-pattern.md`
+
+Documents the DESIGN.md convention that emerged alongside Claude Design (Anthropic Labs, April 2026). Compares three implementations — first-party Claude Design canvas, community getdesign.md (69 brand files from Linear/Stripe/Ferrari/Wired/etc.), and the open-source CLI reproduction `bluzir/claude-code-design`. Includes a 60-line minimum viable DESIGN.md starter, decision table for picking the right approach, and anti-patterns specific to DESIGN.md files (copy-pasted from framework defaults, missing "do not use" sections, conflicting with authoritative tokens.css).
+
+Clarifies a common community confusion: the design collection at getdesign.md is maintained as `awesome-design-md` by VoltAgent, **not** `hesreallyhim/awesome-claude-code` (the latter is a general Claude Code meta-list, not design-specific).
+
+### Updated: `principles/10-agent-security.md`
+
+Added April 2026 developments:
+
+- **New incident timeline entry:** CVE-2026-32211 (Microsoft Azure DevOps MCP, CVSS 9.1, missing authentication, disclosed 2026-04-03). Illustrates that first-party MCP servers still require auth verification.
+- **New section "April 2026 Update: State of Attacks and Defenses"** covering:
+  - **PIDP-Attack** reaching 98.125% success across 3 benchmarks and 8 models — attacks crossed the 90%+ threshold, static defenses insufficient
+  - **Adaptive attack success >85%** against SOTA defenses (from the arxiv:2601.17548 meta-analysis)
+  - **SentinelOne memory integrity module** reducing memory-poisoning Mean-Time-To-Detect from 72 hours to under 15 minutes
+  - **Multi-modal defense framework** achieving 94% detection / 70% trust leakage reduction / 96% task accuracy retention via layered architecture (attention-based anomaly + intent-flow analysis + output constraints)
+
+The takeaway: defenses must assume injection succeeds and limit blast radius, because preventing it outright is no longer viable.
+
+### Research provenance
+
+The four documents feeding these changes live in the private workspace at `research/agentic/harness-tools-superpowers-impeccable.md`, `research/agentic/claude-design-ecosystem-2026-04.md`, `research/security/agentic-security-april-2026.md`, and `research/agentic/multiclaude-orchestration-alternatives-2026-04.md`. They include fact-checks against community posts (e.g., Impeccable is 1 skill + 18 commands + CLI, not "20 skills"; `visual-companion` does not have "two modes" as sometimes claimed; `awesome-claude-code` is general-purpose, not design-specific). Future drafts of these principles should cite the research directly rather than re-derive.
+
+---
+
 ## 2026-04-18 (Safety Phase 3: marker bypass + backup retention + API key detection + docker sandbox)
 
 ### Updated: `hooks/safety_common.py` - unified bypass API
