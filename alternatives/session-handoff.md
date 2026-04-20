@@ -321,6 +321,109 @@ Before ending any session longer than 15 minutes:
 
 ---
 
+## F: Rollup Handoffs (Summary Pointers)
+
+**Source:** Distilled from the `thread_summaries.covered_until_message_id` pattern in [PavelMuntyan/MF0-1984](https://github.com/PavelMuntyan/MF0-1984) (Pavel Muntyan's multi-provider memory app, 2026-04), adapted for file-based handoffs.
+
+**Core idea:** On projects that accumulate 20+ handoffs, reading the full history becomes overhead. A **rollup handoff** is a specially-marked handoff that summarizes a span of prior handoffs and carries a pointer to where the summary ends. Old handoffs are not deleted — they get a backlink to the rollup that subsumed them. New sessions read: rollup + only handoffs dated after the rollup's boundary.
+
+This is the handoff equivalent of a CHANGELOG that snapshots every N minor versions rather than keeping every commit message in scrollback.
+
+**File convention:**
+
+```
+.claude/handoffs/
+├── 2026-03-01_12-00_session-01_kickoff.md
+├── 2026-03-02_14-30_session-02_auth-refactor.md
+├── ...
+├── 2026-03-15_18-00_session-12_ci-pipeline.md
+├── 2026-03-16_09-00_rollup_march-weeks-1-3.md   ← rollup
+├── 2026-03-17_10-15_session-13_post-rollup.md
+└── INDEX.md
+```
+
+**Frontmatter on the rollup file:**
+
+```yaml
+---
+type: rollup
+session: rollup-march-w1-3
+covers:
+  - session-01_kickoff
+  - session-02_auth-refactor
+  - ...
+  - session-12_ci-pipeline
+through: 2026-03-15 18:00
+author: ani
+---
+
+# Rollup — March weeks 1-3
+
+## Strategic arc
+Started kickoff → pivoted to auth refactor in week 1 after performance
+findings → stabilized on JWT + Redis → week 3 finished the CI pipeline.
+
+## Decisions that still apply
+- JWT over session cookies (session-02) — [see handoff]
+- In-memory fallback for Redis (session-04) — [see handoff]
+- ...
+
+## What did NOT work (do not retry)
+- OAuth2 proxy (session-03) — auth library incompatibility, see handoff
+- Redis Cluster (session-06) — operational complexity not justified
+- ...
+
+## Current state at rollup boundary
+- Working: auth, CI, basic API
+- Open: rate limiting design
+- Next: pricing page
+```
+
+**Backlinks on the subsumed handoffs:**
+
+Each old handoff gets one new frontmatter field appended:
+
+```yaml
+rolled_up_into: 2026-03-16_09-00_rollup_march-weeks-1-3
+```
+
+The body of the old handoff is NOT rewritten. The file stays exactly as it was; only the frontmatter gains the pointer.
+
+**INDEX.md update:**
+
+```markdown
+2026-03-16 09:00 | ROLLUP | covers sessions 01-12, 2026-03-01 → 2026-03-15
+2026-03-17 10:15 | CLOSED | session-13 | ...
+```
+
+**Session start protocol:**
+
+1. Read INDEX.md
+2. Find the most recent ROLLUP entry
+3. Read the rollup handoff
+4. Read any handoffs dated **after** the rollup's `through` field
+5. Skip handoffs with `rolled_up_into` set (they are already summarized)
+
+**Pros:**
+- [+] Scales to projects with 50+ handoffs without overhead on session start
+- [+] Old handoffs preserved for forensic / blame / "wait I wrote that?" lookup
+- [+] `covers:` list is explicit — no guessing what the rollup subsumes
+- [+] `through:` boundary means post-rollup sessions are clearly additive
+- [+] Pairs naturally with [Principle 16 (Project Chronicles)](../principles/16-project-chronicles.md) — chronicle entries can cite the rollup as a source
+
+**Cons:**
+- [-] Manual process today — needs a CLI or script to generate rollups safely
+- [-] The rollup author is another potential source of drift — a bad rollup is worse than no rollup
+- [-] Multi-session teams need a convention for who writes the rollup (probably the session doing it gets locks on all subsumed handoffs)
+
+**When to choose:** Long-running projects past 20 handoffs where startup context takes longer than the actual work. When multiple sessions share the same project and the raw handoff pile hurts onboarding. When you are already using approach A + C and want them to scale.
+
+**Upgrade path from C (Session Journal):** A journal's "pruning" step can become a rollup: instead of archiving to `.claude/journal-archive/`, write a rollup handoff covering the pruned entries and keep the journal current. The rollup is the readable archive.
+
+**Attribution to MF0-1984:** The `covered_until_message_id` column in their `thread_summaries` table is what made this pattern clean. Their version works inside a SQLite schema; we translate to markdown frontmatter + git. Same idea, different medium.
+
+---
+
 ## Recommendation
 
 **Default: A (Manual HANDOFF.md) + E (Memory)**
@@ -333,6 +436,7 @@ For most workflows, asking Claude to write a HANDOFF.md before closing the sessi
 2. **Add B (rules-based reminder)** -- a `.claude/rules/` file that reminds Claude to write HANDOFF.md before ending long sessions.
 3. **If you work on multi-day projects, add C (journal)** -- accumulate learnings across sessions.
 4. **If you juggle multiple features, consider D (ContextHarness)** -- task-level context switching.
+5. **When your handoff pile passes ~20 entries on one project, add F (Rollup Handoffs)** -- summarize old history into one rollup, keep the raw files for forensic lookup.
 
 **Anti-patterns to avoid:**
 - Dumping raw conversation history into a file (noise overwhelms signal)

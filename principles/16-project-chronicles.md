@@ -132,6 +132,27 @@ Chronicles are append-only and grow over time. For very long projects (50+ entri
 - Or add a "Summary" section at the top that condenses older entries
 - Old entries remain valuable as searchable history even if not read in full
 
+## Chronicles and Handoff Rollups
+
+Chronicles and rollup handoffs solve adjacent problems and should be used together on long projects.
+
+| Artifact | Purpose | When written |
+|---|---|---|
+| **Handoff** | "What should the next session do?" | End of every session |
+| **Rollup handoff** | "Summarize handoffs 1..N so new sessions do not read all of them" | When handoff pile exceeds ~20 entries |
+| **Chronicle entry** | "Why did the project go this way?" | At milestones / pivots / dead-end confirmations |
+| **Chronicle** (whole file) | "How did we get here?" | Exists for the project lifetime |
+
+The useful workflow:
+
+1. Session writes a handoff (always).
+2. If a milestone or pivot happened, session **also** appends a chronicle entry pointing at the handoff.
+3. When the handoff pile gets too big, a session writes a rollup handoff covering handoffs 1..N. The rollup's `covers:` list should line up with the chronicle entries that cite those handoffs — if a chronicle entry cites handoff H and H is subsumed by a rollup, the chronicle entry's "Handoff: H" reference still resolves (the raw file is kept, just marked `rolled_up_into: ...`).
+
+See [alternatives/session-handoff.md §F (Rollup Handoffs)](../alternatives/session-handoff.md) for the rollup pattern in detail (frontmatter layout, session-start protocol, attribution to MF0-1984 which introduced the `covered_until_message_id` pointer that this pattern borrows).
+
+**When not to use rollups:** small projects (< 10 handoffs), short-lived work (< 2 weeks), or projects where reading every handoff is the point (onboarding material, audit trail). Rollups are a scale mitigation, not always a win.
+
 ## Relationship to Other Principles
 
 - **Codified Context (07):** Chronicles are another form of codified context - project knowledge that persists across sessions
