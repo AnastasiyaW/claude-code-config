@@ -14,7 +14,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 
 ## What This Gives You
 
-**19 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**23 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -32,6 +32,10 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - **Skill is a monolithic wall of text?** Split into Direction, Blueprints, Solutions ([DBS Framework](principles/17-dbs-skill-creation.md))
 - **Parallel chats fight over GPUs or overwrite each other's state?** Append-only handoffs + lock-file coordination ([Multi-Session Coordination](principles/18-multi-session-coordination.md))
 - **One chat needs to send a specific request to another?** File-based mailbox with email-style threading and delivery receipts ([Inter-Agent Communication](principles/19-inter-agent-communication.md))
+- **AI-assisted code review findings get rediscovered next PR?** Review finding → regression test → invariant → cross-reference ([Knowledge Base Enforcement](principles/21-knowledge-base-enforcement.md))
+- **Zero-day vulnerabilities buried in source tree?** LLM + rules + SAST pipeline ([Vulnerability Detection Pipeline](principles/20-vulnerability-detection-pipeline.md))
+- **User needs to choose between visual options (UI, design, diagrams)?** HTML fragment server + file-based event queue ([Visual Context Pattern](principles/22-visual-context-pattern.md))
+- **Output keeps reverting to generic defaults (Inter font, SELECT *, etc.)?** Anti-attractor procedure + three-layer enforcement ([Anti-pattern as Config](principles/23-anti-pattern-as-config.md))
 
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
 
