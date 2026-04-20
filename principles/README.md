@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 19 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 23 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -196,6 +196,46 @@ Directed asynchronous messaging between parallel Claude sessions using classical
 
 ---
 
+### [20 - Vulnerability Detection Pipeline](20-vulnerability-detection-pipeline.md)
+
+LLM-driven pipeline for discovering security vulnerabilities in source code. Combines the model's pattern-matching with deterministic SAST rules and triage gates so findings come with evidence, not just suspicion. Pattern: scan → score → cross-reference against known CVE taxonomies → file regression test.
+
+**When to use:** Auditing an unfamiliar codebase. Pre-release security review. Investigating a reported CVE in a dependency. Routine "find what is there" scans on sensitive code.
+
+**Source:** Claude-led vulnerability research experiments (Feb 2026), OWASP ASVS, internal security review practice
+
+---
+
+### [21 - Knowledge Base Enforcement](21-knowledge-base-enforcement.md)
+
+Every accepted code-review finding gains three forms: a regression test (guards against recurrence), an invariant written to the knowledge base (teaches future sessions), and a cross-reference in the file(s) it constrains (discoverable at edit time). Missing any form loses a guarantee.
+
+**When to use:** After any non-trivial code-review finding. When "we fixed this before" keeps happening. Building a KB that agents read before editing code in a specific area.
+
+**Source:** Production workflow distilled from repeat-incident patterns
+
+---
+
+### [22 - Visual Context Pattern](22-visual-context-pattern.md)
+
+Local HTTP server + HTML fragments + file-based event queue lets an agent present UI / design / diagram options to a human and read clicks back. Works across every agent runtime (Claude Code, Codex, Cursor, Gemini CLI) because it uses files, not MCP. Minimum viable implementation is ~100 lines.
+
+**When to use:** Any decision where "would the user understand this better by seeing it than reading it?" is yes. UI mockup selection, spatial / architectural diagrams, visual comparisons. NOT for simple yes/no text decisions.
+
+**Source:** Distilled from obra/superpowers visual-companion skill (2026-04)
+
+---
+
+### [23 - Anti-pattern as Config](23-anti-pattern-as-config.md)
+
+Three-layer enforcement stack for preventing LLM regression to generic defaults: skill + reference file with explicit anti-patterns (layer 1), slash-commands wrapping common checks like `/audit` and `/polish` (layer 2), deterministic detector that runs without LLM and fails build on match (layer 3). Plus the anti-attractor procedure: name reflex → reject if listed → enumerate alternatives → justify pick.
+
+**When to use:** Whenever outputs revert to a single known-bad default (Inter font, purple gradients, `SELECT *`, bare `except`, microservices for small apps, etc.). Frontend design, security review, SQL code, Dockerfiles, Python idioms, test quality.
+
+**Source:** Distilled from pbakaus/impeccable (2026-04) + OWASP agent security research + internal harness-design practice
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -234,6 +274,11 @@ Use this table to pick the right principle for your situation:
 | "One chat needs to ask another a specific question" | 19 Inter-Agent Communication | 18 Multi-Session Coordination |
 | "Need to broadcast an architectural decision to all running sessions" | 19 Inter-Agent Communication | 07 Codified Context |
 | "Sender wants to know if recipient actually processed the message" | 19 Inter-Agent Communication | 02 Proof Loop |
+| "Looking for zero-day vulnerabilities in an unfamiliar codebase" | 20 Vulnerability Detection Pipeline | 10 Agent Security |
+| "Same code-review findings keep getting rediscovered" | 21 Knowledge Base Enforcement | 07 Codified Context |
+| "Need the user to choose between UI or design options" | 22 Visual Context Pattern | 01 Harness Design |
+| "Agent output keeps defaulting to Inter / SELECT * / bare except" | 23 Anti-pattern as Config | 04 Deterministic Orchestration |
+| "Cloud design tool vs terminal-first design workflow?" | 22 Visual Context Pattern | alternatives/design-md-pattern.md |
 
 ### Composition Patterns
 
@@ -245,3 +290,6 @@ These principles are designed to layer:
 4. **Reasoning + Verification:** Use Structured Reasoning (05) to analyze, Proof Loop (02) to prove the analysis is correct.
 5. **Security + Supply Chain:** Use Agent Security (10) for runtime defense against injection, Supply Chain Defense (09) for dependency-level protection. Together they cover both code-level and package-level attack vectors.
 6. **Security + Proof Loop:** Use Agent Security (10) to prevent injection during build, Proof Loop (02) with fresh-session verification to catch any injection that persisted.
+7. **Visual + Anti-pattern:** Use Visual Context Pattern (22) to show design options in a browser, Anti-pattern as Config (23) to keep those options from sliding back to generic defaults (Inter, purple gradients, etc.).
+8. **KB Enforcement + Proof Loop:** Use Knowledge Base Enforcement (21) to capture review findings as tests + invariants + cross-refs, Proof Loop (02) to verify the regression test actually protects against recurrence.
+9. **Vulnerability Pipeline + Red Lines:** Use Vulnerability Detection Pipeline (20) to find issues, Red Lines (15) to codify the non-negotiable ones that must never regress.

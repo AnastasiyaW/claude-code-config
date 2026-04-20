@@ -6,7 +6,7 @@ AI coding agents operate at the intersection of trusted instructions and untrust
 
 Prompt injection is ranked #1 on the OWASP Top 10 for LLM Applications 2025. Attacks surged 340% in 2026. Critical CVEs have been filed against every major coding agent: GitHub Copilot (CVE-2025-53773, CVSS 7.8), Cursor (CVE-2025-54135, CVSS 9.8), Claude Code (CVE-2025-59536, CVSS 8.7). Only 34.7% of organizations have deployed dedicated prompt injection defenses.
 
-This principle codifies what we know about attack patterns, real incidents, and defense layers as of March 2026.
+This principle codifies what we know about attack patterns, real incidents, and defense layers as of April 2026.
 
 ---
 
@@ -207,7 +207,7 @@ The Attack Taxonomy above maps to specific OWASP items. Where an item is not cov
 | 2026 Mar | axios@1.14.1 supply chain + RAT | DPRK-backed account hijack, WAVESHAPER.V2 RAT deployment | GHSA-fw8c-xr5c-95f9 |
 | 2026 Mar | Cursor MCP case-sensitivity | `.cursor/mcp.json` vs `.Cursor/mcp.json` bypass -> RCE via prompt injection | CVE-2025-59944 (8.0), fixed v1.7 |
 | 2026 Mar 31 | Claude Code source leak | 59.8 MB source map accidentally shipped in npm v2.1.88 - exposes internal architecture for attackers | - |
-| 2026 Apr | Claude Code CLI: 3 command injection CVEs | TERMINAL env var lookup, editor path injection, auth helper - all share one root cause (unsanitized shell interpolation). Found by Phoenix Security hours after source leak. Validated unpatched on v2.1.91 (production) as of Apr 3 | CVE-2026-35020 / 35021 / 35022 (CVSS 7.2-8.4) |
+| 2026 Apr | Claude Code CLI: 3 command injection CVEs | TERMINAL env var lookup, editor path injection, auth helper - all share one root cause (unsanitized shell interpolation). Found by Phoenix Security hours after source leak. Validated unpatched on v2.1.91 (production) as of Apr 3. **Not filed as GHSA as of 2026-04-20** (most recent published Anthropic advisory is GHSA-5cwg-9f6j-9jvx, "Insecure System-Wide Configuration Loading", 2026-04-17). Current patch status in later builds unverified — check `anthropics/claude-code/security/advisories` before making a trust decision | CVE-2026-35020 / 35021 / 35022 (CVSS 7.2-8.4) |
 | 2026 Apr 3 | Microsoft Azure DevOps MCP: missing auth | First-party MCP server from Microsoft shipped without authentication on the listener. Any client on the network could enumerate and call tools. Illustrates that first-party MCP = still untrusted until auth is verified | CVE-2026-32211 (CVSS 9.1) |
 
 ---
@@ -433,7 +433,7 @@ MCP is a particularly dangerous attack surface because it was designed for ease 
 
 ---
 
-## Framework Security Comparison (March 2026)
+## Framework Security Comparison (April 2026)
 
 | Feature | Claude Code | Cursor | Copilot | Devin |
 |---------|-------------|--------|---------|-------|
@@ -615,6 +615,7 @@ RedCodeAgent is the first automated red-team agent against code agents. It accum
 - **07 Codified Context:** CLAUDE.md and rules files are trusted sources but must be protected from unauthorized modification
 - **09 Supply Chain Defense:** Package age gating prevents compromised packages from reaching the agent environment
 - **06 Multi-Agent Decomposition:** Each agent boundary is an attack surface for cross-agent injection (82.4% compromise rate)
+- **23 Anti-pattern as Config:** The Attack Taxonomy in this principle is the security-domain sibling of the anti-pattern config pattern — same problem class (enumerate known-bad patterns, enforce with detectors), different field layout
 
 ---
 
