@@ -1,4 +1,4 @@
-# 22 - Anti-pattern as Config: Explicit Negative Lists and the Anti-Attractor Procedure
+# 23 - Anti-pattern as Config: Explicit Negative Lists and the Anti-Attractor Procedure
 
 **Source:** Distilled from pbakaus/impeccable (2026-04) + OWASP agent security research + our own harness-design experience.
 
