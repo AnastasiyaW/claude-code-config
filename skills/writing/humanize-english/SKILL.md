@@ -99,7 +99,6 @@ Other high-excess words (>5x frequency spike):
 | illuminate | show, reveal, expose |
 | unveil | launch, drop, release |
 | remarkable | striking, sharp, wild |
-| dramatically / significantly / drastically / substantially | concrete number ("2x faster", "by 40%"), or plain "fast/big/huge". LLMs love vague amplifiers - humans name the scale |
 
 **Key finding from Liang et al.:** unlike content shifts (COVID terms = nouns), LLM excess is almost entirely STYLE words - 66% verbs, 18% adjectives. This is what makes them detectable.
 

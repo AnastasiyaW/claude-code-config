@@ -208,6 +208,38 @@ The Attack Taxonomy above maps to specific OWASP items. Where an item is not cov
 | 2026 Mar | Cursor MCP case-sensitivity | `.cursor/mcp.json` vs `.Cursor/mcp.json` bypass -> RCE via prompt injection | CVE-2025-59944 (8.0), fixed v1.7 |
 | 2026 Mar 31 | Claude Code source leak | 59.8 MB source map accidentally shipped in npm v2.1.88 - exposes internal architecture for attackers | - |
 | 2026 Apr | Claude Code CLI: 3 command injection CVEs | TERMINAL env var lookup, editor path injection, auth helper - all share one root cause (unsanitized shell interpolation). Found by Phoenix Security hours after source leak. Validated unpatched on v2.1.91 (production) as of Apr 3 | CVE-2026-35020 / 35021 / 35022 (CVSS 7.2-8.4) |
+| 2026 Apr 3 | Microsoft Azure DevOps MCP: missing auth | First-party MCP server from Microsoft shipped without authentication on the listener. Any client on the network could enumerate and call tools. Illustrates that first-party MCP = still untrusted until auth is verified | CVE-2026-32211 (CVSS 9.1) |
+
+---
+
+## April 2026 Update: State of Attacks and Defenses
+
+### Attack success rates crossed the 90%+ threshold
+
+- **PIDP-Attack** (Prompt Injection via Delayed Payload): 98.125% success rate across 3 benchmarks and 8 different models. This is not a lab-only result — it replicates across state-of-the-art production agents.
+- **Adaptive attacks against SOTA defenses:** >85% success. Static defenses are now insufficient; depth-based risk reduction is the only viable strategy.
+- **Indirect PI via poisoned email → GPT-4o → SSH key exfil:** up to 80% success (Palo Alto Networks, January 2026 replication).
+
+The consequence: defenses must assume injection succeeds and limit blast radius, not try to prevent it outright.
+
+### Memory integrity detection breakthrough
+
+SentinelOne introduced a memory integrity verification module in 2026 Q1 with measurable impact:
+
+- **Mean Time To Detect** for memory poisoning attacks: **72 hours → under 15 minutes**
+- Technique: real-time behavior anomaly correlation + memory audit on write
+
+For agent systems with persistent memory (Claude Code's `~/.claude/memory/`, MCP-backed memory servers, long-running LangGraph agents), this is the first production-grade detective control. The preventive side still has no good answer — memory poisoning remains temporally decoupled and hard to filter at write time.
+
+### Multi-modal defense framework (production-viable)
+
+Published results show 94% detection accuracy for prompt injection, 70% reduction in trust leakage, 96% task accuracy retention (the defense does not significantly degrade legitimate workflows). The framework combines:
+
+- Attention-based anomaly detection (post-input, pre-reasoning)
+- Intent-flow analysis (reasoning trace matches goal)
+- Output-constraint enforcement (tool calls match expected patterns)
+
+Architecture note: this is a **layered defense**, not a single classifier. Each layer has ~85-90% accuracy alone, but combined they reach 94% while keeping false-positive rates workable.
 
 ---
 
