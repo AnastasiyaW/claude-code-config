@@ -121,6 +121,30 @@ Run validator against 3 other projects to confirm false positive rate
 
 **Compression ratio:** A 2-hour session produces ~100K tokens of conversation. The handoff is ~1,500 tokens. That is 67x compression with higher signal density.
 
+### Handoff as Verification Contract
+
+A good handoff is not a dump of "what I did." It is a **contract for the next session** - with explicit verification items.
+
+```markdown
+## Verification (Phase 1, read-only, ~30 min)
+
+1. [ ] Run `python scripts/validate_config.py` - should report 0 broken refs
+2. [ ] Check `scripts/context_degradation.py --days 7` runs without errors
+3. [ ] Verify HOW-IT-WORKS.md renders on GitHub (no broken links)
+4. [ ] Confirm principles/README.md lists 17 principles, not 16
+5. [ ] Grep HOW-IT-WORKS.md for personal data (IPs, server names)
+6. [ ] Spot-check 3 random links in README.md - do they resolve?
+```
+
+This is the [Proof Loop](principles/02-proof-loop.md) pattern applied to session transitions. The previous session does not ask the next one to trust its claims. It says: "here are 6 things to independently verify." The receiving session's role is **verifier**, not generator - it checks before it builds.
+
+**Why this matters:** Without verification items, the next session assumes everything is correct and builds on top. If the previous session left a subtle error (a broken link, a wrong count, a leaked personal detail), it compounds. With a verification contract, the first 30 minutes are a read-only audit. Errors are caught before they propagate.
+
+**The pattern:**
+- **Generator session** = did the work, wrote the handoff, listed what to verify
+- **Verifier session** = fresh context, no attachment to the work, runs the checklist
+- **Separation** = the generator cannot verify itself (same bias as Generator-Evaluator)
+
 ---
 
 ## Hooks: Code That Runs When Rules Would Be Forgotten
