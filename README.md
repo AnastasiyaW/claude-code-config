@@ -56,7 +56,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 | [test-muting-guard](hooks/test-muting-guard.py) | `PreToolUse` | Blocks adding `@skip`, `.only()`, `@Ignore` to existing tests |
 | [backup-retention-cleanup](hooks/backup-retention-cleanup.py) | `Stop` | Cleans up old backup branches (14-day retention) |
 
-**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md).
+**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md).
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -227,12 +227,12 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 23 个架构原则、15 对比方案、18 个技能、15 个即用型 Hook 脚本和 8 个项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 23 个架构原则、15 对比方案、18 个技能、14 个即用型 Hook 脚本和 8 个项目模板。
 
 **核心功能:**
 - `principles/` - 23 个独立架构原则，每个解决一个具体失败模式
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 15 个即用型 Hook 脚本（安全防护、会话管理、技能路由）
+- `hooks/` - 14 个即用型 Hook 脚本（安全防护、会话管理、技能路由）
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆和项目编年史模板
 - `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证）
 
@@ -244,12 +244,12 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 23 архитектурных принципа, 15 сравнений подходов, 18 навыков, 15 hook-скриптов и 8 шаблонов.
+Система конфигурации для Claude Code агентов. 23 архитектурных принципа, 15 сравнений подходов, 18 навыков, 14 hook-скриптов и 8 шаблонов.
 
 **Что внутри:**
 - `principles/` - 23 принципа, каждый предотвращает конкретный тип отказа
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - 15 готовых скриптов (7 safety guards, handoff, drift validator, keyword router и др.)
+- `hooks/` - 14 готовых скриптов (7 safety guards, handoff, drift validator, keyword router и др.)
 - `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник
 - `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация)
 
