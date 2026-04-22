@@ -4,6 +4,58 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-22 (v3.1.0 - Proof-Verify Skill + Keyword Router + Freshness Audit)
+
+### Added: Proof-Verify Skill (`skills/development/proof-verify/`)
+
+Plan-based verification with independent agents. Four phases:
+
+1. **Plan** - freeze acceptance criteria in `.proof/PLAN.md` before any code
+2. **Build** - implement, record progress and evidence
+3. **Verify** - independent agent (fresh context, never saw build) checks each AC
+4. **Fix** - minimal fixes, re-verify, loop until all PASS
+
+Key: builder cannot verify their own work. Verifier reads PLAN.md only, runs checks independently.
+
+**KB-aware extension** (`references/kb-aware-verification.md`): verifier also checks conformance against project knowledge base - coding standards, architecture patterns, conventions. ACs catch functional bugs, KB conformance catches style/architecture drift.
+
+New template: `templates/proof-plan.md` - starter plan with AC format and KB reference section.
+
+Sources: Proof Loop (Principle 02), Sprint Contract (Principle 01), OpenClaw-RL, oh-my-claudecode Ralph.
+
+### Added: Keyword-Skill-Router Hook (`hooks/keyword-skill-router.py`)
+
+`UserPromptSubmit` hook that detects natural-language keywords and suggests matching skills. Adapted from oh-my-claudecode's keyword detection pattern with key difference: **soft suggestions** (agent decides relevance) vs OMC's hard routing (forced invocation).
+
+- 8 routes: planning, code review, security, handoff, research, debugging, simplify, init
+- ~40 regex patterns, bilingual (Russian + English)
+- Non-blocking: outputs suggestion, does not force skill invocation
+
+### Added: HOW-IT-WORKS.md - Technical Deep Dive
+
+New page explaining HOW each technology works mechanically:
+- Rules (conditional context injection)
+- Memory (wiki-graph, 78 files, 178 cross-links, layered loading)
+- Handoffs (multi-session state transfer, 67x compression, verification contract)
+- Hooks (code vs rules - "rules are hope, hooks are guarantees")
+- KV-Cache (96.9% hit rate, 4 rules for cache-friendly context)
+- Context fill vs degradation (measured 169 sessions, 45K turns)
+- Supply Chain Defense (one line blocked DPRK attack)
+
+New script: `scripts/context_degradation.py` - measures quality proxies across context fill-level buckets. Tests "40%+ = degradation" claim. Our data on 1M context: no degradation up to 72% fill.
+
+### Updated: README freshness audit
+
+- Principle count: 17 → 23 (other sessions added 18-23)
+- Skills: 16 → 18 (added proof-verify, plan-swarm-review)
+- Hooks: 5 → 15 (added all safety hooks + keyword router + backup cleanup)
+- Alternatives: 12 → 15
+- Templates: 7 → 8 (added proof-plan)
+- Chinese and Russian sections updated with correct counts
+- Fixed principle 12 numbering conflict (DBS → 17)
+
+---
+
 ## 2026-04-20 (Humanize skills update: 9 new AI markers + Habr feedback)
 
 ### Updated: `skills/writing/humanize-russian/SKILL.md`
