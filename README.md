@@ -47,6 +47,14 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 | [session-handoff-reminder](hooks/session-handoff-reminder.py) | `Stop` | Reminds to write handoff before closing long sessions |
 | [session-handoff-check](hooks/session-handoff-check.py) | `SessionStart` | Shows recent handoffs from previous sessions |
 | [stop-phrase-guard](hooks/stop-phrase-guard.py) | `Stop` | Detects behavioral-regression phrases (ownership dodging, permission-seeking, premature stopping) |
+| [keyword-skill-router](hooks/keyword-skill-router.py) | `UserPromptSubmit` | Detects natural-language keywords and suggests matching skills (bilingual RU/EN) |
+| [api-key-leak-detector](hooks/api-key-leak-detector.py) | `PostToolUse` | Scans tool output for exposed API keys, tokens, secrets |
+| [command-injection-guard](hooks/command-injection-guard.py) | `PreToolUse` | Blocks shell substitution with non-trivial commands |
+| [git-destructive-guard](hooks/git-destructive-guard.py) | `PreToolUse` | Blocks `git reset --hard`, `push --force`, `branch -D` |
+| [git-auto-backup](hooks/git-auto-backup.py) | `PreToolUse` | Creates backup branch before destructive git operations |
+| [self-harm-guard](hooks/self-harm-guard.py) | `PreToolUse` | Prevents agent from killing its own process, locking SSH |
+| [test-muting-guard](hooks/test-muting-guard.py) | `PreToolUse` | Blocks adding `@skip`, `.only()`, `@Ignore` to existing tests |
+| [backup-retention-cleanup](hooks/backup-retention-cleanup.py) | `Stop` | Cleans up old backup branches (14-day retention) |
 
 **Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md).
 
@@ -70,7 +78,7 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 **New:** [HOW-IT-WORKS.md](HOW-IT-WORKS.md) - technical deep dive into how each technology actually works, with real measurements.
 
 **Structure:**
-- `principles/` - 19 standalone architectural principles. Read the one that matches your current problem.
+- `principles/` - 23 standalone architectural principles. Read the one that matches your current problem.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
@@ -182,6 +190,8 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Video | `script-evaluator` | Score scripts on 6 dimensions, detect flatness patterns |
 | Video | `remotion-production-guide` | Complete Remotion reference: animations, springs, typography, 3D, export |
 | Video | `video-post-production` | FFmpeg patterns for audio, captions, color, platform export |
+| Development | `proof-verify` | Plan-based verification: freeze ACs, build, verify with independent agent, KB conformance |
+| Architecture | `plan-swarm-review` | Multi-agent plan review with parallel independent reviewers |
 | Writing | `humanize-english` | Transform AI text into natural English prose |
 | Writing | `humanize-russian` | Transform AI text into natural Russian prose |
 
@@ -217,14 +227,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 19 个架构原则、12+ 对比方案、16 个技能、5 个即用型 Hook 脚本和 7 个项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 23 个架构原则、15 对比方案、18 个技能、15 个即用型 Hook 脚本和 8 个项目模板。
 
 **核心功能:**
-- `principles/` - 19 个独立架构原则，每个解决一个具体失败模式
+- `principles/` - 23 个独立架构原则，每个解决一个具体失败模式
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 5 个即用型 Hook 脚本（漂移检测、安全防护、会话交接）
-- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 记忆和项目编年史模板
-- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查）
+- `hooks/` - 15 个即用型 Hook 脚本（安全防护、会话管理、技能路由）
+- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆和项目编年史模板
+- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证）
 
 **安装:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` 或直接复制所需文件。
 
@@ -234,14 +244,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 19 архитектурных принципов, 12+ сравнений подходов, 16 навыков, 5 hook-скриптов и 7 шаблонов.
+Система конфигурации для Claude Code агентов. 23 архитектурных принципа, 15 сравнений подходов, 18 навыков, 15 hook-скриптов и 8 шаблонов.
 
 **Что внутри:**
-- `principles/` - 19 принципов, каждый предотвращает конкретный тип отказа
+- `principles/` - 23 принципа, каждый предотвращает конкретный тип отказа
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - 5 готовых скриптов (валидация drift, защита от деструктивных команд, утечка секретов, handoff)
-- `templates/` - стартовые CLAUDE.md для web-app, ML, library + шаблоны memory и хроник
-- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью)
+- `hooks/` - 15 готовых скриптов (7 safety guards, handoff, drift validator, keyword router и др.)
+- `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник
+- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация)
 
 **Установка:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` или копирование нужных файлов.
 

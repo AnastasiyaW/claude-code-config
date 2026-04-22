@@ -4,7 +4,7 @@ This is a configuration system repository for AI coding agents, not an applicati
 
 ## Purpose
 
-- `principles/` - 19 architectural principles, each preventing a specific failure mode
+- `principles/` - 23 architectural principles, each preventing a specific failure mode
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem
 - `hooks/` - ready-to-use Python hook scripts (session management, safety guards)
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types
