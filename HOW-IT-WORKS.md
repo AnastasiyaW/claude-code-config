@@ -131,7 +131,7 @@ A good handoff is not a dump of "what I did." It is a **contract for the next se
 1. [ ] Run `python scripts/validate_config.py` - should report 0 broken refs
 2. [ ] Check `scripts/context_degradation.py --days 7` runs without errors
 3. [ ] Verify HOW-IT-WORKS.md renders on GitHub (no broken links)
-4. [ ] Confirm principles/README.md lists 17 principles, not 16
+4. [ ] Confirm principles/README.md lists all principles (count matches directory)
 5. [ ] Grep HOW-IT-WORKS.md for personal data (IPs, server names)
 6. [ ] Spot-check 3 random links in README.md - do they resolve?
 ```

@@ -381,7 +381,7 @@ Plan-swarm-review SKILL.md updated to reference this KB during code mode reviews
 
 Based on Vul-RAG approach (ACM TOSEM 2025): knowledge-level entries outperform code-level RAG by +16-24% accuracy.
 
-Full Vul-RAG entries (10 articles with code examples, root cause analysis, fixing patterns): published to knowledge-vault/docs/security/cwe/ for happyin.space deployment.
+Full Vul-RAG entries (10 articles with code examples, root cause analysis, fixing patterns): published to knowledge-vault/docs/security/cwe/.
 
 ---
 

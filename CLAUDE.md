@@ -54,7 +54,7 @@ When creating or updating any skill in `.claude/skills/`:
 ```
 [What it does] + [When to use -- specific phrases] + [Key capabilities]
 ```
-Bad: `"Helps with servers."` -- Good: `"Use when: service hangs, GPU health check, tunnel issues on port 2222."`
+Bad: `"Helps with servers."` -- Good: `"Use when: service hangs, GPU health check, SSH tunnel not connecting."`
 
 **Mandatory sections in SKILL.md:**
 - `## Gotchas` -- populate from real failures, update on every edge case

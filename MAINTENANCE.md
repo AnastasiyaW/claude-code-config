@@ -94,7 +94,7 @@ Whenever you notice a class of drift the script missed, **add it as a new automa
    - **Already ported** - covered by an existing principle/rule → verify alignment, no action
 3. For each file in public that exists in local, diff the content:
    - Is the public version lagging behind local evolution? → update public
-   - Is the public version correctly generic while local is happyin/project-specific? → no action
+   - Is the public version correctly generic while local is project-specific? → no action
 4. Update UPDATES.md with any ports or fixes
 
 **Classification helper questions:**
