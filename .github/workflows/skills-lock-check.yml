@@ -1,0 +1,53 @@
+name: skills-lock check
+
+# Verify skills-lock.json is in sync with the actual skills/ directory.
+# Runs on every PR and every push to main. If anyone edits a SKILL.md
+# (or its references/ or scripts/) without regenerating the lock, this
+# job fails with a clear diff of what changed.
+#
+# Regenerate locally:
+#     python scripts/generate_skills_lock.py
+#     git add skills-lock.json && git commit
+#
+# Adopted from Multica's lockfile-in-CI pattern (see docs/ in their
+# repo). Catches unintentional skill drift before merge instead of
+# weeks later when a consumer notices.
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'skills-lock.json'
+      - 'scripts/generate_skills_lock.py'
+      - '.github/workflows/skills-lock-check.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'skills/**'
+      - 'skills-lock.json'
+      - 'scripts/generate_skills_lock.py'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify skills-lock.json matches skills/
+        run: |
+          python scripts/generate_skills_lock.py --check
+
+      - name: Show how to fix
+        if: failure()
+        run: |
+          echo "::error::skills-lock.json is stale. To fix locally:"
+          echo "  python scripts/generate_skills_lock.py"
+          echo "  git add skills-lock.json && git commit -m 'chore: refresh skills-lock'"
