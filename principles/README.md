@@ -4,6 +4,24 @@ A collection of 23 battle-tested principles for building reliable, high-quality 
 
 ---
 
+## Pick by project type
+
+Start here if you are installing claude-code-config into a specific project. Each row is a sensible baseline; add more principles as you hit the problem they solve.
+
+| Project type | Minimum | Recommended additions |
+|---|---|---|
+| **Solo developer, single project** | 04 Deterministic Orchestration, 07 Codified Context, 09 Supply Chain Defense | 11 Documentation Integrity, 13 Research Pipeline |
+| **Web app (React, Vue, Next.js)** | 04, 05 Structured Reasoning, 09, 10 Agent Security | 08 Skills Best Practices, 11 Documentation Integrity |
+| **ML / training / inference pipeline** | 03 Autoresearch, 04, 09, 12 Low-Signal Residual Training | 05, 13 Research Pipeline, 16 Project Chronicles |
+| **Library / published package** | 04, 08 Skills Best Practices, 09, 10 | 11, 17 DBS Skill Creation |
+| **Multi-agent / parallel sessions** | 01 Harness Design, 06 Multi-Agent Decomposition, 09, 18 Multi-Session Coordination, 19 Inter-Agent Communication | 02 Proof Loop, 14 Managed Agents, 22 Visual Context Pattern |
+| **Long-running project (weeks+)** | 02 Proof Loop, 07 Codified Context, 16 Project Chronicles | 11 Documentation Integrity, 21 Knowledge Base Enforcement |
+| **Security-sensitive codebase** | 09 Supply Chain Defense, 10 Agent Security, 15 Red Lines, 20 Vulnerability Detection Pipeline | 02 Proof Loop, 21 Knowledge Base Enforcement |
+
+**Principles 09 (Supply Chain Defense) and 10 (Agent Security) apply universally** - install them even if your project type is not listed.
+
+---
+
 ## Principles Overview
 
 ### [01 - Harness Design](01-harness-design.md)
