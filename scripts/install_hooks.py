@@ -24,6 +24,7 @@ Opt-in extras (use --extras):
   - session-handoff-reminder     Stop          reminds to write handoff
   - session-handoff-check        SessionStart  surfaces recent handoffs
   - keyword-skill-router         UserPromptSubmit  suggests matching skills
+  - task-inbox-show              SessionStart  surfaces .claude/task-inbox/ pending tasks
 
 Usage
 -----
@@ -75,6 +76,7 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("session-handoff-reminder.py",  "Stop", None),
     ("session-handoff-check.py",     "SessionStart", None),
     ("keyword-skill-router.py",      "UserPromptSubmit", None),
+    ("task-inbox-show.py",           "SessionStart", None),
 ]
 
 # Shared utility (not a hook itself - but needed by hooks)
