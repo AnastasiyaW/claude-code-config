@@ -4,6 +4,59 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-23 (v3.2.0 - Article Structure Review + Handoff Skill Injection)
+
+### Added: Article Structure Review Skill (`skills/writing/article-structure-review/`)
+
+Structural self-review for technical articles before publication. Fills three gaps not covered by word-level skills (humanize, infostyle):
+
+1. **Thesis/proof balance** - each significant claim needs a concrete example, number, case study, code snippet, or source citation. Antipattern: 3+ claims in a row without any proof element. Mechanical test: count thesis vs proof per H2 section, ratio above 2:1 = rebuild.
+
+2. **Genre consistency** - one primary genre per article (Story / Reference / Analysis / Rant / Tutorial). If genres mixed, mark transitions explicitly. Test: read only first paragraph of each H2 section - does it read as one throughline or disconnected blocks?
+
+3. **Limitations block** (mandatory) - "What's NOT solved / Where it breaks" section at article end. Builds trust, antidotes promotional tone, communicates maturity. Not false modesty - concrete scaling limits, unverified hypotheses, tradeoffs, known holes.
+
+Plus three secondary checks: paragraph length variety (no three 3-sentence paragraphs in a row = AI marker), middle-section overload detection (40% of theses in middle third = rebalance), visual vs prose check (structural data → diagram/table, not description).
+
+Based on recurring reader feedback on LLM-assisted technical drafts: "many theses, few examples", "overconfident tone", "middle overloaded", "missing limitations", "some parts unclear why they're here - show a picture".
+
+### Added: Required Skills Section in Handoffs
+
+Session handoff format extended with `## Required skills` section. When a new session picks up a handoff, it reads the listed skills BEFORE continuing work - ensures project-specific rules (e.g. humanize for writing, article-structure-review for articles) load automatically.
+
+Benefits:
+- Handoff becomes project-aware, not just session-aware
+- Auto-loading of skills tied to codified state (principle 07)
+- Eliminates "new session doesn't know about project rules" class of issue
+
+Applied to session-handoff rule (`.claude/rules/session-handoff.md` in project) + new handoff template. Example:
+
+```markdown
+## Required skills
+- article-writing/skills/humanize-russian.md
+- article-writing/skills/article-structure-review.md
+- article-writing/skills/infostyle-audit.md
+```
+
+### Added: Project-Level Auto-Load Rule Pattern
+
+New pattern: project-specific `.claude/rules/auto-load-*.md` rules that list mandatory skills with triggers. When editing certain files or matching user commands, agent is instructed to read skills first. Example triggers for writing project:
+
+- Edit/Write over `drafts/**/article.md`
+- User commands like "пиши статью", "правь черновик", "ответ на коммент"
+- Session start in project directory
+
+Three-tier loading guarantee:
+1. CLAUDE.md lists skills in required audit order (soft)
+2. `.claude/rules/auto-load-*.md` with explicit triggers (firmer)
+3. `## Required skills` in handoff for session continuity (strongest for multi-session work)
+
+### Context for this update
+
+These additions emerged from reader feedback on two published technical articles. Round-trip: published → critical feedback → skill formalization → shared publicly. Matches the "external verifier" pattern from Proof Loop (principle 02) - reviewers' critiques become inputs for tooling, not one-off responses.
+
+---
+
 ## 2026-04-22 (v3.1.0 - Proof-Verify Skill + Keyword Router + Freshness Audit)
 
 ### Added: Proof-Verify Skill (`skills/development/proof-verify/`)
