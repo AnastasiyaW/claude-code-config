@@ -83,7 +83,8 @@ This is not a collection of tips. It is a **system** that teaches your agent *ho
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
 - `skills/` - domain-specific knowledge (AI/ML, frontend, iOS, code review). Loaded on demand.
-- `scripts/` - diagnostic utilities (config validator, KV-cache stats).
+- `scripts/` - diagnostic utilities (config validator, KV-cache stats, skills-lock generator, handoff GC).
+- `skills-lock.json` - reproducible lockfile with content hashes of every skill (regenerate via `scripts/generate_skills_lock.py`).
 - `CLAUDE.md` - compact summary of all principles for global config.
 
 ---

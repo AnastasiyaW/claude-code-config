@@ -57,6 +57,46 @@ These additions emerged from reader feedback on two published technical articles
 
 ---
 
+## 2026-04-23 (v3.2.0 - Multica patterns adopted)
+
+Three patterns adopted from Multica (multica-ai/multica) after deep research.
+Multica itself is a team-scale product (Postgres + Go + Next.js) - too heavy
+for solo use - but their engineering has reusable pieces.
+
+### Added: `scripts/generate_skills_lock.py` + `skills-lock.json`
+
+Deterministic lockfile for all skills. Each skill gets:
+- `content_hash` - sha256 of SKILL.md + references/ + scripts/ (path-sorted)
+- `size_bytes`, `file_count`, `files` list, `last_modified`
+- `aggregate_hash` at top level for whole-repo drift detection
+
+Run `python scripts/generate_skills_lock.py --check` in CI to catch
+unintentional drift (someone edits SKILL.md, forgets to regen lock).
+
+Inspired by Multica's `skills-lock.json` pattern, adapted to our file-based
+skill structure (no pgvector dependency).
+
+### Added: `scripts/cleanup_handoffs.py`
+
+TTL-based GC for `.claude/handoffs/` with crucial distinction:
+- **DONE** (CLOSED/RESUMED/ABANDONED) → archive after `--done-ttl` days
+- **ORPHAN** (ACTIVE/UNKNOWN) → **warn only**, never auto-delete
+
+The DONE/ORPHAN split comes from Multica's daemon GC (PR #1559). Naive
+"delete anything older than N days" is dangerous: old ACTIVE handoff may
+be real forgotten work, not trash.
+
+`INDEX.md` never touched (preserves principle 18 append-only invariant).
+
+### Notes on what was NOT adopted
+
+- Multica's Postgres + pgvector stack: too heavy, conflicts with our
+  "file-based, zero deps" design principle (shared with mclaude)
+- WebSocket real-time progress: our file-polling is good enough solo
+- Team task board UI: we are single-user context, not a team platform
+
+---
+
 ## 2026-04-22 (v3.1.0 - Proof-Verify Skill + Keyword Router + Freshness Audit)
 
 ### Added: Proof-Verify Skill (`skills/development/proof-verify/`)
