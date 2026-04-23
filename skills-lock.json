@@ -1,0 +1,202 @@
+{
+  "lockfile_version": 1,
+  "generated_at": "2026-04-23T14:33:41+00:00",
+  "skill_count": 19,
+  "aggregate_hash": "sha256:03e520b34c3c1b5359c7d5f4aa434d2553eea69d4e2591d917a3af8c7f256e81",
+  "skills": {
+    "ai-ml/diffusion-engineering": {
+      "content_hash": "sha256:f497eea4a627a5cc16bf870f9b9c12675e56e3b53f158da61c7add501c459659",
+      "size_bytes": 62606,
+      "file_count": 7,
+      "files": [
+        "SKILL.md",
+        "references/architectures.md",
+        "references/encoders-data.md",
+        "references/eval-debug.md",
+        "references/memory.md",
+        "references/samplers.md",
+        "references/training.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.263400+00:00"
+    },
+    "ai-ml/flux2-klein-prompting": {
+      "content_hash": "sha256:2f67071d6f2907d659569c3870fdc7445096f27151866ac26b9e1a1077ef86dc",
+      "size_bytes": 11448,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.307183+00:00"
+    },
+    "ai-ml/flux2-lora-training": {
+      "content_hash": "sha256:13ec6f85e5a64894b70fcf50f9123dc127cddd0663c86eb675f4cb56f6331edf",
+      "size_bytes": 22661,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-03-28T12:03:53.970263+00:00"
+    },
+    "ai-ml/forensic-prompt-compiler": {
+      "content_hash": "sha256:f7e6a93fe5c6c9ae1a85db8bd053f242b146fe5a80f85e00d89072d328faf9a1",
+      "size_bytes": 11652,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.347868+00:00"
+    },
+    "ai-ml/vlm-segmentation": {
+      "content_hash": "sha256:cd85217a333287c56e24ee82e979f26ec3a853e2aaddbdc0c6adf94a01b78725",
+      "size_bytes": 34988,
+      "file_count": 4,
+      "files": [
+        "SKILL.md",
+        "references/diffusion-engineering.md",
+        "references/gpu-deployment.md",
+        "references/vlm-segmentation.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.393594+00:00"
+    },
+    "architecture/harness-design": {
+      "content_hash": "sha256:3fed4bcdda2d52386a7ab5de3a87fa4fd1461b15ef58dd7a1782c8da6fcf45c7",
+      "size_bytes": 11778,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-03-28T12:03:53.974436+00:00"
+    },
+    "architecture/plan-swarm-review": {
+      "content_hash": "sha256:29c0ed001061bb73832995c5271dc8df87a7fd8fcd4304097cb2851921541a6f",
+      "size_bytes": 22911,
+      "file_count": 2,
+      "files": [
+        "SKILL.md",
+        "references/vulnerability-kb.md"
+      ],
+      "last_modified": "2026-04-16T14:44:34.238826+00:00"
+    },
+    "development/deep-review": {
+      "content_hash": "sha256:2f2ca48dfc6f5c9d551f095f9b1bafc109836276cd4b39db1991048e025e4c5d",
+      "size_bytes": 12882,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-03-28T12:03:53.969737+00:00"
+    },
+    "development/proof-verify": {
+      "content_hash": "sha256:ef88617009287d457d534ff2bbd152d564951aece9ef73d836054a0c750af474",
+      "size_bytes": 9851,
+      "file_count": 2,
+      "files": [
+        "SKILL.md",
+        "references/kb-aware-verification.md"
+      ],
+      "last_modified": "2026-04-22T06:38:40.186908+00:00"
+    },
+    "frontend/frontend-design": {
+      "content_hash": "sha256:cc13e92e9386396511f386368141516a8966a93600b19c02baefce7facee700b",
+      "size_bytes": 42665,
+      "file_count": 5,
+      "files": [
+        "SKILL.md",
+        "references/components-frameworks.md",
+        "references/layout-css.md",
+        "references/performance-a11y.md",
+        "references/visual-styles.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.433912+00:00"
+    },
+    "ios/ios-development": {
+      "content_hash": "sha256:c232c054a7b016bd5ab5ef94c72e0ab1c96825cf974d78bb71ace55e4e223f41",
+      "size_bytes": 109450,
+      "file_count": 9,
+      "files": [
+        "SKILL.md",
+        "references/architecture.md",
+        "references/data.md",
+        "references/metal-graphics.md",
+        "references/navigation.md",
+        "references/networking.md",
+        "references/performance.md",
+        "references/swiftui.md",
+        "references/uikit.md"
+      ],
+      "last_modified": "2026-03-31T11:12:23.473014+00:00"
+    },
+    "video-production/product-meaning-extractor": {
+      "content_hash": "sha256:8ecb1a942a701f15b847d8b3b44b23d1084df62122aa82b91c78a2b71c022800",
+      "size_bytes": 8743,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-11T18:21:44.747139+00:00"
+    },
+    "video-production/remotion-production-guide": {
+      "content_hash": "sha256:75bdc40851d6424de7761cba2adf764b78d16de8448722fe4b31a3efd606218c",
+      "size_bytes": 7678,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-11T18:25:05.866602+00:00"
+    },
+    "video-production/script-evaluator": {
+      "content_hash": "sha256:3496d3aff8300f67361799a6d9919322f30c01b623e1a12d3f21f6c0749643c8",
+      "size_bytes": 6160,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-11T18:24:11.150436+00:00"
+    },
+    "video-production/video-narrative-arc": {
+      "content_hash": "sha256:fed9094bc97b8936dfaeef131116637d05b133959f7dbbea71eefa18e38060c9",
+      "size_bytes": 8872,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-11T18:23:19.993853+00:00"
+    },
+    "video-production/video-post-production": {
+      "content_hash": "sha256:5e0e1953c5fa27ae5cfa95683cc9500521d1938690f78e591738a079262cd0c2",
+      "size_bytes": 6366,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-11T18:25:55.864681+00:00"
+    },
+    "writing/article-structure-review": {
+      "content_hash": "sha256:f76edff48945d6cd006344741d4f487678a7389890a69ad26e4800aab4f87f47",
+      "size_bytes": 12436,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-23T08:29:27.869663+00:00"
+    },
+    "writing/humanize-english": {
+      "content_hash": "sha256:c5bd4817c38485d82a7e272f96847b441c097a39daf4d70f19e4cbd0058ca2bb",
+      "size_bytes": 11764,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-20T09:17:38.931543+00:00"
+    },
+    "writing/humanize-russian": {
+      "content_hash": "sha256:e506ec416561ed101270dc0a753cf04f60be9c389e7b5ae65605a350f2a764b2",
+      "size_bytes": 15193,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-04-20T09:17:38.910641+00:00"
+    }
+  }
+}
