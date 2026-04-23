@@ -1,14 +1,64 @@
 # Claude Code Configuration System
 
-**Setup in 10 seconds:** paste this into your Claude Code chat and hit Enter:
-
-```
-https://github.com/AnastasiyaW/claude-code-config — look through everything here, pick what fits my project, and set it up
-```
-
-A practical configuration kit for Claude Code agents. Drop it into your project and your agent immediately gets battle-tested architectural principles, security hardening, and decision frameworks - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code agents. 23 architectural principles, 14 safety hooks, 19 skills, 8 templates. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
+
+---
+
+## Installation
+
+Three paths depending on what you need:
+
+### Option 1: Claude Code plugin (fastest)
+
+```bash
+claude plugin install https://github.com/AnastasiyaW/claude-code-config
+```
+
+Then in your Claude Code chat:
+
+```
+Read AGENTS.md and pick the principles, hooks, and skills that match my project.
+```
+
+### Option 2: Global install (hooks + skills available in every project)
+
+```bash
+git clone https://github.com/AnastasiyaW/claude-code-config ~/claude-code-config
+
+# Copy the always-on safety hooks to your global config
+python ~/claude-code-config/scripts/install_hooks.py --global
+
+# Copy skills you want (or all)
+mkdir -p ~/.claude/skills
+cp -r ~/claude-code-config/skills/* ~/.claude/skills/
+```
+
+`~/.claude/hooks/` stores the hook scripts; `~/.claude/settings.json` is where they are registered. The install script merges safe defaults into your existing settings.
+
+### Option 3: Project-local (hooks/skills only in this project)
+
+```bash
+cd /your/project
+git clone https://github.com/AnastasiyaW/claude-code-config .claude-config
+python .claude-config/scripts/install_hooks.py --local
+cp -r .claude-config/skills .claude/skills
+```
+
+This keeps everything under `.claude/` in your repo, nothing global.
+
+### Choosing what to install
+
+| Project type | Minimum viable set |
+|---|---|
+| **Any project** | 5 safety hooks (destructive-command, secret-leak, git-destructive, git-auto-backup, session-drift-validator) + Principles 09 (Supply Chain), 10 (Agent Security), 11 (Documentation Integrity) |
+| **Web app** | above + `frontend-design` skill + Principles 04 (Deterministic Orchestration), 05 (Structured Reasoning) |
+| **ML / data pipeline** | above + `flux2-*`, `diffusion-engineering`, `vlm-segmentation` skills + Principles 03 (Autoresearch), 12 (Low-Signal Training) |
+| **Multi-agent / parallel sessions** | above + [mclaude](https://github.com/AnastasiyaW/mclaude) + Principles 01 (Harness), 06 (Multi-Agent), 18 (Multi-Session Coordination), 19 (Inter-Agent Communication) |
+| **Library / package** | above + Principles 08 (Skills Best Practices), 17 (DBS Skill Creation) |
+
+See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and [HOW-IT-WORKS.md](HOW-IT-WORKS.md) for the mechanics of each layer.
 
 ---
 
