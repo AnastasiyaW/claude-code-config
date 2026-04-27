@@ -4,6 +4,46 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-27 (v3.3.0 - Drift Validator Robustness)
+
+### Improved: `scripts/validate_config.py`
+
+Validator hardened across 5 dimensions after surfacing 24 false-positive "broken refs" on a real install. Drift dropped to 0 with no false negatives.
+
+**1. Skip patterns extended** - 6 new substring filters catch path-like strings that aren't real file paths:
+- `*` - glob patterns (`~/.ssh/id_*`, `~/.claude/scripts/block_*.py`, `~/.secrets/*`, `/proc/*/environ`)
+- `/api/` - URL endpoints (e.g. `/api/v1/projects/7/tasks` documented in rule files)
+- `docker/login-action` - GitHub Actions reference, not a file
+- `./script.sh` - generic placeholder in safety rule examples
+- `cat/less/` - command list separated by slashes (cat/less/head/tail/grep/bat/xxd)
+- `YYYY-` - date placeholder in handoff template paths
+
+**2. Linux system path skip on Windows** - new `LINUX_SYSTEM_PREFIXES` tuple (`/etc/`, `/proc/`, `/opt/`, `/var/`, `/usr/`, `/dev/`) skipped when `sys.platform == "win32"`. Rule files reference these as concepts for SSH/system docs but they don't exist on the local filesystem.
+
+**3. Cross-machine paths opt-in** - new `CROSS_MACHINE_PREFIXES` tuple (default empty) for paths on remote hosts (Hyper-V VMs, build hosts, container mounts). Extend in your fork.
+
+**4. Workspace roots extensible via env var** - new `CLAUDE_WORKSPACE_ROOTS` env var (colon-sep on Unix, semicolon on Windows) for users with monorepo outside `~/Desktop`. Roots checked in priority order: env var entries -> `~/Desktop` -> `~` -> Claude Code project memory dirs.
+
+**5. Claude Code memory dir resolution** - `~/.claude/projects/*/memory/` enumeration so refs like `memory/<filename>` resolve to the session-scoped memory store. Filtered to dirs that have a `memory/` subdir to avoid stat-call explosion on machines with many project records.
+
+### Fixed
+
+- **Stale report file**: previously `drift-report.md` was only written when drift was detected. After fixes that dropped drift to 0, the prior dirty report persisted forever, misleading anyone who read the file directly (incl. verifier agents). Now always written - either drifted detail or "Last run: clean - scanned N files".
+
+- **UnicodeEncodeError on Cyrillic paths**: Windows default cp1252 stdout crashed when printing broken refs containing non-ASCII (e.g. `claude-stories/YYYY-MM-DD-тема.md`). Now reconfigures stdout/stderr to UTF-8 with replacement errors at startup.
+
+### Why this matters
+
+Validator is part of the Documentation Integrity defense layer (principle 11). If it cries wolf 24x on first install, users mute it - exactly what defense-in-depth shouldn't do. The fixes distinguish:
+- Real drift (file moved/deleted) - flag
+- Conceptual references (URLs, glob, command lists) - skip
+- Cross-platform refs (Linux paths on Windows) - skip with platform guard
+- User workspace layout - configurable via env var
+
+Rule of thumb after this update: if validator flags something, it's a real broken ref worth fixing. No more "oh it's just the validator being wrong".
+
+---
+
 ## 2026-04-23 (v3.2.0 - Article Structure Review + Handoff Skill Injection)
 
 ### Added: Article Structure Review Skill (`skills/writing/article-structure-review/`)

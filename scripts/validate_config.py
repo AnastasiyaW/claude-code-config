@@ -10,15 +10,22 @@ memory errors - validate references at session start, not after failure.
 
 Runs on SessionStart hook. Fast (should complete in <500ms).
 
-Exit codes:
-    0 = all references valid OR only warnings
-    1 = critical drift detected (missing files referenced as must-exist)
+Customization (env vars):
+    CLAUDE_WORKSPACE_ROOTS - colon-sep (Unix) or semicolon-sep (Windows)
+        list of EXTRA roots to search for unresolved relative paths.
+        Useful when your monorepo lives outside ~/Desktop.
+        Example (bash): export CLAUDE_WORKSPACE_ROOTS=~/code:/d/projects
 
-Output: writes report to .claude/drift-report.md if issues found,
+Exit codes:
+    0 = always (advice layer; warnings don't block session start)
+
+Output: writes report to ~/.claude/drift-report.md (always - even when clean,
+        so stale reports from prior dirty runs don't mislead readers),
         prints summary to stdout for hook to show in session context.
 """
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -43,7 +50,8 @@ PATH_PATTERN = re.compile(
     r")`"
 )
 
-# Skip these even if they match the pattern (known placeholders/examples)
+# Skip these even if they match the pattern (known placeholders/examples).
+# Substring match - if the path *contains* any of these, skip.
 SKIP_PATTERNS = [
     "path/to/",
     "foo/",
@@ -58,26 +66,93 @@ SKIP_PATTERNS = [
     "0N",   # placeholder like 0N-name.md
     "...",  # placeholder like foo/.../bar
     "{{",   # template variable
+    "*",   # glob pattern (e.g. id_*, block_*.py, ~/.secrets/*, /proc/*/environ)
+    "/api/",   # URL endpoints (e.g. /api/v1/projects/7/tasks)
+    "docker/login-action",  # GitHub Actions ref, not a file path
+    "./script.sh",  # generic script placeholder
+    "cat/less/",    # tool list (cat/less/head/tail/grep/bat/xxd)
+    "YYYY-",        # date placeholder in template paths
 ]
+
+# Linux/macOS-only system paths - skip on Windows (validator can't resolve them
+# locally but rule files reference them as concepts for SSH/system config docs).
+LINUX_SYSTEM_PREFIXES = ("/etc/", "/proc/", "/opt/", "/var/", "/usr/", "/dev/")
+
+# Cross-machine references - paths that live on a *different host* than this
+# Claude session (Hyper-V VMs, remote build hosts, container mount points).
+#
+# Default: empty. Extend in your fork if rule files mention paths on remote
+# hosts. Example:
+#   CROSS_MACHINE_PREFIXES = ("C:\\BuildVM\\", "/mnt/buildbot/")
+CROSS_MACHINE_PREFIXES: tuple[str, ...] = ()
 
 
 def extract_paths(content: str) -> set[str]:
-    """Extract file path references from markdown text."""
+    """Extract file path references from markdown text.
+
+    Filters out:
+      - SKIP_PATTERNS substrings (placeholders, glob `*`, URL paths)
+      - LINUX_SYSTEM_PREFIXES on Windows (we can't resolve /etc/, /proc/ here)
+      - CROSS_MACHINE_PREFIXES (remote-only refs, opt-in via fork)
+    """
+    is_windows = sys.platform == "win32"
     matches = PATH_PATTERN.findall(content)
     paths = set()
     for match in matches:
         path = match[0] if isinstance(match, tuple) else match
         if any(skip in path for skip in SKIP_PATTERNS):
             continue
+        if is_windows and path.startswith(LINUX_SYSTEM_PREFIXES):
+            continue
+        if CROSS_MACHINE_PREFIXES and path.startswith(CROSS_MACHINE_PREFIXES):
+            continue
         paths.add(path)
     return paths
+
+
+def _build_workspace_roots() -> list[Path]:
+    """Compose ordered list of candidate roots for contextual lookup.
+
+    Order:
+      1. CLAUDE_WORKSPACE_ROOTS env var entries (user-specified primary
+         monorepo paths - most likely to hit, checked first).
+      2. ~/Desktop, ~ (legacy fallbacks for refs without explicit prefix).
+      3. ~/.claude/projects/*/  (Claude Code memory dirs - for `memory/<file>`
+         refs that target the session-scoped memory store).
+
+    Perf: claude_projects iteration is filtered to dirs with a `memory/`
+    subdir (skips empty project records that wouldn't match anyway).
+    """
+    roots: list[Path] = []
+
+    # 1. User-specified roots via env var (colon-sep on Unix, semicolon on Win)
+    env_roots = os.environ.get("CLAUDE_WORKSPACE_ROOTS", "")
+    if env_roots:
+        sep = ";" if sys.platform == "win32" else ":"
+        for entry in env_roots.split(sep):
+            entry = entry.strip()
+            if entry:
+                roots.append(Path(entry).expanduser())
+
+    # 2. Generic fallbacks
+    roots.append(Path.home() / "Desktop")
+    roots.append(Path.home())
+
+    # 3. Claude Code project memory dirs (filtered by has-memory-subdir)
+    claude_projects = Path.home() / ".claude" / "projects"
+    if claude_projects.exists():
+        for proj in claude_projects.iterdir():
+            if proj.is_dir() and (proj / "memory").is_dir():
+                roots.append(proj)
+
+    return roots
 
 
 def check_path(path_str: str, base: Path) -> tuple[bool, str]:
     """Check if a path exists. Returns (exists, resolved_path_str).
 
     Tries (in order): expand ~, absolute, relative to base, relative to cwd,
-    and contextual lookup under common workspace roots (Desktop, home).
+    then contextual lookup under workspace roots (see _build_workspace_roots).
     """
     # Expand home directory (~/foo)
     if path_str.startswith("~"):
@@ -98,13 +173,8 @@ def check_path(path_str: str, base: Path) -> tuple[bool, str]:
     if Path(path_str).exists():
         return True, path_str
 
-    # Contextual lookup - path might be a suffix like "project-name/file.md".
-    # Check under common roots: Desktop, home.
-    workspace_roots = [
-        Path.home() / "Desktop",
-        Path.home(),
-    ]
-    for root in workspace_roots:
+    # Contextual lookup under workspace roots
+    for root in _build_workspace_roots():
         if not root.exists():
             continue
         candidate = root / path_str
@@ -132,6 +202,19 @@ def validate_file(md_file: Path) -> list[str]:
 
 
 def main() -> int:
+    # Force UTF-8 output on Windows - broken refs may contain Cyrillic /
+    # non-ASCII path components, default cp1252 stdout crashes on print.
+    if (
+        sys.platform == "win32"
+        and sys.stdout.encoding
+        and sys.stdout.encoding.lower() != "utf-8"
+    ):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, OSError):
+            pass  # Older Python or non-tty stdout - best effort
+
     claude_dir = Path.home() / ".claude"
     cwd = Path.cwd()
 
@@ -163,9 +246,19 @@ def main() -> int:
         issues = validate_file(target)
         all_issues.extend(issues)
 
-    # Report
+    # Report - always write report (even on clean run) so file-based readers
+    # (incl. verifier agents) consistently see current state. Without this, a
+    # stale drifted report from a prior session persists and misleads anyone
+    # who reads the file directly.
+    report_path = claude_dir / "drift-report.md"
     if not all_issues:
         print(f"[config-validator] OK: {len(targets)} files, no drift detected")
+        report_path.write_text(
+            "# Config Drift Report\n\n"
+            f"Last run: clean - scanned {len(targets)} files, "
+            "no broken references.\n",
+            encoding="utf-8",
+        )
         return 0
 
     print(f"[config-validator] DRIFT DETECTED: {len(all_issues)} broken references")
@@ -175,8 +268,6 @@ def main() -> int:
     if len(all_issues) > 10:
         print(f"  ... and {len(all_issues) - 10} more")
 
-    # Write detailed report
-    report_path = claude_dir / "drift-report.md"
     report_path.write_text(
         "# Config Drift Report\n\n"
         f"Scanned {len(targets)} files, found {len(all_issues)} broken references.\n\n"
@@ -187,7 +278,6 @@ def main() -> int:
     print(f"[config-validator] Full report: {report_path}")
 
     # Warnings don't block - return 0 so session still starts
-    # (change to return 1 if you want drift to block session)
     return 0
 
 
