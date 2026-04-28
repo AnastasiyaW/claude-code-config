@@ -4,6 +4,25 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-28 (v3.4.0 - Merge Conflict Resolution Principle)
+
+### Added: `principles/24-merge-conflict-resolution.md`
+
+Codifies what worked during a real two-session race condition: Claude session A and Claude session B editing the same TypeScript monolith concurrently. Without the protocol, session A could have wholesale-overwritten session B's parallel work by "taking its own side" as fresher. With the protocol, both sessions' work merged cleanly into one PR.
+
+**The protocol**: when conflicts arise, isolated agents (fresh context) independently verify each side against verified data sources (live probes > production deployment > tests > git blame > code > docs). A second agent in a separate fresh context audits the proposed resolution. Errors are checked in parallel as resolutions are produced — if errors emerge, the resolution is wrong even if both agents agreed.
+
+**Anti-patterns** the principle blocks:
+- "auto-merge tool already resolved this, probably correct" — tool sees syntax, not semantics
+- "I'll take my side, mine is fresher" — may erase production hot-fix from parallel session
+- "merge fast, fix later" — fixing on master is an order of magnitude more expensive
+
+**Connection**: this is the [Proof Loop](principles/02-proof-loop.md) and [Generator-Evaluator](principles/01-harness-design.md) patterns specialized to a high-stakes, low-context decision (which version of these N lines belongs in the final code). Also extends [no-guessing](CLAUDE.md) — every resolution decision must be backed by verified data, not operator intuition.
+
+**Summary checklist** at the end of the principle file lists 7 boxes that must be checked before merging anything with conflicts.
+
+---
+
 ## 2026-04-27 (v3.3.0 - Drift Validator Robustness)
 
 ### Improved: `scripts/validate_config.py`
