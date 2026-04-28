@@ -4,6 +4,26 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-28 (v3.6.1 — API UTF-8 posting + verify-at-consumer retry anti-pattern)
+
+### Added: `rules/api-utf8-posting.md`
+
+Правило при POST/PUT любого API с **non-ASCII телом** (комментарии в issue trackers, чат-сообщения в TG/Slack, GitHub PR/issue body, webhooks). На Windows цепочка `Claude harness → bash subprocess → cp1251/cp1252 console codepage → curl -d` теряет UTF-8 байты — stored body содержит литеральные `?` (0x3F) вместо букв.
+
+**Mandatory pattern**: Python `urllib.request` + `json.dumps(..., ensure_ascii=False).encode("utf-8")` + header `Content-Type: application/json; charset=utf-8`. Inline `curl -d '{"text":"Привет"}'` НЕ использовать.
+
+**Mandatory verification**: после каждого non-ASCII POST'а — GET back и проверить mojibake. Helper `assert_no_mojibake()` ловит heuristic "0 non-ASCII chars + много `?`" → RuntimeError.
+
+**Hot-fix protocol** когда user в реальном времени flag'ит mojibake: НЕ извиняться, repost немедленно через Python pattern (1 мин > 5 мин обсуждения), GET back verify, только после verification confirm. Анти-паттерн: повторить broken POST с минорной правкой ("может теперь сработает") — encoding bug deterministic.
+
+5 root-cause точек где UTF-8 ломается на Windows (curl inline, subprocess без encoding, open() без encoding, python -c inline, PowerShell Invoke-WebRequest) с конкретными fix'ами для каждой.
+
+### Updated: `rules/verify-at-consumer.md`
+
+Добавлен 6-й anti-pattern: **"Receiver вернул HTTP 200 + я отправила событие повторно — должно работать"**. Если payload shape wrong, retry дропается так же silently. Retry без diagnosis = waste времени. Generic, переживает конкретные incidents.
+
+---
+
 ## 2026-04-28 (v3.6.0 — Universal destructive intent + Verify-at-consumer + Independent Verifier)
 
 ### Updated: `hooks/human-confirmation-guard.py`
