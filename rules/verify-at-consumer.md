@@ -86,6 +86,9 @@ Schema валидирует **shape**, не семантику. `{data: {url: "X
 ❌ **End-to-end test = sender side test**
 "Webhook отправлен" — проверка sender'а. Нужно проверять что **receiver обработал**: row в БД, UI render, queue job processed.
 
+❌ **"Receiver вернул HTTP 200 + я отправила событие повторно — должно работать"**
+Если payload shape wrong, retry дропается так же silently. HTTP 200 при втором/третьем delivery — та же ошибка, не fix. Retry без diagnosis = waste времени.
+
 ## Mechanical enforcement (TBD)
 
 ### Hook idea: PreToolUse при git commit
