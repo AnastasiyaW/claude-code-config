@@ -46,6 +46,25 @@ After making any change:
 2. Review CLAUDE.md and relevant .claude/rules of the project and update them to be accurate given the changes.
 3. Push changes to GitHub. If no repo exists yet -- offer to create a **private** one (`gh repo create --private`). Never create a public repo without explicit request.
 
+## Merge Conflict Resolution -- Isolated Agents + Verified Data
+
+**Rule (2026-04-28):** When merge conflicts arise -- `git merge`, `rebase`, manual sync with deployed code, or a race with a parallel session -- **do NOT resolve "by logic" or trust auto-merge blindly**. Use the protocol:
+
+1. **Spawn isolated agents** (fresh context, not the current session) -- each sees the conflict + relevant data only
+2. **Independent verify** each side against **verified data sources** (live prod = strongest ground truth, then deployment artifact, tests, git blame, code, docs in descending authority order)
+3. **Synthesize, do not just choose** -- best resolution often preserves both intents (defensive null check from A + refactored call site from B); rarely "take A wholesale"
+4. **Parallel error checking** while agents work -- `bun build` / `tsc` / linter / smoke test continuously; errors trump agent agreement
+5. **Generator-Evaluator** -- agent A produces resolution, agent B in fresh context independently audits (sees only proposed code, not A's reasoning)
+
+**Anti-patterns blocked**:
+- "auto-merge resolved it, probably correct" -- tool sees syntax, not semantics
+- "I'll take my side, mine is fresher" -- may erase production hot-fix the parallel session deployed
+- "merge fast, fix later" -- fixing on master is an order of magnitude more expensive than verifying before merge
+
+This specializes the [Proof Loop](principles/02-proof-loop.md) and [Generator-Evaluator](principles/01-harness-design.md) patterns to a high-stakes, low-context decision: which version of these N lines belongs in the final code? Also extends the no-guessing rule above -- every resolution decision must be backed by verified data, not intuition.
+
+**Full protocol + 7-box pre-merge checklist + real case study:** [principles/24-merge-conflict-resolution.md](principles/24-merge-conflict-resolution.md).
+
 ## Skills -- Best Practices
 
 When creating or updating any skill in `.claude/skills/`:
