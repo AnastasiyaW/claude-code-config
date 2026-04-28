@@ -4,6 +4,72 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-28 (v3.6.0 — Universal destructive intent + Verify-at-consumer + Independent Verifier)
+
+### Updated: `hooks/human-confirmation-guard.py`
+
+Расширен с "только catastrophic" на **universal destructive intent** (rm/docker rm/kubectl delete/curl DELETE/cloud APIs/process kill/package uninstall/IAM delete/etc) + safe-target whitelist (`build/`, `dist/`, `node_modules/`, `target/`, `__pycache__/`, `.cache/`, `.venv/`, `/tmp/`, `.pyc`, `.bak`, `.DS_Store` и т.п.).
+
+**Логика**:
+1. Detect destructive intent в команде
+2. Если rm-like + ВСЕ targets в SAFE_TARGETS → allow silent (рутинная очистка не требует prompts)
+3. Иначе требует `# user-confirmed: "<verbatim phrase>" <timestamp>` token, fresh ≤10 min
+
+**Effect**: 90% destructive ops теперь требуют human-in-the-loop, но routine `rm -rf node_modules` не блокирует.
+
+### Added: `hooks/verify-deleted-guard.py` (PostToolUse)
+
+Пятый шаг user workflow ("проверяем что реально удалили"). Hook **после** действия проверяет существование target:
+
+| Verifier | Что проверяет |
+|---|---|
+| `rm` / `rmdir` | `Path(target).exists()` для каждого arg |
+| `docker rm/rmi/volume rm/network rm` | `docker ps -a` / `docker images` / `docker volume ls` — name not listed |
+| `kubectl delete X Y` | `kubectl get X Y` returns NotFound |
+| `curl -X DELETE <url>` | follow-up `curl GET <url>` returns 404/410/204 |
+
+Verdict: `verified-deleted` / `still-present` / `could-not-verify` → `~/.claude/logs/safety.log` + stderr warn если still-present. Не блокирует (post-action), но даёт agent'у signal не докладывать "deleted" когда proof говорит обратное.
+
+### Added: `rules/no-guessing.md`
+
+Канонический core-rule: каждое решение опирается на verifiable source (paper / code / probe / прямая цитата user), не "обычно так делают". **Расширено в этом v3.6.0** разделом **Independent Verifier Agent** — Generator-Evaluator pattern для важных решений: перед destructive/irreversible действием spawn isolated agent в свежем контексте, передать минимум контекста, попросить НЕ доверять reasoning'у Generator'а и независимо проверить факты. Verdict PROCEED/HOLD/REJECT.
+
+Реальные кейсы где сработало бы (включая Replit Lemkin incident — single agent под стрессом игнорировал code freeze; independent verifier с свежим контекстом не имел бы ни стресса, ни context'а — просто посмотрел на freeze marker и REJECT).
+
+### Added: `rules/verify-at-consumer.md`
+
+Специализация no-guessing для интеграций (webhook, API, queue, RPC). Idea credit: Илюхина's Claude. Real case 2026-04-28:
+
+| Layer | What we saw |
+|---|---|
+| Spec | `file_uploaded { url, filename, size, prompt_id }` |
+| Sender log | `HTTP 200` ✓ |
+| Reality (consumer code) | `services/chat/.../webhook.ts:592` reads `body.data?.url` |
+| Result if shipped without verifier | Все события дропаются silently, debug 4 часа |
+
+Правило: **Spec ≠ implementation. HTTP 200 ≠ correctness. Generator имеет blind spot.** Правда об контракте живёт в коде получателя, не в spec doc или коде отправителя. Перед shipping integration code — read consumer code, trace exact field paths, spawn isolated verifier agent для cross-check.
+
+### Hook chain в `settings.json` (PreToolUse → Bash)
+
+```
+1. destructive-command-guard.py     (Layer 1: catastrophic)
+2. human-confirmation-guard.py      (Layer 2: ANY destructive — universal)
+3. db-snapshot-guard.py             (Layer 3: backup для DB)
+4. block_git_destructive.py         (Layer 4: git destructive)
+5. ...
+```
+
+PostToolUse → Bash:
+```
+6. detect_api_key_leak.py           (existing)
+7. verify-deleted-guard.py          (Layer 5: post-condition check) ← NEW
+```
+
+Это формализует workflow user'а:
+**1. Спросить дважды → 2. Сделать бэкап → 3. Verify бэкап → 4. Удалить → 5. Verify удалилось.**
+
+---
+
 ## 2026-04-28 (v3.5.0 — Defence-in-depth for destructive ops)
 
 ### Added: `hooks/human-confirmation-guard.py`
