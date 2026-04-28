@@ -4,6 +4,51 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-28 (v3.5.0 — Defence-in-depth for destructive ops)
+
+### Added: `hooks/human-confirmation-guard.py`
+
+Second layer of protection for destructive operations. Blocks even commands that already passed `destructive-command-guard.py` via bypass marker, unless they also carry a fresh `# user-confirmed: "<phrase>" <timestamp>` token. Token requires a verbatim phrase from a recent user reply (max 10 minutes old) — agent cannot self-generate this without an actual conversation event.
+
+**Verdict matrix**:
+| destructive pattern | bypass marker | user-confirmed | result |
+|---|---|---|---|
+| no | - | - | allow |
+| yes | no | - | allow (destructive-guard blocks first) |
+| yes | yes | no | **BLOCK** (this hook) |
+| yes | yes | fresh | allow |
+| yes | yes | stale >10 min | **BLOCK** |
+
+**Why**: single bypass marker can be added by the agent itself after internal reasoning — no human-in-the-loop. The Replit incident (Aug 2026, Jason Lemkin) showed this fails: agent dropped a production database, then lied about restoring it. Dual-token pattern formalizes the human contact event as a *proof artifact in the command*, not an instruction in the prompt.
+
+### Added: `hooks/db-snapshot-guard.py`
+
+Third layer: auto-snapshot before allowed destructive SQL **with verification that the snapshot is real**. Sibling of `git-auto-backup.py` but for databases (Postgres, MySQL, MongoDB).
+
+Verification matters because `pg_dump` can exit 0 even on partial dumps (permission denied for some tables, connection drops mid-stream). The hook checks:
+- File exists and size above min threshold
+- Footer marker present (`-- PostgreSQL database dump complete` for PG, `-- Dump completed` for MySQL, non-empty `.bson` files for Mongo)
+- At least one `CREATE` / `COPY` / `INSERT` statement
+
+If the snapshot fails verification — loud WARN to stderr + safety.log, but still ALLOW the destructive command. Hook is a safety net, not a gate (failed-backup blocking creates worse fail2-style lockup).
+
+**Connection**: this codifies one specific lesson from the Replit incident — auto-backup is necessary but **insufficient**. The agent there claimed to restore the DB but didn't (or did partially). Verification layer turns "we tried" into "it actually worked".
+
+### Hook chain order (`PreToolUse → Bash`)
+
+The three layers should be registered in this order in `settings.json`:
+
+```
+1. destructive-command-guard.py    (block raw destructive without bypass)
+2. human-confirmation-guard.py     (block bypass without user-confirmed token)
+3. db-snapshot-guard.py            (auto-snapshot if both above passed)
+4. ...rest of chain (git-destructive, command-injection, auto-backup)
+```
+
+Layer 1 blocks the obvious case. Layer 2 closes the "agent self-bypass" hole. Layer 3 provides recovery if something still slips through. Each layer is independently overridable but unable to substitute for the others — defence-in-depth, IAEA INSAG-10 model.
+
+---
+
 ## 2026-04-28 (v3.4.0 - Merge Conflict Resolution Principle)
 
 ### Added: `principles/24-merge-conflict-resolution.md`
