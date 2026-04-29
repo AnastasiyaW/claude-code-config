@@ -112,6 +112,8 @@ def parse_session(path: Path) -> dict:
             obj = json.load(f)
     except Exception as e:
         return {"error": str(e), "size": path.stat().st_size, "path": str(path)}
+    sid_raw = obj.get("sessionId") or path.stem
+    sid_clean = sid_raw.removeprefix("local_")
     return {
         "title": obj.get("title", "(untitled)"),
         "cwd": obj.get("cwd", ""),
@@ -120,7 +122,7 @@ def parse_session(path: Path) -> dict:
         "model": obj.get("model", ""),
         "turns": obj.get("completedTurns", 0),
         "archived": obj.get("isArchived", False),
-        "session_id": obj.get("sessionId", path.stem.replace("local_", "")),
+        "session_id": sid_clean,
         "size": path.stat().st_size,
         "path": str(path),
     }
@@ -204,13 +206,14 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .acct-body.collapsed { display: none; }
   .session-card {
     background: #15161a; padding: 12px 14px; border-bottom: 1px solid #25262a;
-    display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center;
+    display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
   }
   .session-card:hover { background: #1c1d22; }
   .session-card.restored { background: #15201a; }
-  .session-card.restored::after {
-    content: "RESTORED"; color: #34a853; font-size: 10px; font-weight: 600;
-    grid-column: 3; align-self: start;
+  .session-card.restored .restored-tag { display: inline; }
+  .restored-tag {
+    display: none; color: #34a853; font-size: 10px; font-weight: 600;
+    background: #15201a; padding: 2px 6px; border-radius: 8px; margin-left: 6px;
   }
   .session-title { font-weight: 500; font-size: 15px; color: #e8eaed; }
   .session-meta {
@@ -225,15 +228,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   .badge.project { background: #2a3a1a; }
   .badge.archived { background: #5a3a1a; }
   .session-id {
-    font-family: ui-monospace, monospace; color: #9aa0a6; font-size: 11px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    color: #c7d2fe; font-size: 13px;
+    background: #1f2230; padding: 4px 10px; border-radius: 6px;
+    user-select: all; cursor: text;
   }
-  .restore-btn {
-    background: #4285f4; color: white; border: none; padding: 8px 14px;
-    border-radius: 6px; cursor: pointer; font-size: 13px; font-family: inherit;
-    white-space: nowrap;
-  }
-  .restore-btn:hover { background: #5a95f5; }
-  .restore-btn.copied { background: #34a853; }
+  .session-id:hover { background: #2a2f44; }
   .untitled { color: #777; font-style: italic; }
   .legacy-tag { background: #5a1a1a; color: #ffaaaa; padding: 1px 6px; border-radius: 8px; font-size: 10px; margin-left: 6px; }
   .footer { margin-top: 30px; padding: 14px; background: #1a1b1e; border-radius: 8px; color: #9aa0a6; font-size: 13px; }
@@ -261,11 +261,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
   <div id="content">__CONTENT__</div>
 
   <div class="footer">
-    <strong>How to restore</strong>: click the blue button on any session — it copies the command to your clipboard.
-    Paste in chat with Claude:<br>
-    <code>восстанови эту сессию: python ~/.claude/scripts/sessions_restore.py &lt;sid8&gt;</code><br>
-    Or run directly in terminal. Source files are NEVER deleted; restore is a copy-only operation with byte-verify.
-    Restart Claude desktop app after restore to see sessions appear in UI.
+    <strong>How to restore</strong>: triple-click the <span class="session-id">sid8</span> chip on any card to select, copy it, then tell Claude in chat:<br>
+    <code>восстанови session local_XX</code> — Claude will run the restore script with verify and audit.<br>
+    Or run yourself: <code>python ~/.claude/scripts/sessions_restore.py &lt;sid8&gt;</code><br>
+    Source files are NEVER deleted; restore is copy-only with byte-verify. Restart Claude desktop app after to see sessions in UI.
     <br><br>
     <details>
       <summary>Troubleshooting</summary>
@@ -333,17 +332,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     });
   });
 
-  document.querySelectorAll('.restore-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      const cmd = btn.dataset.cmd;
-      navigator.clipboard.writeText(cmd).then(() => {
-        const orig = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1200);
-      });
-    });
-  });
+  // session-id chip is selectable via user-select:all CSS — triple-click selects, ctrl+c copies. No JS needed.
 
   applySort();
 </script>
@@ -353,7 +342,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 def render_session_card(meta: dict, restored_ids: set[str]) -> str:
     sid = meta.get("session_id", "")
-    sid8 = sid[:8] if sid else "?"
+    sid12 = sid[:12] if sid else "?"  # 12 chars = ~2^48, virtually no collisions across 710 sessions
     is_restored = sid in restored_ids
     title = meta.get("title") or "(untitled)"
     title_html = html.escape(title)
@@ -386,8 +375,6 @@ def render_session_card(meta: dict, restored_ids: set[str]) -> str:
     if is_restored:
         classes.append("restored")
 
-    restore_cmd = f"python ~/.claude/scripts/sessions_restore.py {sid8}"
-
     return f"""
     <div class="{' '.join(classes)}"
          data-search="{html.escape(search_text)}"
@@ -396,14 +383,13 @@ def render_session_card(meta: dict, restored_ids: set[str]) -> str:
          data-size="{meta.get('size', 0)}"
          data-title="{html.escape(title.lower())}">
       <div>
-        <div class="session-title">{title_html} {src_tag}</div>
+        <div class="session-title">{title_html} {src_tag}<span class="restored-tag">RESTORED</span></div>
         <div class="session-meta">
           <span>{last_iso} <span style="color:#777">({last_rel})</span></span>
           {''.join(badges)}
-          <span class="session-id">{sid8}…</span>
         </div>
       </div>
-      <button class="restore-btn" data-cmd="{html.escape(restore_cmd)}">Restore</button>
+      <span class="session-id" title="Triple-click to select, then ctrl+c to copy">local_{sid12}</span>
     </div>"""
 
 
