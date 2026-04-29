@@ -44,15 +44,36 @@ Source: bundled JS `.vite/build/index.js` line 771: `const $6t="claude-code-sess
 
 NB: timestamp format is inconsistent — some sessions use Unix ms (int), others ISO string. Parser must handle both.
 
-## Three operations
+## Four operations
 
-### 1. Inventory — full picture
+### 1. Registry — interactive HTML browse (recommended starting point)
+
+Script: `scripts/sessions_registry.py`
+
+```bash
+python scripts/sessions_registry.py                # generate + auto-open in default browser
+python scripts/sessions_registry.py --no-open      # generate only
+python scripts/sessions_registry.py --output /custom/path.html
+```
+
+Produces a self-contained HTML registry with:
+- **Live JS search** by title / cwd / sessionId substring
+- **Sort** by recency / turns count / title A-Z / size
+- **Filter**: hide 0-turn auto-runs ("Morning digest", "Observer daily analysis"), hide already-restored
+- Per-accountId **collapsible sections**, active accountId highlighted green
+- **"Restore" button** per session — copies command to clipboard
+- **"RESTORED" badge** for sessions already migrated (read from `~/.claude/desktop-migrations.jsonl`)
+- Includes BOTH `claude-code-sessions/` (current) AND `local-agent-mode-sessions/` (legacy pre-Feb 2026)
+
+Use when: user wants to browse the archive visually before deciding what to restore. After clicking Restore, paste the copied command in chat with Claude (it knows the next step) or run it directly in terminal.
+
+### 2. Inventory — full picture (text)
 
 Script: `scripts/sessions_inventory.py`
 
 Scans all `<accountId>/<orgId>/local_*.json`, prints grouped table with title/cwd/size/lastActivityAt sorted by recency. Includes cross-account view (which projects appear in multiple accountIds — useful when same user worked on the same project under different accounts).
 
-### 2. Find — search by title/cwd substring
+### 3. Find — search by title/cwd substring (text)
 
 Script: `scripts/sessions_find.py`
 
@@ -65,7 +86,7 @@ python sessions_find.py --untitled                  # parse-failed or empty
 
 Output is top-N matches sorted by recency, with copy-pasteable restore command.
 
-### 3. Restore — selective single-session migration
+### 4. Restore — selective single-session migration
 
 Script: `scripts/sessions_restore.py`
 
@@ -105,9 +126,21 @@ Drift serious work into Claude Code CLI. CLI sessions live in `~/.claude/project
 
 ## Files
 
-- `scripts/sessions_inventory.py` — full table
-- `scripts/sessions_find.py` — search
+- `scripts/sessions_registry.py` — interactive HTML registry, opens in browser
+- `scripts/sessions_inventory.py` — full text table (grep-friendly)
+- `scripts/sessions_find.py` — substring search
 - `scripts/sessions_restore.py` — selective copy with verify and audit log
+
+## macOS specifics
+
+All four scripts detect platform via `sys.platform` and pick the right path automatically — no flags needed on Mac.
+
+- **Storage path**: `~/Library/Application Support/Claude/claude-code-sessions/<acct>/<org>/local_<sid>.json`
+- **Legacy path**: `~/Library/Application Support/Claude/local-agent-mode-sessions/<acct>/<org>/local_<sid>.json`
+- **HTML auto-open**: uses `open <html>` (system default browser)
+- **No MSIX issue**: macOS .dmg install is the only distribution channel; no atomic-rename bug
+- **Spotlight bonus**: `mdfind -onlyin ~/Library/Application\ Support/Claude/ "<query>"` works on session JSONs (indexes content), faster than `find` for one-off lookups
+- **Reveal in Finder** after restore: `open -R ~/Library/Application\ Support/Claude/claude-code-sessions/<acct>/<org>/local_<sid>.json`
 
 ## License
 

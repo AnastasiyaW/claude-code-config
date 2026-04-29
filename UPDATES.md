@@ -4,6 +4,38 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-29 (v3.6.3 — Desktop sessions HTML registry + macOS docs)
+
+### Added: `skills/operational/desktop-sessions-discovery/scripts/sessions_registry.py`
+
+Четвёртый скрипт в комплекте — генерирует **HTML registry** всех сессий, авто-открывается в default браузере. UX: пользователь browse'ит дашборд, кликает "Restore" на нужной session — команда копируется в clipboard. Дальше paste в чат с Claude (skill auto-invoke сработает) или прямо в terminal.
+
+**HTML features**:
+- Live JS search по title / cwd / sessionId substring
+- Sort: most recent / most turns / title A-Z / size desc
+- Filter: hide 0-turn auto-runs (типа "Morning digest" / "Observer daily analysis"), hide already-restored
+- Per-accountId collapsible секции, active accountId выделен зелёным border
+- "RESTORED" badge для sessions уже migrated (читается из `~/.claude/desktop-migrations.jsonl`)
+- Включает обе storage: `claude-code-sessions/` (current) + `local-agent-mode-sessions/` (legacy pre-Feb 2026)
+- Self-contained HTML (no external deps), dark theme, ~640KB для 711 sessions
+
+**Реальный use case**: на тестовой машине (Win11) — 711 sessions across 6 accountIds, 48MB total. Из них 69 видны в desktop UI (active accountId), остальные 642 — invisible. Registry показывает все 711 в одном scroll, с поиском и filter'ами.
+
+### Added в SKILL.md: macOS specifics secція
+
+- Path: `~/Library/Application Support/Claude/claude-code-sessions/<acct>/<org>/local_<sid>.json`
+- Legacy path: `~/Library/Application Support/Claude/local-agent-mode-sessions/<acct>/<org>/`
+- Все 4 скрипта auto-detect platform через `sys.platform` — no flags needed на Mac
+- Mac-only bonus: `mdfind -onlyin ~/Library/Application\ Support/Claude/ "<query>"` (Spotlight indexes content of JSON files, faster than `find` для one-off lookups)
+- HTML auto-open через `open <html>` (system default browser)
+- macOS .dmg install не имеет MSIX EXDEV bug — sessions персистятся stable
+
+### Added: `.gitignore`
+
+Базовый `.gitignore` с `__pycache__/`, `*.pyc`, `.DS_Store`, IDE folders. Repo раньше не имел — bytecode из smoke tests рисковал попасть в commits.
+
+---
+
 ## 2026-04-29 (v3.6.2 — Claude desktop sessions discovery toolkit)
 
 ### Added: `skills/operational/desktop-sessions-discovery/`
