@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Claude desktop app sessions inventory across all accountIds.
+Claude desktop app sessions inventory.
 
-Scans <accountId>/<orgId>/local_*.json under platform-specific Claude
-storage path and prints a compact table grouped by accountId.
+Scans all <accountId>/<orgId>/local_*.json under
+C:\\Users\\<user>\\AppData\\Roaming\\Claude\\claude-code-sessions\\
+and prints a compact table grouped by accountId.
 
-Read-only. No writes, no migration. See sessions_restore.py for actual move.
+Read-only. No writes, no migration. See migrate_session.py for actual move.
 """
 from __future__ import annotations
 import io
 import json
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
-
 def storage_root() -> Path:
-    """Return the platform-specific Claude desktop sessions root."""
+    """Platform-specific Claude desktop sessions root."""
     if sys.platform == "darwin":
         return Path.home() / "Library" / "Application Support" / "Claude" / "claude-code-sessions"
     if sys.platform == "win32":
@@ -26,11 +26,12 @@ def storage_root() -> Path:
         if appdata:
             return Path(appdata) / "Claude" / "claude-code-sessions"
         return Path.home() / "AppData" / "Roaming" / "Claude" / "claude-code-sessions"
-    # Linux / WSL — Anthropic doesn't ship desktop here yet, but try ~/.config
     return Path.home() / ".config" / "Claude" / "claude-code-sessions"
 
 
 ROOT = storage_root()
+
+# Force UTF-8 stdout (Windows cp1252 default would mojibake Cyrillic titles)
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", line_buffering=True)
 
 
@@ -46,6 +47,7 @@ def fmt_iso(s) -> str:
     if not s:
         return "?"
     if isinstance(s, (int, float)):
+        # Unix ts: ms if > 1e10, else seconds
         ts = s / 1000 if s > 1e10 else s
         try:
             return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M")
@@ -60,23 +62,14 @@ def fmt_iso(s) -> str:
     return str(s)
 
 
-def to_ts(v) -> float:
-    if isinstance(v, (int, float)):
-        return v / 1000 if v > 1e10 else v
-    if isinstance(v, str):
-        try:
-            return datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp()
-        except Exception:
-            return 0
-    return 0
-
-
 def parse_session(path: Path) -> dict:
     try:
         with path.open(encoding="utf-8") as f:
             obj = json.load(f)
     except Exception as e:
         return {"error": str(e), "size": path.stat().st_size}
+    sid_raw = obj.get("sessionId") or path.stem
+    sid_clean = sid_raw.removeprefix("local_")
     return {
         "title": obj.get("title", "(untitled)"),
         "cwd": obj.get("cwd", "?"),
@@ -85,7 +78,7 @@ def parse_session(path: Path) -> dict:
         "model": obj.get("model", "?"),
         "turns": obj.get("completedTurns", 0),
         "archived": obj.get("isArchived", False),
-        "session_id": obj.get("sessionId", path.stem.replace("local_", "")),
+        "session_id": sid_clean,
         "size": path.stat().st_size,
     }
 
@@ -93,8 +86,6 @@ def parse_session(path: Path) -> dict:
 def main() -> int:
     if not ROOT.exists():
         print(f"ERROR: {ROOT} does not exist", file=sys.stderr)
-        print(f"       Either Claude desktop app not installed, or storage path differs.", file=sys.stderr)
-        print(f"       Set CLAUDE_SESSIONS_ROOT env var to override.", file=sys.stderr)
         return 1
 
     accounts = sorted([d for d in ROOT.iterdir() if d.is_dir()])
@@ -104,12 +95,14 @@ def main() -> int:
     print(f"# Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print()
 
+    # Collect all sessions across all accounts for cross-account view
     all_sessions = []
 
     for acct_dir in accounts:
         acct_short = acct_dir.name[:8]
         orgs = sorted([d for d in acct_dir.iterdir() if d.is_dir()])
 
+        # Per-account stats
         all_session_files = list(acct_dir.rglob("local_*.json"))
         total_size = sum(p.stat().st_size for p in all_session_files)
         latest = max((p.stat().st_mtime for p in all_session_files), default=0)
@@ -118,6 +111,7 @@ def main() -> int:
         print(f"## Account {acct_short}…  ({len(all_session_files)} sessions, {fmt_size(total_size)}, last {latest_str})")
         print()
 
+        # Sort sessions by lastActivityAt desc (most recent first)
         sessions_meta = []
         for org_dir in orgs:
             for sf in org_dir.glob("local_*.json"):
@@ -127,8 +121,20 @@ def main() -> int:
                 meta["path"] = sf
                 sessions_meta.append(meta)
 
-        sessions_meta.sort(key=lambda m: to_ts(m.get("last")), reverse=True)
+        # Normalize sort key: int/float ts → str ISO via fmt; missing → empty
+        def sort_key(m):
+            v = m.get("last") or 0
+            if isinstance(v, (int, float)):
+                return v / 1000 if v > 1e10 else v
+            if isinstance(v, str):
+                try:
+                    return datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp()
+                except Exception:
+                    return 0
+            return 0
+        sessions_meta.sort(key=sort_key, reverse=True)
 
+        # Print table: date | turns | title | cwd-tail | size
         print(f"  {'last':<16}  {'turns':>5}  {'size':>5}  {'sid':<8}  title  [cwd]")
         print(f"  {'-'*16}  {'-'*5}  {'-'*5}  {'-'*8}  -----")
         for m in sessions_meta:
@@ -145,6 +151,7 @@ def main() -> int:
         all_sessions.extend(sessions_meta)
         print()
 
+    # Cross-account summary by cwd (which projects appear in which accounts)
     print()
     print("## Cross-account view: same project across multiple accounts?")
     print()

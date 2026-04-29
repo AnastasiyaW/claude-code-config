@@ -4,10 +4,10 @@
 Search Claude desktop app sessions by title / cwd / sessionId substring.
 
 Usage:
-    python sessions_find.py <query>                        # case-insensitive substring in title or cwd
-    python sessions_find.py <query> --account <acct-prefix>  # filter by accountId prefix (8 chars)
-    python sessions_find.py --since 2026-04-01             # all sessions since date
-    python sessions_find.py --untitled                      # find empty/parse-failed sessions
+    python sessions_find.py <query>                  # case-insensitive substring in title or cwd
+    python sessions_find.py <query> --account <prefix>  # filter by accountId prefix (8 hex chars)
+    python sessions_find.py --since 2026-04-01       # all sessions since date
+    python sessions_find.py --untitled                # find empty/parse-failed sessions
 
 Read-only. Output includes ready-to-copy restore command.
 """
@@ -19,7 +19,6 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-
 
 def storage_root() -> Path:
     if sys.platform == "darwin":
@@ -33,6 +32,7 @@ def storage_root() -> Path:
 
 
 ROOT = storage_root()
+
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", line_buffering=True)
 
 
@@ -42,11 +42,13 @@ def parse_session(path: Path) -> dict:
             obj = json.load(f)
     except Exception as e:
         return {"error": str(e), "path": path}
+    sid_raw = obj.get("sessionId") or path.stem
+    sid_clean = sid_raw.removeprefix("local_")  # storage stores with prefix; we keep canonical UUID
     return {
         "title": obj.get("title", ""),
         "cwd": obj.get("cwd", ""),
         "last": obj.get("lastActivityAt"),
-        "session_id": obj.get("sessionId", path.stem.replace("local_", "")),
+        "session_id": sid_clean,
         "size": path.stat().st_size,
         "path": path,
     }
@@ -78,7 +80,7 @@ def to_ts(v) -> float:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("query", nargs="?", default="", help="substring to find in title or cwd")
-    ap.add_argument("--account", help="filter by accountId prefix (e.g., 8 hex chars)")
+    ap.add_argument("--account", help="filter by accountId prefix (8 hex chars)")
     ap.add_argument("--since", help="filter to sessions since date YYYY-MM-DD")
     ap.add_argument("--untitled", action="store_true", help="find sessions without title or with parse errors")
     ap.add_argument("--limit", type=int, default=50, help="max results (default 50)")
@@ -131,21 +133,21 @@ def main() -> int:
         return 0
 
     print(f"# Found {len(matches)} sessions")
-    print(f"# {'date':<16}  {'sid':<8}  {'acct':<8}  title  [cwd]")
-    print(f"# {'-'*16}  {'-'*8}  {'-'*8}  -----")
+    print(f"# {'date':<16}  {'sid (12-char prefix-unique)':<20}  {'acct':<8}  title  [cwd]")
+    print(f"# {'-'*16}  {'-'*20}  {'-'*8}  -----")
     for m in matches:
         last = fmt_ts(m.get("last"))
-        sid = m.get("session_id", "?")[:8]
+        sid = m.get("session_id", "?")[:12]  # 12 chars = essentially collision-free across <10K sessions
         acct = m.get("acct", "?")[:8]
         title = (m.get("title") or "(untitled)")[:60]
         cwd = m.get("cwd", "?")
         cwd_tail = "/".join(cwd.replace("\\", "/").split("/")[-2:]) if cwd else "?"
         err = " [PARSE_ERR]" if "error" in m else ""
-        print(f"  {last:<16}  {sid:<8}  {acct:<8}  {title}{err}  [{cwd_tail}]")
+        print(f"  {last:<16}  local_{sid:<14}  {acct:<8}  {title}{err}  [{cwd_tail}]")
 
     print()
-    print("# To restore one of these into your active accountId:")
-    print(f"#   python sessions_restore.py <sid8>")
+    print("# To restore: copy the local_xxxxxxxxxxxx prefix and run:")
+    print("#   python ~/.claude/scripts/sessions_restore.py local_xxxxxxxxxxxx")
     return 0
 
 

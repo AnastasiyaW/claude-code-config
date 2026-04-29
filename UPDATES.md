@@ -4,6 +4,40 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-29 (v3.6.4 — desktop-sessions: UX cleanup + critical bug fixes)
+
+User feedback в первом live-test: "не надо кнопки которые ничего не делают". Справедливо — кнопка "Restore" в HTML только копировала команду в clipboard, фактически action делал отдельный скрипт. Affordance врала.
+
+### Changed: HTML registry — no fake action buttons
+
+`scripts/sessions_registry.py`:
+- **Убрана** синяя "Restore" кнопка (была copy-only, выглядела как action)
+- **Добавлен** selectable `local_<sid12>` chip с `user-select: all` CSS — triple-click select, ctrl+c copy. Honest affordance: видно что это data, не action.
+- "RESTORED" badge теперь inline tag в title, не псевдо-overlay grid.
+- Footer обновлён: "triple-click chip → tell Claude in chat" workflow.
+
+### Fixed: critical bug — substring vs prefix match (collision risk)
+
+`scripts/sessions_restore.py`: `find_session()` использовал `if q in sid` (substring anywhere) — query "26" нашёл 54 совпадения (короткий substring встречается посреди UUID разных sessions). Это могло привести к **wrong session restored** при ambiguous match auto-pick.
+
+**Fix**: `if sid.startswith(q)` (prefix-match). 12-char query теперь надёжно уникален среди тысяч sessions. Anti-collision rationale в docstring.
+
+### Fixed: critical bug — stored `sessionId` field has `local_` prefix
+
+Storage внутри JSON: `sessionId: "local_262fa296-2064-..."` — Anthropic stores с тем же `local_` префиксом, что и filename. Мой `parse_session()` возвращал raw value, а `find_session()` ожидал clean UUID — restore падал с `no session matching` для valid sids.
+
+**Fix**: `sid_clean = sid_raw.removeprefix("local_")` во всех 4 скриптах. Display строки везде явно re-add `local_` префикс для consistency. `restore.py` accepts both `local_<uuid>` и bare `<uuid>` форму.
+
+### Changed: 12-char display (was 8)
+
+8 chars = 2^32 уникальных = collision risk на ~65K sessions (birthday paradox). 12 chars = 2^48 — practically collision-free на любом human archive. `inventory.py`, `find.py`, `registry.py` показывают `local_<12chars>` consistently.
+
+### Restored: generic platform detection regression
+
+Случайный `cp` при sync local→public перезаписал generic versions (`storage_root()` функция с `sys.platform` детектом) хардкодом Windows-путей. Восстановлено — Mac/Linux users снова работают без environment variables.
+
+---
+
 ## 2026-04-29 (v3.6.3 — Desktop sessions HTML registry + macOS docs)
 
 ### Added: `skills/operational/desktop-sessions-discovery/scripts/sessions_registry.py`

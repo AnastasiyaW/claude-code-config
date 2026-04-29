@@ -3,8 +3,8 @@
 """
 Restore one Claude desktop session into the active accountId.
 
-Active accountId = directory with the most recently modified local_*.json
-(heuristic — print and confirm via --dry-run before commit).
+Active accountId = the one with the most recently modified local_*.json
+(heuristic — print and confirm before copy).
 
 Usage:
     python sessions_restore.py <sessionId-8-or-full>           # auto-detect active acct
@@ -16,7 +16,7 @@ Behaviour:
     2. Detect or use --to active accountId
     3. Copy local_<full-id>.json into <activeAcct>/<sameOrgId>/
        (if target orgId folder doesn't exist — create it)
-    4. Verify by reading back and comparing bytes
+    4. Verify by reading back and comparing
     5. Append to ~/.claude/desktop-migrations.jsonl audit log
     6. Print restart-app reminder
 
@@ -31,7 +31,6 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-
 
 def storage_root() -> Path:
     if sys.platform == "darwin":
@@ -51,19 +50,25 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", line_bufferin
 
 
 def find_session(query: str) -> list[Path]:
-    q = query.lower()
+    """Find local_*.json files where sessionId STARTS WITH query (case-insensitive).
+
+    Prefix-match avoids collisions: short query "26" wouldn't match the literal
+    middle of an unrelated UUID. Accepts both "local_abc123" and "abc123" forms.
+    """
+    q = query.lower().removeprefix("local_")
     found = []
     for acct in ROOT.iterdir():
         if not acct.is_dir():
             continue
         for f in acct.rglob("local_*.json"):
             sid = f.stem.replace("local_", "").lower()
-            if q in sid:
+            if sid.startswith(q):
                 found.append(f)
     return found
 
 
 def detect_active_acct() -> str | None:
+    """Active accountId = directory with most recently modified local_*.json."""
     best = (0.0, None)
     for acct in ROOT.iterdir():
         if not acct.is_dir():
@@ -107,6 +112,7 @@ def main() -> int:
     src_org = src.parent.name
     src_sid = src.stem.replace("local_", "")
 
+    # Detect target accountId
     if args.to:
         target_acct = next(
             (d.name for d in ROOT.iterdir() if d.is_dir() and d.name.startswith(args.to)),
@@ -125,6 +131,7 @@ def main() -> int:
         print(f"NOOP: session is already in target accountId {target_acct[:8]}", file=sys.stderr)
         return 0
 
+    # Pick orgId in target — prefer one matching src_org, else first existing, else create src_org
     target_acct_dir = ROOT / target_acct
     target_orgs = [d.name for d in target_acct_dir.iterdir() if d.is_dir()]
     if src_org in target_orgs:
@@ -137,6 +144,7 @@ def main() -> int:
     target_dir = target_acct_dir / target_org
     target_path = target_dir / src.name
 
+    # Read title for human confirmation
     try:
         with src.open(encoding="utf-8") as f:
             meta = json.load(f)
@@ -163,6 +171,7 @@ def main() -> int:
     target_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, target_path)
 
+    # Verify (proof loop)
     if not target_path.exists():
         print(f"ERROR: copy did not produce target file", file=sys.stderr)
         return 7
@@ -173,6 +182,7 @@ def main() -> int:
         print(f"ERROR: byte mismatch after copy, removed target", file=sys.stderr)
         return 8
 
+    # Audit log
     append_audit(
         {
             "ts": datetime.now().isoformat(timespec="seconds"),
