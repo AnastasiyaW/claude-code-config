@@ -4,6 +4,41 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-04-29 (v3.6.2 — Claude desktop sessions discovery toolkit)
+
+### Added: `skills/operational/desktop-sessions-discovery/`
+
+Новая skill-категория `operational/` для скиллов работы с самим Claude (не контент/код, а runtime). Первая запись — обходное решение для GitHub issue [#48511](https://github.com/anthropics/claude-code/issues/48511) "all session history disappears when switching accounts in Code mode" (открыт без ответа Anthropic).
+
+**Контекст**. Claude desktop app хранит сессии в `<accountId>/<orgId>/local_*.json`. При переключении аккаунта `LocalSessionManager.loadSessions()` читает только active accountId — старые сессии становятся **невидимы в UI**, но физически остаются на диске. Один реальный пользователь обнаружил у себя 710 sessions / 50 MB истории, разбитой по 6 accountId-папкам, из которых видно только 69. Главный заброшенный архив 330 sessions (45 MB) полностью невидим.
+
+Storage paths (reverse-engineered, **не документированы Anthropic**):
+
+| Платформа | Путь |
+|---|---|
+| Win32 .exe | `%APPDATA%\Claude\claude-code-sessions\<acct>\<org>\local_<sid>.json` |
+| Windows MSIX | `%LOCALAPPDATA%\Packages\Claude_pzs8sxrjxfjjc\LocalCache\Roaming\Claude\…` (broken — issue [#48362](https://github.com/anthropics/claude-code/issues/48362), atomic-rename fails в песочнице) |
+| macOS | `~/Library/Application Support/Claude/claude-code-sessions/<acct>/<org>/local_<sid>.json` |
+
+Источник: `.vite/build/index.js` line 771: `const $6t="claude-code-sessions"`. Может измениться в любом релизе.
+
+**Три скрипта**:
+
+1. `scripts/sessions_inventory.py` — таблица всех sessions по accountId, с titles/cwd/turns/last activity, плюс cross-account view (какие проекты были открыты под несколькими accountId)
+2. `scripts/sessions_find.py "<query>"` — поиск по substring в title/cwd, фильтр по accountId/дате/`--untitled`
+3. `scripts/sessions_restore.py <sid8>` — selective copy одной sessions в active accountId с byte-verify и audit log в `~/.claude/desktop-migrations.jsonl`. Source НЕ удаляется (kept as backup).
+
+**3 риска (toolkit имеет deadline)**:
+- v2.1.9+ regression (issue [#18645](https://github.com/anthropics/claude-code/issues/18645)): валидация блокирует sessions с других машин. Cross-account на той же машине пока работает, но Anthropic ужесточает проверки.
+- VM bundle architecture coming (issue [#54428](https://github.com/anthropics/claude-code/issues/54428)): следующая desktop-версия переходит на `vm_bundles/claudevm.bundle/sessiondata.img` disk-image. После релиза file-copy migration **может сломаться полностью**.
+- Mass merge всех 700+ sessions в один accountId = неюзабельный UI. Selective restore только когда нужна конкретная.
+
+**Long-term recommendation**: дрифт серьёзной работы в CLI Claude Code. CLI sessions в `~/.claude/projects/<slug>/<UUID>.jsonl` account-agnostic, stable storage, JSONL формат, переживают desktop reorgs. Desktop app — для quick UI, но не для long-running.
+
+Generic platform detection (`sys.platform` aware), UTF-8-safe stdout (для Cyrillic/Chinese titles), proof-loop verify (byte-match после copy), audit log в JSONL.
+
+---
+
 ## 2026-04-28 (v3.6.1 — API UTF-8 posting + verify-at-consumer retry anti-pattern)
 
 ### Added: `rules/api-utf8-posting.md`
