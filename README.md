@@ -132,7 +132,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
 - `hooks/` - ready-to-use Python scripts for session management and safety guards.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types.
-- `skills/` - domain-specific knowledge (AI/ML, frontend, iOS, code review). Loaded on demand.
+- `skills/` - domain-specific knowledge (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
 - `scripts/` - diagnostic utilities (config validator, KV-cache stats, skills-lock generator, handoff GC).
 - `skills-lock.json` - reproducible lockfile with content hashes of every skill (regenerate via `scripts/generate_skills_lock.py`).
 - `CLAUDE.md` - compact summary of all principles for global config.
@@ -245,6 +245,7 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Architecture | `plan-swarm-review` | Multi-agent plan review with parallel independent reviewers |
 | Writing | `humanize-english` | Transform AI text into natural English prose |
 | Writing | `humanize-russian` | Transform AI text into natural Russian prose |
+| Operational | `desktop-sessions-discovery` | Find/restore Claude desktop app sessions hidden after account switch (issue #48511) — 4 scripts (inventory/find/restore/HTML registry) for Mac/Win/Linux |
 
 ---
 
@@ -285,7 +286,7 @@ Principles are updated with new research findings, real-world incidents, and com
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
 - `hooks/` - 14 个即用型 Hook 脚本（安全防护、会话管理、技能路由）
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆和项目编年史模板
-- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证）
+- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具）
 
 **安装:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` 或直接复制所需文件。
 
@@ -302,7 +303,7 @@ Principles are updated with new research findings, real-world incidents, and com
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
 - `hooks/` - 14 готовых скриптов (7 safety guards, handoff, drift validator, keyword router и др.)
 - `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник
-- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация)
+- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты для самого Claude)
 
 **Установка:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` или копирование нужных файлов.
 
