@@ -25,7 +25,7 @@ If you read the [README](README.md) and thought "okay but HOW does this work mec
 3. Only matching rules are injected into the system prompt
 4. The rest never consume tokens
 
-**Measured impact:** 9 rule files, 561 lines total. In a typical session, 3-4 are active (200-250 lines). The other 300+ lines never enter context.
+**Measured impact:** 14 rule files, ~1400 lines total. In a typical session, 3-5 are active (250-400 lines). The other 1000+ lines never enter context.
 
 ---
 

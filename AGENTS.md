@@ -17,7 +17,7 @@ This is a configuration system repository for AI coding agents, not an applicati
 
 When the user asks you to "set up this project" or "apply these principles":
 
-1. Read `README.md` first - it lists the 23 principles by problem they solve
+1. Read `README.md` first - it lists the 25 principles by problem they solve
 2. Read `principles/README.md` for the maturity-level map (L1 -> L2 -> L3)
 3. Do NOT bulk-copy everything. Pick what matches the user's actual project:
    - Any project: Principle 09 (Supply Chain Defense), Principle 10 (Agent Security), Principle 11 (Documentation Integrity)
