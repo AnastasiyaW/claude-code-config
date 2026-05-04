@@ -81,11 +81,15 @@ MIN_SESSION_MINUTES = 2
 def detect_test_command(cwd: Path) -> tuple[list[str], str] | None:
     """Detect what test command to run. Returns (cmd_list, label) or None."""
 
+    # Project override supports leading #-comment lines for documentation.
+    # First non-comment non-empty line wins.
     override = cwd / ".claude" / "test-command"
     if override.exists() and override.is_file():
-        cmd_str = override.read_text(encoding="utf-8").strip()
-        if cmd_str and not cmd_str.startswith("#"):
-            return (cmd_str.split(), f"override({cmd_str})")
+        for raw_line in override.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#"):
+                continue
+            return (line.split(), f"override({line})")
 
     pkg_json = cwd / "package.json"
     if pkg_json.exists():
@@ -103,9 +107,13 @@ def detect_test_command(cwd: Path) -> tuple[list[str], str] | None:
         except (json.JSONDecodeError, OSError):
             pass
 
-    if (cwd / "pytest.ini").exists() or (cwd / "pyproject.toml").exists() or (cwd / "tests").is_dir():
-        if shutil.which("pytest"):
-            return (["pytest", "--tb=short", "-q"], "pytest")
+    # Python: require actual test files, not just a placeholder tests/ directory.
+    # pytest exit 5 = "no tests collected" - treating that as failure breaks projects
+    # with empty tests/ scaffolds. Silent-pass until first real test exists.
+    has_pytest_config = (cwd / "pytest.ini").exists() or (cwd / "pyproject.toml").exists()
+    has_test_files = bool(list(cwd.rglob("test_*.py"))[:1] or list(cwd.rglob("*_test.py"))[:1])
+    if (has_pytest_config or has_test_files) and has_test_files and shutil.which("pytest"):
+        return (["pytest", "--tb=short", "-q"], "pytest")
 
     if (cwd / "Cargo.toml").exists() and shutil.which("cargo"):
         return (["cargo", "test", "--quiet"], "cargo test")
@@ -170,6 +178,12 @@ def main() -> int:
         return 0
 
     if result.returncode == 0:
+        return 0
+
+    # pytest exit 5 = "no tests collected" - silent pass (project has scaffold but
+    # no tests yet; gate auto-activates when first real test exists).
+    is_pytest = label.startswith("pytest") or "pytest" in label
+    if is_pytest and result.returncode == 5:
         return 0
 
     output = (result.stdout or "") + "\n" + (result.stderr or "")
