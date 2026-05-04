@@ -107,12 +107,37 @@ def detect_test_command(cwd: Path) -> tuple[list[str], str] | None:
         except (json.JSONDecodeError, OSError):
             pass
 
-    # Python: require actual test files, not just a placeholder tests/ directory.
-    # pytest exit 5 = "no tests collected" - treating that as failure breaks projects
-    # with empty tests/ scaffolds. Silent-pass until first real test exists.
-    has_pytest_config = (cwd / "pytest.ini").exists() or (cwd / "pyproject.toml").exists()
-    has_test_files = bool(list(cwd.rglob("test_*.py"))[:1] or list(cwd.rglob("*_test.py"))[:1])
-    if (has_pytest_config or has_test_files) and has_test_files and shutil.which("pytest"):
+    # Python: only conventional locations, NEVER rglob from cwd. rglob from an
+    # umbrella directory (workspace with many subprojects) sweeps too widely and
+    # catches CLI scripts named test_*.py that sys.exit at module load. Real bug
+    # case 2026-05-04: workspace dir found face-relax-lora/scripts/test_single.py
+    # and pytest exited code 3 (internal error) at collection.
+    has_pytest_ini = (cwd / "pytest.ini").exists()
+
+    pyproject = cwd / "pyproject.toml"
+    has_pyproject_pytest = False
+    if pyproject.exists():
+        try:
+            txt = pyproject.read_text(encoding="utf-8", errors="ignore")
+            has_pyproject_pytest = "[tool.pytest" in txt or "pytest" in txt
+        except OSError:
+            pass
+
+    def _dir_has_test_files(d: Path) -> bool:
+        if not d.is_dir():
+            return False
+        try:
+            return any(
+                p.is_file() and p.suffix == ".py" and
+                (p.name.startswith("test_") or p.name.endswith("_test.py"))
+                for p in d.iterdir()
+            )
+        except OSError:
+            return False
+
+    has_tests_dir = _dir_has_test_files(cwd / "tests") or _dir_has_test_files(cwd / "test")
+
+    if (has_pytest_ini or has_pyproject_pytest or has_tests_dir) and shutil.which("pytest"):
         return (["pytest", "--tb=short", "-q"], "pytest")
 
     if (cwd / "Cargo.toml").exists() and shutil.which("cargo"):
