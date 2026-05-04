@@ -4,6 +4,64 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-04 (v3.7.0 — no-pre-existing-evasion: structural anti-laziness stack)
+
+Adds the behavioural enforcement layer for bug-fix tasks. Stops agents
+from labelling discovered issues as "pre-existing", "out of scope", or
+"deferred for separate refactor" to escape work. Phrase detection
+(existing `stop-phrase-guard.py`) is detective; this release adds the
+preventive structural layer.
+
+**New principle**: `principles/26-no-pre-existing-evasion.md`. Documents
+the failure mode (issue #42796: 173 violations / 17 days), the bradfeld
+"fix or ticket" pattern with five named exceptions, and the
+hook-enforcement design.
+
+**New rule**: `rules/no-pre-existing-evasion.md`. Drop into a project's
+`.claude/rules/` or merge into `CLAUDE.md`. Lists the five legitimate
+reasons to defer (missing-data, missing-dep, arch-decision,
+scope-explosion, inaccessible-repo) - "complicated", "risky",
+"pre-existing" are explicitly rejected.
+
+**New hooks**:
+
+- `hooks/test-gate-stop-hook.py` (Layer 2). Runs the project test suite
+  on every Stop event. Blocks the "done" claim if the suite is red.
+  Detects pytest, npm/pnpm/yarn/bun test, cargo test, go test, plus
+  `.claude/test-command` override. Anti-loop guard via `stop_hook_active`.
+  Bypass: `CLAUDE_SKIP_TEST_GATE=1` env or `.claude/.skip-test-gate` marker.
+
+- `hooks/problems-md-validator.py` (Layer 4). Validates that every entry
+  in `PROBLEMS.md` has a Status that is either one of the five 5-exception
+  reasons, a resolution state (RESOLVED/WORKAROUND/NOT_A_BUG/CLOSED), or
+  a specific blocker (`BLOCKED-<thing>`). Plain `OPEN` is rejected.
+  Parser ignores section group headings (`## Open`, `## Resolved`) and
+  only inspects date-prefixed entries (`## YYYY-MM-DD ...`).
+  Bypass: `CLAUDE_SKIP_PROBLEMS_CHECK=1` or `.claude/.skip-problems-check`.
+
+**Layer summary** (defence in depth):
+
+| Layer | Component | Catches |
+|---|---|---|
+| 1 (detective) | `stop-phrase-guard.py` (existing) | Old phrases ("pre-existing", "good stopping point", etc.) |
+| 2 (preventive) | `test-gate-stop-hook.py` (new) | Red tests at Stop event |
+| 3 (verifier) | Independent agent pattern (proof-loop) | Documented; not codified - requires fresh-context spawn |
+| 4 (preventive) | `problems-md-validator.py` (new) | OPEN entries without 5-exception ticket |
+
+**Smoke-tested** in a sandbox project (4 calculator tests, 2 fail / 2 pass)
+across 9 scenarios:
+- Test gate: red → BLOCK; anti-loop guard; env var bypass; marker bypass; green → silent pass
+- PROBLEMS.md: missing → silent pass; OPEN no exception → BLOCK; valid 5-exception statuses → pass; anti-loop guard
+- Caught one parser false-positive (section headings being treated as entries) and fixed before publication
+
+**Reference**:
+- Origin investigation: [anthropics/claude-code#42796](https://github.com/anthropics/claude-code/issues/42796)
+- bradfeld pattern: [advanced-claude-config gist](https://gist.github.com/bradfeld/1deb0c385d12289947ff83f145b7e4d2)
+- Compliance Decay paper: Jaroslawicz et al. 2025
+- Opus 4.7 literal-interpretation guidance: [Anthropic blog](https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code)
+
+---
+
 ## 2026-04-29 (v3.6.4 — desktop-sessions: UX cleanup + critical bug fixes)
 
 User feedback в первом live-test: "не надо кнопки которые ничего не делают". Справедливо — кнопка "Restore" в HTML только копировала команду в clipboard, фактически action делал отдельный скрипт. Affordance врала.
