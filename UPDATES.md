@@ -4,6 +4,55 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-04 (v3.7.1 — test-gate-stop-hook: 3 hardening fixes from real-world deployment)
+
+Patch release. After v3.7.0 shipped, applying the hooks to three real
+workloads (a sandbox calculator project, pinterest-parser with empty
+tests scaffold, retouch-app/server in Go, plus the CODE_Claude umbrella
+workspace) surfaced three structural bugs. Each one would have caused
+false BLOCK on legitimate sessions; each was caught and fixed before
+the hook spread to wider use.
+
+**Round 1 — section headings false-positive in problems-md-validator**.
+Pure section group headings (`## Open`, `## Resolved`, `## Workarounds`)
+were being treated as problem entries and flagged for missing Status.
+Fix: only `## YYYY-MM-DD ...` (date-prefixed) headings count as entries.
+Section headings now silent. Commit `634c08e`.
+
+**Round 2 — test-gate override parser dropped commented files**. The
+`.claude/test-command` override file is meant to be self-documenting,
+so users put leading `#` comment lines explaining the command. The
+parser used `strip()` and saw only the first comment as content, then
+rejected the whole file. Fix: walk lines, skip leading comment/blank,
+take first command line. Same release: pytest exit 5 ("no tests
+collected") was being treated as failure, which broke any project
+with a placeholder `tests/` directory. Fix: pytest exit 5 = silent
+pass. The gate auto-activates when the first real test lands. Commit
+`f6b5bfe`.
+
+**Round 3 — umbrella-directory false-positive via rglob**. The Python
+detection used `cwd.rglob("test_*.py")` to verify real test files
+exist before selecting pytest. From a multi-project workspace umbrella,
+rglob swept the entire tree and found CLI scripts named `test_*.py`
+in unrelated subprojects (e.g. `face-relax-lora/scripts/test_single.py`
+which does `sys.exit(1)` at module load). pytest tried to collect them
+during import → SystemExit → exit 3 (internal error) → BLOCK. Fix:
+drop rglob entirely, use only conventional locations (top-level
+`pytest.ini`, `pyproject.toml` that mentions pytest, immediate
+children of `tests/` or `test/`). Projects placing tests deep
+(e.g. `src/pkg/tests/`) now opt in via `.claude/test-command`
+override. Commit `3f74981`.
+
+**Lesson encoded in this release**: defence-in-depth applies to
+deployment process, not only runtime. Sandbox alone does not catch
+these — a sandbox is too clean. The pattern that worked: sandbox
+unit-test → one simple real project → one multi-project workspace.
+Each tier surfaced bugs the previous tier could not. Any hook that
+will run globally should pass all three tiers before being registered
+in `~/.claude/settings.json`.
+
+---
+
 ## 2026-05-04 (v3.7.0 — no-pre-existing-evasion: structural anti-laziness stack)
 
 Adds the behavioural enforcement layer for bug-fix tasks. Stops agents
