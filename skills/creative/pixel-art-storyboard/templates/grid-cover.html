@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>{{COLLECTION_TITLE}} · Animated Pixel Covers</title>
+<style>
+  :root {
+    --bg: #0b0812;
+    --fg: #a896b4;
+    --dim: #5a4e6a;
+    --accent: #ffb4c8;
+    --border: rgba(255,255,255,.06);
+    --cover-w: 256px;
+    --cover-h: 384px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    min-height: 100vh;
+  }
+  .page { max-width: 1400px; margin: 0 auto; padding: 56px 40px 96px; }
+  header { margin-bottom: 56px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  header h1 {
+    margin: 0 0 12px; font-size: 14px; font-weight: 500;
+    letter-spacing: .35em; text-transform: uppercase; color: var(--accent);
+  }
+  header p {
+    margin: 0; font-size: 12px; letter-spacing: .15em;
+    color: var(--dim); text-transform: uppercase; line-height: 1.6;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, var(--cover-w));
+    gap: 32px; justify-content: center;
+  }
+  @media (max-width: 1280px) { .grid { grid-template-columns: repeat(2, var(--cover-w)); } }
+  @media (max-width: 640px)  { .grid { grid-template-columns: var(--cover-w); } }
+
+  .cover { width: var(--cover-w); display: flex; flex-direction: column; }
+  .canvas-wrap {
+    width: var(--cover-w); height: var(--cover-h);
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  canvas {
+    display: block; width: 100%; height: 100%;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
+  .meta { margin-top: 18px; padding: 0 4px; }
+  .meta .num { font-size: 9px; letter-spacing: .3em; color: var(--dim); }
+  .meta .title {
+    font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin: 6px 0 4px;
+  }
+  .meta .symbol {
+    font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: var(--fg);
+  }
+  .meta .year { margin-top: 8px; font-size: 9px; letter-spacing: .25em; color: var(--dim); }
+
+  footer {
+    margin-top: 64px; padding-top: 24px; border-top: 1px solid var(--border);
+    font-size: 10px; letter-spacing: .2em; color: var(--dim);
+    text-transform: uppercase; line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>{{COLLECTION_TITLE}}</h1>
+    <p>{{COLLECTION_SUBTITLE}}</p>
+  </header>
+
+  <div class="grid">
+    <!-- Repeat this block per cover. Replace c1 -> c2, c3, c4 etc -->
+    <div class="cover">
+      <div class="canvas-wrap"><canvas id="c1" width="64" height="96"></canvas></div>
+      <div class="meta">
+        <div class="num">{{NUMBER_1}}</div>
+        <div class="title">{{TITLE_1}}</div>
+        <div class="symbol">{{SYMBOL_1}}</div>
+        <div class="year">{{YEAR_1}} · loop {{LOOP_S_1}}s</div>
+      </div>
+    </div>
+    <!-- ...more covers... -->
+  </div>
+
+  <footer>{{FOOTER_TEXT}}</footer>
+</div>
+
+<script>
+// Common helpers (same as single-cover.html)
+function setupCanvas(id) {
+  const cv = document.getElementById(id);
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  return { cv, ctx, W: cv.width, H: cv.height };
+}
+function rect(ctx, x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); }
+function px(ctx, x, y, c) { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, 1, 1); }
+function hex(c) { const m = c.match(/#([0-9a-f]{6})/i); if (!m) return [0,0,0]; const v = parseInt(m[1],16); return [(v>>16)&255,(v>>8)&255,v&255]; }
+function rgb(r,g,b) { const h = n => Math.max(0,Math.min(255,n|0)).toString(16).padStart(2,'0'); return '#'+h(r)+h(g)+h(b); }
+function mix(a,b,t) { const A=hex(a),B=hex(b); return rgb(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t); }
+function hash(n) { const x = Math.sin(n*12.9898)*43758.5453; return x - Math.floor(x); }
+
+// Per-cover scene functions — replace these with your scenes
+function drawCover1(ctx, W, H, t) {
+  for (let y = 0; y < H; y++) rect(ctx, 0, y, W, 1, mix('#0a0814', '#1a0e1c', y/H));
+  const r = 4 + Math.sin(t * Math.PI * 2) * 2;
+  for (let dy = -r; dy <= r; dy++)
+    for (let dx = -r; dx <= r; dx++)
+      if (dx*dx + dy*dy <= r*r) px(ctx, W/2 + dx, H/2 + dy, '#ffb4c8');
+}
+// function drawCover2(ctx, W, H, t) { ... }
+// function drawCover3(ctx, W, H, t) { ... }
+// function drawCover4(ctx, W, H, t) { ... }
+
+// Animation driver — independent RAF per canvas, distinct loop periods
+function startCanvas(id, drawFn, periodMs) {
+  const { ctx, W, H } = setupCanvas(id);
+  const start = performance.now();
+  function frame(now) {
+    const t = ((now - start) % periodMs) / periodMs;
+    drawFn(ctx, W, H, t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+window.addEventListener('load', () => {
+  startCanvas('c1', drawCover1, 4000);
+  // startCanvas('c2', drawCover2, 8000);
+  // startCanvas('c3', drawCover3, 5000);
+  // startCanvas('c4', drawCover4, 10000);
+});
+</script>
+</body>
+</html>

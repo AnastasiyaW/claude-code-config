@@ -4,6 +4,83 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.9.0 — new `pixel-art-storyboard` skill: narrative-to-canvas pipeline)
+
+Companion skill to `pixel-art-studio` (v3.8.0). Where `pixel-art-studio` handles
+static sprite design, palettes, dithering, quality scoring — `pixel-art-storyboard`
+handles the upstream step: turning a 2-paragraph scene description (book synopsis,
+album brief, ambient mood) into a self-contained HTML file with **canvas-rendered
+seamless-loop animated pixel art**.
+
+**`skills/creative/pixel-art-storyboard/`**:
+
+- **SKILL.md** (Direction): 5-element scene framework (Subject/Setting/Lighting/
+  Palette/Motion), workflow with mandatory rules (single self-contained HTML,
+  no Math.random in render path, image-rendering: pixelated required, RAF per
+  canvas), gotchas for canvas pixel art, troubleshooting table, 3 prompt registers.
+
+- **references/looped-animation-techniques.md**: phase-derived loops
+  (`t = (now/period) % 1`), sub-pixel breathing (Metal Slug technique), parallax
+  LCM principle (Slynyrd worked example: 96px canvas with scroll rates 1/2/3/4/8),
+  particle architectures (Architecture B: phase-locked deterministic field —
+  `pos = f(phase, seed[i])`), palette interpolation for day/night cycles,
+  loop period selection by mood, code patterns for correct vs wrong implementations.
+
+- **references/scene-description-framework.md**: 5-element framework table,
+  compositional shorthand (iconography first, symbolic accent, negative space),
+  three reference forms (cover-style / establishing shot / loop-friendly), three
+  full worked examples (Romeo & Juliet, lonely cabin, cyberpunk alley), constraint
+  guidance per canvas size, anti-patterns table, narrative-to-spec workflow.
+
+- **references/three-registers.md**: distinct prompt styles for LLM agent
+  (parameter-heavy, machine-friendly), human pixel artist (atmospheric, emotional),
+  SDXL Pixel Art LoRA (noun-heavy, comma-separated, with anchor tokens). Same
+  scene shown all three ways for comparison.
+
+- **references/easing-curves.md**: integer-pixel quantization issue, why linear
+  ease feels wrong for pixel motion, designed-step easing (Celeste-style),
+  pixelSnap wrapper, anticipation>action timing rule, when to skip easing
+  entirely (sub-pixel breathing, phase-locked motion).
+
+- **templates/single-cover.html**: starter HTML for a single book/album cover
+  with placeholder canvas program.
+
+- **templates/grid-cover.html**: starter HTML for multi-cover grid layout
+  (4×1 → 2×2 → 1×4 responsive, dark-atmospheric aesthetic with JetBrains Mono +
+  pink accents matching reference style).
+
+**Worked example bundled**: `pixel-art-studio/examples/twilight-covers/` —
+Twilight Saga 4 books (2005-2008) as animated pixel covers in a single HTML.
+Each cover is a hand-coded canvas program with seamless loop:
+
+- **Twilight (4s loop)**: red apple in pale cupped hands; highlight orbits;
+  petal drifts diagonally
+- **New Moon (8s loop)**: red tulip with ruffled petals; one petal falls
+  per cycle; subtle stem sway
+- **Eclipse (5s loop)**: torn red ribbon flowing diagonally; sin-wave flutter;
+  single thread drifts through tear
+- **Breaking Dawn (10s loop)**: white queen + pawn on checkered board with
+  warm spotlight; transformation halo pulses in last 25% of cycle; queen-ghost
+  briefly overlays pawn
+
+Scene scenarios saved at
+`research/product/pixel-art-2026-05-10/twilight-scenarios.md`.
+
+Verified via Claude Preview MCP: server started, console clean (0 errors),
+4 canvases at correct positions in 2×2 layout (CSS responsive), each running
+its own requestAnimationFrame loop with distinct period.
+
+**Why this matters**: completes the pixel-art creation pipeline.
+storyboard (narrative → animated cover) → studio (sprite design + palette +
+quality) → reviewer (Generator-Evaluator independent quality verdict). Three
+skills compose into a full creative workflow.
+
+Research source: 4-language earlier research (EN/CN/KR/RU) + new agent on
+loop animation theory and scene description writing. All saved in
+`research/product/pixel-art-2026-05-10/`.
+
+---
+
 ## 2026-05-10 (v3.8.0 — new `pixel-art-studio` skill + first evaluator agent)
 
 Major addition: complete pixel-art creation toolkit as a single skill, plus the first
