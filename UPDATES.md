@@ -4,6 +4,118 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.11.0 — Design Seeds palettes + animation baking + interaction reviewer + 2026 image-to-pixel-art tools research)
+
+Five additions in one release. Each addresses a feedback item from real session use:
+- "Палитры должны быть красивые из коробки" → Design Seeds curated palettes
+- "Запекать анимации в GIF/видео с прозрачностью" → bake_animation.py
+- "Шахматы парят над доской — нужен агент-проверка взаимодействия" → pixel-art-interaction-reviewer
+- "Плавнее анимации" → smoother-animation-baking.md (баке N×больше кадров)
+- "Image-to-pixel-art tools 2026" → research saved + documented
+
+**Design Seeds curated palette database** (`scripts/palettes/design-seeds/`):
+10 palettes hand-curated from design-seeds.com (Jessica Colaluca's site), covering the
+mood spectrum: nature-tones (sage), heavenly-hues (deep night blues + warm star-glow),
+color-serve (warm peach), color-palette (pastel pink), rose-palette (vintage rose),
+tropical-tones (warm tropical), color-imagination (dreamy blue), color-escape (peaceful
+peach), color-set (autumn red), color-wander (mystic violet). Each .hex file cites
+source URL + tags + mood + best-for use cases. `_index.json` provides tag-based search
+across the catalog.
+
+**`palette.py` extended** with:
+- `--list` now shows the design-seeds category (10 palettes)
+- `--search-tag <tag>` returns matching palettes by tag (e.g. `twilight`, `dramatic`,
+  `pinks`, `mystical`, `dreamy`, `warm-accent`)
+- `--mood <query>` searches by free-form mood substring (e.g. `night`, `dawn warm`,
+  `romantic`, `peaceful`)
+- Nested palette path support: `design-seeds/heavenly-hues` resolves to
+  `palettes/design-seeds/heavenly-hues.hex`
+
+Verified: `--search-tag twilight` returns Heavenly Hues with full metadata including
+"best_for: Twilight cover, moonlit ambient, stars + warm accent". Direct ramp lookup
+for cover generation.
+
+**`bake_animation.py` (Playwright + ffmpeg pipeline)**:
+Convert canvas-rendered HTML animations to GIF / APNG / WebM (with alpha channel) /
+MP4 / PNG sequence. Uses headless Chromium to drive the same JS draw functions that
+run at runtime — single source of truth, no Python re-implementation drift.
+
+Procedure:
+1. Open HTML page in Playwright headless Chromium
+2. Override requestAnimationFrame to no-op (control time manually)
+3. For each baked frame: set `t = i/N`, call `drawXxx(ctx, W, H, t)`, capture
+   canvas via `toDataURL`
+4. Encode N frames via Pillow (GIF/APNG) or ffmpeg (WebM yuva420p / MP4 h264)
+
+WebM with alpha (yuva420p) is the canonical output for video-editing import — it
+preserves transparency through After Effects, DaVinci Resolve, etc. MP4 doesn't
+support alpha, use it only for solid-bg covers.
+
+Install: `pip install playwright Pillow && playwright install chromium`. ffmpeg
+required for video formats.
+
+**`smoother-animation-baking.md` reference** (in pixel-art-storyboard skill):
+Documents the baking workflow + the key insight: animations are parametric on `t ∈ [0,
+1)`, so we can sample `t` at any density at bake time. Runtime: 4-8 hand-coded
+keyframes; baked: 100-240 frames per loop = much smoother. Costs nothing at display
+time because output is a static GIF/video file.
+
+Includes: format comparison table (GIF / APNG / WebM / MP4 / PNG sequence), FPS
+selection guide (30fps sweet spot, 60fps for sub-pixel-fine motion), file size
+trade-offs (WebM ~200-500KB vs GIF 800KB-2MB), production recipe (develop with
+canvas+RAF, ship as `<video>` baked).
+
+**`pixel-art-interaction-reviewer` agent** (4th specialized reviewer):
+Catches things style/animation/composition reviewers miss — chess piece floating
+ABOVE the board with no surface contact, character shadow falling FROM SAME side as
+highlight (light-direction inconsistency), foreground object that should occlude
+background but doesn't, scale mismatches (chair smaller than child's head).
+
+Six dimensions (100pt rubric):
+- Gravity & surface support (25pt) — feet/base touching ground/surface
+- Occlusion order / Z-depth (20pt) — z-order matches 3D intent
+- Light direction consistency (20pt) — single light source, all highlights/shadows
+  agree
+- Anchor point / framing (15pt) — subject anchored sensibly per cover/scene
+  conventions
+- Scale plausibility (10pt) — sizes between objects narratively coherent
+- Animation frame consistency in interactions (10pt) — held objects don't drift,
+  particles respect physics
+
+Hard blockers (always REJECT): floating-without-justification, broken z-order,
+contradictory light sources without diegetic reason.
+
+**`pixel-art-quality-board` updated to spawn 4 reviewers in parallel** (was 3).
+Aggregate `board_score = (style + animation + composition + interaction) / 4`.
+Worst-of-N still applies. Cost note: 4x single-reviewer instead of 3x. Calibration
+allows skipping interaction reviewer for minimal-asset covers (single icon, no
+inter-object physics).
+
+**Calibration on Twilight v2 covers (Breaking Dawn — pawn becomes queen)**:
+The interaction reviewer (calibration example in agent file) catches that the pawn
+sits at y=49 with bottom y=63, but board starts at y=70 → pawn floats 7 pixels
+above board surface. This is exactly the type of error users were spotting; now an
+agent catches it programmatically.
+
+**`research/product/pixel-art-2026-05-10/image-to-pixel-art-tools-2026.md`** (research):
+Comprehensive 2026 tool catalog for "real cover photo → pixel art" workflow:
+- **Open-source Python**: pyxelate (best quality, soft-abandoned, Python 3.10
+  recommended), Pillow LIBIMAGEQUANT (excellent baseline), hitherdither (advanced
+  dithering kernels), rembg (background removal preprocessor)
+- **AI-based**: nerijs/pixel-art-xl (HuggingFace, 8 steps LCM, img2img at strength
+  0.6-0.8 for reference-driven), RetroDiffusion (commercial REST API, 50 free
+  credits, true pixel art model not SD-adapted), PixelLab (Python SDK), ModelScope
+  flux-2-klein-4b-spritesheet-lora
+- **Web tools**: All UI-only (Pixilart, Lospec Pixelizer, PixelOver, ezgif)
+
+Recommended pipeline for project use case: `rembg` (background separation) →
+`pyxelate` GMM+Atkinson at 32×48 (reference grid for hand-coding) → `hitherdither`
+for palette-constrained passes → Pillow palette extraction as hex list for canvas JS.
+
+Plugin description: 22 skills, 4 → 5 evaluator agents.
+
+---
+
 ## 2026-05-10 (v3.10.0 — retouch-style standardization + multi-agent quality review system)
 
 User-supplied production references (`Grass Field with City.html` + `Elements Sheet.html`)

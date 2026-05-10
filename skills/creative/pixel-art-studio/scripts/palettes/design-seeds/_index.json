@@ -1,0 +1,102 @@
+{
+  "source": "https://www.design-seeds.com",
+  "license_note": "Palettes are © Jessica Colaluca / Design Seeds. Used here as inspiration reference for non-commercial pixel-art generation. Each entry cites original URL.",
+  "fetched": "2026-05-10",
+  "palettes": {
+    "nature-tones": {
+      "title": "Nature Tones",
+      "url": "https://www.design-seeds.com/2024/07/nature-tones_29.html",
+      "tags": ["nature-made", "spring", "teals", "sage", "fresh"],
+      "mood": "gentle plant-life freshness",
+      "best_for": ["forest scenes", "spring book covers", "calm ambient"]
+    },
+    "heavenly-hues": {
+      "title": "Heavenly Hues",
+      "url": "https://www.design-seeds.com/2024/04/heavenly-hues_18.html",
+      "tags": ["blues", "winter", "twilight", "deep-night", "warm-accent"],
+      "mood": "deep night sky with warm star-glow",
+      "best_for": ["night scenes", "Twilight cover", "moonlit ambient", "stars + warm accent"]
+    },
+    "color-serve": {
+      "title": "Color Serve",
+      "url": "https://www.design-seeds.com/2024/07/color-serve.html",
+      "tags": ["edible", "oranges", "summer", "warm", "appetite"],
+      "mood": "warm peach + sage + lemon, dawn-summer",
+      "best_for": ["dawn covers", "warm summer scenes", "food-themed art"]
+    },
+    "color-palette": {
+      "title": "Color Palette (pinks-summer)",
+      "url": "https://www.design-seeds.com/2024/06/color-palette_18.html",
+      "tags": ["pinks", "summer", "pastel", "soft"],
+      "mood": "soft pastel summer, gentle and warm",
+      "best_for": ["romance covers", "soft mood scenes", "kid-friendly"]
+    },
+    "rose-palette": {
+      "title": "Rose Palette",
+      "url": "https://www.design-seeds.com/2024/05/rose-palette.html",
+      "tags": ["browns", "flora", "pinks", "spring", "vintage"],
+      "mood": "vintage rose with sage and dusty brown, romantic",
+      "best_for": ["historical fiction covers", "romantic scenes", "vintage botanical"]
+    },
+    "tropical-tones": {
+      "title": "Tropical Tones",
+      "url": "https://www.design-seeds.com/2024/05/tropical-tones.html",
+      "tags": ["pinks", "summer", "yellows", "tropical", "warm"],
+      "mood": "warm tropical pink + sage + sunny yellow, summer vacation",
+      "best_for": ["summer adventure covers", "tropical scenes", "vacation art"]
+    },
+    "color-imagination": {
+      "title": "Color Imagination",
+      "url": "https://www.design-seeds.com/2024/08/color-imagination.html",
+      "tags": ["blues", "summer", "soft", "daylight", "dreamy"],
+      "mood": "soft blue daylight with warm peach edge, dreamy",
+      "best_for": ["YA covers", "daydreaming scenes", "soft fantasy"]
+    },
+    "color-escape": {
+      "title": "Color Escape",
+      "url": "https://www.design-seeds.com/2024/07/color-escape_29.html",
+      "tags": ["mental-vacation", "summer", "soft", "peach", "calm"],
+      "mood": "cream + soft peach + dusty rose, peaceful retreat",
+      "best_for": ["self-help covers", "calm meditation art", "peaceful retreat scenes"]
+    },
+    "color-set": {
+      "title": "Color Set",
+      "url": "https://www.design-seeds.com/2024/07/color-set.html",
+      "tags": ["autumn", "reds", "wander", "deep", "dramatic"],
+      "mood": "deep autumn red + plum + dusty pink, dramatic and warm",
+      "best_for": ["autumn covers", "dark fantasy", "thriller covers", "dramatic mood"]
+    },
+    "color-wander": {
+      "title": "Color Wander",
+      "url": "https://www.design-seeds.com/2024/07/color-wander_24.html",
+      "tags": ["nature-made", "violets", "wander", "mystical", "dreamy"],
+      "mood": "lavender + lilac + deep violet, dreamy mystic flora",
+      "best_for": ["fantasy covers", "magic realism", "lavender field scenes"]
+    }
+  },
+  "tag_index": {
+    "blues": ["heavenly-hues", "color-imagination"],
+    "winter": ["heavenly-hues"],
+    "twilight": ["heavenly-hues"],
+    "deep-night": ["heavenly-hues"],
+    "summer": ["color-serve", "color-palette", "tropical-tones", "color-imagination", "color-escape"],
+    "spring": ["nature-tones", "rose-palette"],
+    "autumn": ["color-set"],
+    "warm": ["color-serve", "tropical-tones", "color-set"],
+    "soft": ["color-palette", "color-imagination", "color-escape"],
+    "pastel": ["color-palette"],
+    "pinks": ["color-palette", "rose-palette", "tropical-tones"],
+    "violets": ["color-wander"],
+    "reds": ["color-set"],
+    "yellows": ["tropical-tones"],
+    "sage": ["nature-tones", "rose-palette"],
+    "nature": ["nature-tones", "color-wander"],
+    "vintage": ["rose-palette"],
+    "tropical": ["tropical-tones"],
+    "dramatic": ["color-set", "heavenly-hues"],
+    "dreamy": ["color-imagination", "color-wander"],
+    "mystical": ["color-wander"],
+    "calm": ["color-escape", "nature-tones"],
+    "warm-accent": ["heavenly-hues"]
+  }
+}

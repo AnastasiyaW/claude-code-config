@@ -27,6 +27,7 @@ except ImportError:
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PALETTES_DIR = SCRIPT_DIR / "palettes"
+DESIGN_SEEDS_DIR = PALETTES_DIR / "design-seeds"
 
 
 # --- Palette I/O ------------------------------------------------------------
@@ -36,6 +37,7 @@ def list_palettes() -> dict[str, list[str]]:
     palettes = {}
     if not PALETTES_DIR.exists():
         return palettes
+    # Top-level palettes (hardware / lospec / cultural)
     for path in sorted(PALETTES_DIR.glob("*.hex")):
         name = path.stem
         category = "general"
@@ -49,12 +51,71 @@ def list_palettes() -> dict[str, list[str]]:
         elif name == "stoneshard-inspired":
             category = "indie-game"
         palettes.setdefault(category, []).append(name)
+    # Design Seeds curated subdirectory
+    if DESIGN_SEEDS_DIR.exists():
+        for path in sorted(DESIGN_SEEDS_DIR.glob("*.hex")):
+            palettes.setdefault("design-seeds", []).append("design-seeds/" + path.stem)
     return palettes
 
 
+def load_design_seeds_index() -> dict:
+    """Load the Design Seeds metadata index (titles, tags, moods)."""
+    index_path = DESIGN_SEEDS_DIR / "_index.json"
+    if not index_path.exists():
+        return {"palettes": {}, "tag_index": {}}
+    with open(index_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def search_palettes_by_tag(tag: str) -> list[dict]:
+    """Search Design Seeds palettes by tag. Returns list of {slug, title, tags, mood, hex_path}."""
+    idx = load_design_seeds_index()
+    tag_lower = tag.lower()
+    matching_slugs = idx.get("tag_index", {}).get(tag_lower, [])
+    results = []
+    for slug in matching_slugs:
+        meta = idx.get("palettes", {}).get(slug, {})
+        results.append({
+            "slug": slug,
+            "name": "design-seeds/" + slug,
+            "title": meta.get("title", slug),
+            "tags": meta.get("tags", []),
+            "mood": meta.get("mood", ""),
+            "best_for": meta.get("best_for", []),
+            "url": meta.get("url", ""),
+        })
+    return results
+
+
+def search_palettes_by_mood(query: str) -> list[dict]:
+    """Search Design Seeds palettes by free-form mood query (substring match against mood + best_for)."""
+    idx = load_design_seeds_index()
+    query_lower = query.lower()
+    results = []
+    for slug, meta in idx.get("palettes", {}).items():
+        haystack = (meta.get("mood", "") + " " + " ".join(meta.get("best_for", []))).lower()
+        if query_lower in haystack:
+            results.append({
+                "slug": slug,
+                "name": "design-seeds/" + slug,
+                "title": meta.get("title", slug),
+                "tags": meta.get("tags", []),
+                "mood": meta.get("mood", ""),
+                "best_for": meta.get("best_for", []),
+                "url": meta.get("url", ""),
+            })
+    return results
+
+
 def load_palette(name: str) -> list[str]:
-    """Load a palette by name. Returns list of hex strings."""
-    path = PALETTES_DIR / f"{name}.hex"
+    """Load a palette by name. Returns list of hex strings.
+
+    Supports nested paths: 'design-seeds/nature-tones' loads from palettes/design-seeds/nature-tones.hex
+    """
+    if "/" in name:
+        path = PALETTES_DIR / (name + ".hex")
+    else:
+        path = PALETTES_DIR / f"{name}.hex"
     if not path.exists():
         raise FileNotFoundError(f"Palette {name!r} not found in {PALETTES_DIR}")
     colors = []
@@ -261,6 +322,10 @@ def main() -> int:
     parser.add_argument("--steps", type=int, default=5, help="Ramp step count")
     parser.add_argument("--hue-shift", type=float, default=40, help="Hue rotation degrees")
     parser.add_argument("--analyze", default=None, help="Analyze palette of image (PNG)")
+    parser.add_argument("--search-tag", default=None,
+                        help="Search Design Seeds palettes by tag (e.g. 'twilight', 'dramatic', 'pinks')")
+    parser.add_argument("--mood", default=None,
+                        help="Search Design Seeds palettes by free-form mood query (e.g. 'night', 'dawn warm', 'romantic')")
     parser.add_argument("-o", "--output", default=None, help="Output file (for --show)")
     args = parser.parse_args()
 
@@ -316,6 +381,20 @@ def main() -> int:
         result = {"input": args.analyze, "color_count": len(colors),
                   "colors": colors[:64], "analysis": analyze_palette(colors)}
         print(json.dumps(result, indent=2))
+        return 0
+
+    if args.search_tag:
+        results = search_palettes_by_tag(args.search_tag)
+        for r in results:
+            r["colors"] = load_palette(r["name"])
+        print(json.dumps({"query_tag": args.search_tag, "matches": len(results), "results": results}, indent=2))
+        return 0
+
+    if args.mood:
+        results = search_palettes_by_mood(args.mood)
+        for r in results:
+            r["colors"] = load_palette(r["name"])
+        print(json.dumps({"query_mood": args.mood, "matches": len(results), "results": results}, indent=2))
         return 0
 
     parser.print_help()

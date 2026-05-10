@@ -279,6 +279,60 @@ If you generate covers and any of these fails, fix before declaring done.
 | Three prompt registers (LLM / human / LoRA) | `references/three-registers.md` |
 | Cover-style canvas template (single + grid) | `templates/single-cover.html`, `templates/grid-cover.html` |
 | Common animation easing functions for pixel art | `references/easing-curves.md` |
+| Retouch-style production standard (8-layer composition) | `references/retouch-style-guide.md` |
+| Smoother animation via baking (Playwright + ffmpeg) | `references/smoother-animation-baking.md` |
+
+## Palette selection: use Design Seeds curated palettes
+
+Before hand-picking colors, search the Design Seeds curated catalog (10 palettes covering moods nature / twilight / dawn / mystic / vintage / autumn / dreamy / dramatic):
+
+```bash
+# By tag
+python ../pixel-art-studio/scripts/palette.py --search-tag twilight
+python ../pixel-art-studio/scripts/palette.py --search-tag dramatic
+python ../pixel-art-studio/scripts/palette.py --search-tag mystical
+
+# By mood (free-form)
+python ../pixel-art-studio/scripts/palette.py --mood "night warm"
+python ../pixel-art-studio/scripts/palette.py --mood "romantic"
+python ../pixel-art-studio/scripts/palette.py --mood "peaceful retreat"
+```
+
+The Design Seeds palettes are PRE-VALIDATED for visual harmony (artist-curated, hue-shifted, mood-coherent). Using one of these as the base palette saves the "color discipline" step entirely.
+
+For cultural / hardware-authentic specific palettes (NES, GameBoy DMG, 五行, 오방색), use the bundled palettes in `pixel-art-studio/scripts/palettes/`.
+
+## Baking finished animations
+
+Once your canvas animation is verified working at runtime, bake it to GIF / WebM-alpha / MP4 / PNG-sequence for archival distribution:
+
+```bash
+# Smooth GIF (30fps × 4s = 120 frames)
+python ../pixel-art-studio/scripts/bake_animation.py http://localhost:9132/index-v2.html \
+  --canvas-id c1 --period-ms 4000 --fps 30 --format gif -o twilight.gif
+
+# WebM with alpha channel (transparent video for compositing into other media)
+python ../pixel-art-studio/scripts/bake_animation.py http://localhost:9132/index-v2.html \
+  --canvas-id c1 --period-ms 4000 --fps 30 --format webm-alpha -o twilight.webm
+```
+
+The bake samples `t` at any density you want, so output is SMOOTHER than runtime. See `references/smoother-animation-baking.md` for details.
+
+## Quality gate: 4-reviewer board
+
+After your animation works in browser, run the comprehensive quality board:
+
+```
+@pixel-art-quality-board "Review skills/creative/pixel-art-studio/examples/twilight-covers/index-v2.html against retouch-style"
+```
+
+Spawns 4 specialized reviewers in parallel:
+- **style** (palette tier, surface detail, layer depth, hue rotation, accent, anti-AI-slop)
+- **animation** (loop seamlessness, motion physics, multi-component, particle determinism, period, phase correctness)
+- **composition** (silhouette test, focal point, hierarchy, negative space, scale, framing)
+- **interaction** (gravity/support, occlusion order, light direction consistency, anchor, scale plausibility, animation frame consistency)
+
+Synthesizes 4 verdicts → board PASS/NEEDS_WORK/REJECT + ranked fixes. The interaction reviewer catches things others miss (chess pieces floating above the board, contradictory light sources, etc.).
 
 ---
 
