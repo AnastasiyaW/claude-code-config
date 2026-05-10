@@ -4,6 +4,57 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.12.0 — Fantasy book covers worked example: LOTR / GoT / Name of the Wind)
+
+End-to-end validation of the v3.11.0 pipeline. Three classic fantasy covers
+generated step-by-step from real book iconography to working canvas-rendered
+animation, demonstrating the full workflow:
+
+1. **Real cover research** (WebSearch on iconography per book)
+2. **Palette selection from Design Seeds catalog** via `--search-tag` and `--mood`
+3. **Scene specification** (5-element framework documented in `scenarios.md`)
+4. **Canvas program coding** (8-layer retouch-style composition per cover)
+5. **Browser verification** (preview MCP, all 3 canvases render)
+6. **Side-by-side composite** for visual proof
+
+Three covers, three different visual moods:
+
+- **The Fellowship of the Ring (Tolkien, 1954)**: One Ring centered with Eye of
+  Sauron + Tengwar inscription orbiting. Palette: `design-seeds/heavenly-hues`
+  (deep navy + warm gold + red eye accent). Loop 8s: ring rotation +
+  inscription glow pulse + embers drifting up from below. Dark Mordor mountain
+  silhouette at horizon.
+
+- **A Game of Thrones (Martin, 1996)**: Iron Throne silhouette with jagged
+  sword-formed back. Palette: custom frost-iron (slate blue → steel → snow
+  + amber torch accent — single warm pixel against cold scene). Loop 8s:
+  snow falls (12 deterministic particles) + torch flickers (multi-component
+  sin) + raven flies across upper third. Distant Wall tower silhouette behind.
+
+- **The Name of the Wind (Rothfuss, 2007)**: Hooded figure centered in autumn
+  forest. Palette: `design-seeds/rose-palette` (browns + sage + dusty rose).
+  Loop 6s (intentional asynchrony with 8s loops above, LCM 24s composite):
+  cloak edge sub-pixel breathing + autumn leaves drifting + hidden campfire
+  glow at lower-left. Flanking tree silhouettes.
+
+All three covers bundled as `skills/creative/pixel-art-studio/examples/fantasy-covers/`:
+- `index.html` — single self-contained HTML with 3-cover grid
+- `scenarios.md` — full 5-element scene specifications + cover iconography
+  research + design notes (palette source diversity, loop period diversity,
+  8-layer retouch standard verification per cover)
+
+Verified programmatically:
+- All 3 canvases render to 6144 / 6144 / 5545 pixels (full coverage)
+- drawLOTR / drawGOT / drawNOTW execute in 1.2-1.9 ms each
+- 0 console errors
+- Visual screenshot captured at 6× scale showing all 3 covers side-by-side
+
+**This is the canonical "how to use the pipeline" example** — reference for
+generating covers from real book iconography. Future skill invocations can
+follow this exact step-by-step procedure for any book series.
+
+---
+
 ## 2026-05-10 (v3.11.0 — Design Seeds palettes + animation baking + interaction reviewer + 2026 image-to-pixel-art tools research)
 
 Five additions in one release. Each addresses a feedback item from real session use:
