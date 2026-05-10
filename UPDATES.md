@@ -4,6 +4,95 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.16.0 — Scaling architecture for 10K+ elements + dataset learning pipeline)
+
+User questions: (1) how to store and orchestrate when library has 10,000+
+elements so a small agent can compose beautiful animations from text;
+(2) if we download 1000 Pinterest pixel art images, can we learn from them
+to build similar quality automatically.
+
+This release adds 4 reference documents covering both questions, plus
+synthesis of two parallel research agents on 2026 state-of-the-art tools.
+
+NEW: references/element-library-scaling-architecture.md (550+ lines)
+- Tier-based growth path (10 to 10,000+ elements)
+- Per-element files in category folders + _manifest.json
+- Lazy loader pattern via _registry.js (dynamic imports)
+- 512-dim CLIP/SigLIP embedding vectors per element
+- ANN search in browser (brute-force at 10K, HNSW WASM beyond)
+- Per-element semver versioning for backward compat
+- Scene grammar (YAML) for composition constraints
+- 8-step agent workflow: text -> intent -> embedding query -> grammar
+  -> render -> vision LLM critique -> iterate -> bake
+- Storage backend tradeoffs (static files / SQLite-in-browser /
+  PostgreSQL+pgvector / managed services)
+- Build pipeline + auto-preview generation
+- Migration plan from v3.15 (9 elements) to v3.16-ready architecture
+
+NEW: references/pinterest-to-library-pipeline.md (300+ lines)
+- 3-layer translation problem: lossy JPEG -> grid-aligned PNG ->
+  structured representation -> element drawer code
+- Stage A pixelization options (pyxelate / Pillow LIBIMAGEQUANT /
+  SDXL+Pixel-Art-XL / RetroDiffusion / FLUX LoRAs)
+- Stage B structured extraction (vision LLM tagging / SAM 2 /
+  palette+clustering)
+- Stage C library integration (3 approaches: manual / AI-assisted /
+  train-then-generate)
+- End-to-end command sequence
+- LoRA training alternative path
+- Hybrid pipeline (best of both)
+- Legal note: prefer HuggingFace datasets / OpenGameArt / Lospec over
+  Pinterest scraping
+
+NEW: references/dataset-to-library-actionable.md (450+ lines)
+THIS IS THE EXECUTABLE PLAN. Combines findings from both research agents
+into single actionable pipeline:
+
+- Stage 0 - Data: bghira/free-to-use-pixelart (HuggingFace, clean license)
+- Stage 1 - Pixelize: Pillow + imagequant PyPI (Oct 2025), 10 min CPU
+  for 1000 images. Optional SD-piXL (ETH Zurich, SIGGRAPH Asia 2024,
+  arxiv 2410.06236) for top-quality subset with mathematical grid
+  alignment guarantee.
+- Stage 2 - Decompose: Qwen2.5-VL-7B local (within 5-10% of GPT-4o,
+  free) OR Gemini 2.5 Flash ($0.50 for 1000 images)
+- Stage 3 - Cluster: DINOv2 (texture-aware visual style) + UMAP (20D)
+  + HDBSCAN (auto-K, expected 15-40 clusters). SigLIP-2 for semantic
+  text-image search.
+- Stage 4 - Mine grammar: mlxtend FP-Growth on element co-occurrence
+  -> rules like "mountains -> fog_band confidence=0.84"
+- Stage 5 - Generate drawers: Claude vision + code generation, ~70-80%
+  correct first pass, ~20 min human refinement per drawer
+- Stage 6 - Train LoRA (optional): FLUX LoRA via fal.ai ($8 per 1000
+  steps) or local fluxgym/ai-toolkit. SDXL LoRA superseded by FLUX
+  in 2026.
+- Stage 7 - Evaluate: CMMD (CLIP Maximum Mean Discrepancy) via
+  clean-fid library. FID is broken for pixel art (Inception trained
+  on ImageNet); CMMD has better convergence on non-ImageNet domains.
+
+Compose scenes via SceneSmith pattern (arxiv 2602.09153, Feb 2026):
+designer + critic + orchestrator with 3-5 iteration loop.
+
+Total cost for mature 100-element library starting from 1000 images:
+~30 hours human work + $10-20 cloud APIs.
+
+NEW: research/product/pixel-art-2026-05-10/ now contains 5 research docs:
+- pixel-art-{en,cn,kr,ru}-research.md (4-language research, v3.8)
+- loop-animation-and-storyboard-research.md (v3.10)
+- twilight-scenarios.md (v3.9)
+- image-to-pixel-art-tools-2026.md (v3.11)
+- high-detail-tools-2026.md (v3.14)
+- image-collection-learning-2026.md (v3.16, NEW)
+- image-to-pixelart-and-training-2026.md (v3.16, NEW)
+
+Plugin description: 22 skills, 5 evaluator agents, 9-element library
+with declarative composition, scaling architecture documented through
+10,000+ elements.
+
+Workshop snapshot also updated: pixel-art-workshop-2026-05-10/
+(consolidated folder) now reflects v3.16 documentation.
+
+---
+
 ## 2026-05-10 (v3.15.0 — Element library: declarative scene composition)
 
 User feedback: hand-coding each cover from scratch (370 lines per Tier 2 scene)
