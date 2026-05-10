@@ -75,6 +75,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import base64
+import io
 import json
 import shutil
 import subprocess
@@ -91,8 +92,14 @@ except ImportError:
 # --- Playwright frame capture -----------------------------------------------
 
 async def capture_frames(url: str, canvas_id: str, period_ms: int, fps: int,
-                          out_dir: Path, viewport: tuple[int, int]) -> list[Path]:
+                          out_dir: Path, viewport: tuple[int, int],
+                          base_image: Path | None = None) -> list[Path]:
     """Open headless browser, set explicit phase, screenshot canvas at each step.
+
+    Args:
+        base_image: Optional path to a static PNG. If provided, each captured
+                    canvas frame is composited OVER this base image (Tier 3
+                    workflow: AI-generated PNG + canvas animation overlay).
 
     Returns list of frame PNG paths in order.
     """
@@ -165,7 +172,20 @@ async def capture_frames(url: str, canvas_id: str, period_ms: int, fps: int,
                     continue
                 b64 = data_url.split(",", 1)[1]
                 frame_path = out_dir / f"{canvas_id}_{i:04d}.png"
-                frame_path.write_bytes(base64.b64decode(b64))
+                raw_bytes = base64.b64decode(b64)
+
+                # Optional composite over base image (Tier 3 workflow)
+                if base_image is not None:
+                    canvas_img = Image.open(io.BytesIO(raw_bytes)).convert("RGBA")
+                    base_img = Image.open(base_image).convert("RGBA")
+                    # Resize canvas overlay to match base if needed (NEAREST to preserve pixel art)
+                    if canvas_img.size != base_img.size:
+                        canvas_img = canvas_img.resize(base_img.size, Image.Resampling.NEAREST)
+                    # Composite: base on bottom, canvas on top
+                    composite = Image.alpha_composite(base_img, canvas_img)
+                    composite.save(frame_path, "PNG")
+                else:
+                    frame_path.write_bytes(raw_bytes)
                 frames.append(frame_path)
 
                 if i % 20 == 0:
@@ -313,10 +333,17 @@ ENCODERS = {
 
 async def bake(url: str, canvas_id: str, period_ms: int, fps: int,
                 fmt: str, output: Path, viewport: tuple[int, int],
-                lossless: bool = False, quality: int = 80) -> None:
+                lossless: bool = False, quality: int = 80,
+                base_image: Path | None = None) -> None:
+    """Run full bake: capture frames + encode.
+
+    Args:
+        base_image: Optional static PNG to composite under canvas (Tier 3 workflow).
+                    AI-generated PNG goes here as the static base.
+    """
     # Capture frames to a temp directory
     out_dir = output.parent / f".bake_{canvas_id}_{period_ms}ms_{fps}fps"
-    frames = await capture_frames(url, canvas_id, period_ms, fps, out_dir, viewport)
+    frames = await capture_frames(url, canvas_id, period_ms, fps, out_dir, viewport, base_image)
 
     if not frames:
         print("No frames captured!", file=sys.stderr)
@@ -347,6 +374,10 @@ def main() -> int:
                              "Default: lossy at q=80 (much smaller, barely visible difference on pixel art)")
     parser.add_argument("--quality", type=int, default=80,
                         help="WebP lossy quality 0-100 (default: 80)")
+    parser.add_argument("--base-image", default=None,
+                        help="Optional static PNG to composite UNDER the canvas overlay. "
+                             "Tier 3 workflow: AI-generated detailed PNG as base, canvas "
+                             "renders only animated elements (snow, glow, flicker) on top.")
     parser.add_argument("-o", "--output", required=True, help="Output file path")
     parser.add_argument("--viewport-w", type=int, default=1280, help="Browser viewport width")
     parser.add_argument("--viewport-h", type=int, default=900, help="Browser viewport height")
@@ -354,6 +385,11 @@ def main() -> int:
 
     output = Path(args.output)
     output.parent.mkdir(parents=True, exist_ok=True)
+
+    base_image_path = Path(args.base_image) if args.base_image else None
+    if base_image_path and not base_image_path.exists():
+        print(f"Error: --base-image {base_image_path} does not exist", file=sys.stderr)
+        sys.exit(1)
 
     asyncio.run(bake(
         url=args.url,
@@ -365,6 +401,7 @@ def main() -> int:
         viewport=(args.viewport_w, args.viewport_h),
         lossless=args.lossless,
         quality=args.quality,
+        base_image=base_image_path,
     ))
     return 0
 

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Tier 2 Detail Demo - 192x288 hand-coded fortress cover</title>
+<style>
+  :root {
+    --bg: #0b0812;
+    --fg: #a896b4;
+    --dim: #5a4e6a;
+    --accent: #ffb4c8;
+    --border: rgba(255,255,255,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    min-height: 100vh;
+  }
+  .page { max-width: 1200px; margin: 0 auto; padding: 56px 40px 96px; }
+  header { margin-bottom: 56px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  header h1 {
+    margin: 0 0 12px; font-size: 14px; font-weight: 500;
+    letter-spacing: .35em; text-transform: uppercase; color: var(--accent);
+  }
+  header p {
+    margin: 0; font-size: 12px; letter-spacing: .15em;
+    color: var(--dim); text-transform: uppercase; line-height: 1.6;
+  }
+  .compare {
+    display: grid; grid-template-columns: 256px 384px; gap: 60px;
+    justify-content: center;
+    align-items: start;
+  }
+  @media (max-width: 800px) { .compare { grid-template-columns: 1fr; } }
+  .cover { display: flex; flex-direction: column; }
+  .canvas-wrap {
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  .canvas-wrap.tier1 { width: 256px; height: 384px; }
+  .canvas-wrap.tier2 { width: 384px; height: 576px; }
+  canvas {
+    display: block; width: 100%; height: 100%;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
+  .meta { margin-top: 18px; padding: 0 4px; }
+  .meta .num { font-size: 9px; letter-spacing: .3em; color: var(--dim); }
+  .meta .title {
+    font-size: 13px; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--accent); margin: 6px 0 4px;
+  }
+  .meta .desc {
+    font-size: 10px; letter-spacing: .15em; color: var(--fg); line-height: 1.6;
+    margin-top: 6px;
+  }
+  .meta .stats { margin-top: 10px; font-size: 9px; letter-spacing: .2em; color: var(--dim); line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Detail Tier Comparison · Fortress Tower at Dusk</h1>
+    <p>Same scene at two detail tiers. Left: Tier 1 (64x96 logical). Right: Tier 2 (192x288 logical). 9x more pixels = far more atmospheric perspective + texture.</p>
+  </header>
+
+  <div class="compare">
+    <div class="cover">
+      <div class="canvas-wrap tier1"><canvas id="c1" width="64" height="96"></canvas></div>
+      <div class="meta">
+        <div class="num">Tier 1 · 64x96</div>
+        <div class="title">Quick prototype</div>
+        <div class="desc">8 layers, ~30 stars, single mountain ridge, simple tower silhouette. Hand-coded in ~30 min.</div>
+        <div class="stats">6,144 logical pixels · 12 colors · 1 mountain layer · 30 stars · 1 motion source</div>
+      </div>
+    </div>
+
+    <div class="cover">
+      <div class="canvas-wrap tier2"><canvas id="c2" width="192" height="288"></canvas></div>
+      <div class="meta">
+        <div class="num">Tier 2 · 192x288</div>
+        <div class="title">Hand-coded high detail</div>
+        <div class="desc">15 layers: atmospheric perspective (3 mountain depth layers, fog passes), pine forest, individual brick texture on tower, multiple window lights with volumetric glow, snow particles + dust drift, river/snow at base.</div>
+        <div class="stats">55,296 logical pixels · 32+ colors · 3 mountain layers + fog · 80+ stars · 4 motion sources</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// Shared helpers
+// =============================================================
+function setupCanvas(id) {
+  const cv = document.getElementById(id);
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  return { cv, ctx, W: cv.width, H: cv.height };
+}
+function rect(ctx, x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, w|0, h|0); }
+function px(ctx, x, y, c) { ctx.fillStyle = c; ctx.fillRect(x|0, y|0, 1, 1); }
+const HEX_CACHE = new Map();
+function hex(c) {
+  const cached = HEX_CACHE.get(c);
+  if (cached) return cached;
+  let r=0, g=0, b=0;
+  if (typeof c === 'string' && c.charAt(0) === '#' && c.length >= 7) {
+    r = parseInt(c.substr(1, 2), 16);
+    g = parseInt(c.substr(3, 2), 16);
+    b = parseInt(c.substr(5, 2), 16);
+  }
+  const result = [r, g, b];
+  if (HEX_CACHE.size < 4096) HEX_CACHE.set(c, result);
+  return result;
+}
+function rgb(r,g,b) { const h = n => Math.max(0, Math.min(255, n|0)).toString(16).padStart(2, '0'); return '#'+h(r)+h(g)+h(b); }
+function mix(a, b, t) {
+  const A = hex(a), B = hex(b);
+  return rgb(A[0]+(B[0]-A[0])*t, A[1]+(B[1]-A[1])*t, A[2]+(B[2]-A[2])*t);
+}
+function hash(n) { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); }
+
+function makeStarField(seed_, count, width, maxY) {
+  const stars = [];
+  let s = seed_ | 0;
+  function rnd() { s = (s * 1664525 + 1013904223) | 0; return ((s >>> 8) & 0xffffff) / 0xffffff; }
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: (rnd() * width) | 0, y: (rnd() * maxY) | 0,
+      b: rnd(), tw: rnd() * 6.28,
+    });
+  }
+  return stars;
+}
+
+function drawSkyGradient(ctx, W, topY, botY, c1, c2, c3, c4) {
+  for (let y = topY; y < botY; y++) {
+    const t = (y - topY) / Math.max(1, botY - topY);
+    let color;
+    if (t < 0.33)      color = mix(c1, c2, t * 3);
+    else if (t < 0.66) color = mix(c2, c3, (t - 0.33) * 3);
+    else               color = mix(c3, c4, (t - 0.66) * 3);
+    rect(ctx, 0, y, W, 1, color);
+  }
+}
+
+// =============================================================
+// TIER 1 - 64x96 (basic)
+// =============================================================
+const STARS_T1 = makeStarField(101, 30, 64, 50);
+
+function drawT1(ctx, W, H, t) {
+  // Sky
+  drawSkyGradient(ctx, W, 0, H,
+    '#0a0612', '#1a2238', '#2a3a58', '#5a6878'
+  );
+  // Stars
+  for (const s of STARS_T1) {
+    const tw = 0.6 + 0.4 * Math.sin(t * 8 + s.tw);
+    if (tw < 0.2) continue;
+    px(ctx, s.x, s.y, mix('#000000', s.b > 0.7 ? '#FAD493' : '#a8a0c0', tw));
+  }
+  // Single mountain silhouette
+  for (let x = 0; x < W; x++) {
+    const h = Math.floor(8 + 6 * Math.sin(x * 0.2) + 4 * Math.sin(x * 0.7));
+    for (let dy = 0; dy < h; dy++) {
+      px(ctx, x, 75 - dy, '#1a2030');
+    }
+  }
+  // Tower silhouette (simple)
+  const tx = 32, ty = 50;
+  for (let dy = 0; dy < 22; dy++) {
+    for (let dx = -3; dx <= 3; dx++) {
+      px(ctx, tx + dx, ty + dy, '#3a3848');
+    }
+  }
+  // Tower top crenellations
+  for (let i = -3; i <= 3; i += 2) {
+    px(ctx, tx + i, ty - 2, '#5a586a');
+  }
+  // Ground (snow)
+  rect(ctx, 0, 76, W, H - 76, '#5a6878');
+  // Snow particles
+  for (let i = 0; i < 6; i++) {
+    const seed = i * 17 + 3;
+    const sT = (t + hash(seed)) % 1;
+    const sx = (hash(seed * 2) * W) | 0;
+    const sy = (sT * H) | 0;
+    if (sy > 8 && sy < 76) {
+      px(ctx, sx, sy, mix('#1a2238', '#c0d0e0', Math.sin(sT * Math.PI) * 0.8));
+    }
+  }
+}
+
+// =============================================================
+// TIER 2 - 192x288 (high detail, 9x more pixel real estate)
+// 15 layers, atmospheric perspective, multi-source lighting
+// =============================================================
+
+// Pre-generated geometry for Tier 2
+const STARS_T2 = makeStarField(202, 80, 192, 130);
+
+// Mountain ranges (3 depth layers with different palettes for atmospheric perspective)
+function makeMountainRange(seed_, count, baseY, heightRange, width) {
+  const peaks = [];
+  let s = seed_ | 0;
+  function rnd() { s = (s * 1664525 + 1013904223) | 0; return ((s >>> 8) & 0xffffff) / 0xffffff; }
+  for (let i = 0; i < count; i++) {
+    peaks.push({
+      x: i * (width / count) + rnd() * 8 - 4,
+      h: heightRange[0] + rnd() * (heightRange[1] - heightRange[0]),
+      asym: rnd() - 0.5,  // asymmetry of slope
+    });
+  }
+  return { baseY, peaks };
+}
+
+const FAR_MTN  = makeMountainRange(311, 8, 220, [60, 110], 192);
+const MID_MTN  = makeMountainRange(322, 12, 240, [50, 90], 192);
+const NEAR_MTN = makeMountainRange(333, 18, 250, [30, 60], 192);
+
+// Pine forest (~80 trees, 3 depth layers)
+function makePineForest(seed_, count, yRange, xRange) {
+  const trees = [];
+  let s = seed_ | 0;
+  function rnd() { s = (s * 1664525 + 1013904223) | 0; return ((s >>> 8) & 0xffffff) / 0xffffff; }
+  for (let i = 0; i < count; i++) {
+    trees.push({
+      x: xRange[0] + rnd() * (xRange[1] - xRange[0]),
+      y: yRange[0] + rnd() * (yRange[1] - yRange[0]),
+      h: 6 + rnd() * 14,
+      depth: rnd(),  // 0=closest, 1=farthest
+    });
+  }
+  return trees;
+}
+
+const PINES_FG = makePineForest(411, 25, [240, 268], [0, 192]);
+const PINES_MG = makePineForest(422, 35, [225, 250], [0, 192]);
+const PINES_BG = makePineForest(433, 45, [210, 235], [0, 192]);
+
+// Tower window grid (12 windows, individual lit/unlit + flicker phase)
+const TOWER_WINDOWS = [
+  // [x_offset_from_tower_center, y_from_tower_top, lit, flicker_phase]
+  [-3, 8, true, 0.1], [3, 8, true, 0.5],
+  [-3, 18, false, 0], [3, 18, true, 0.3],
+  [-3, 28, true, 0.7], [3, 28, true, 0.2],
+  [0, 38, true, 0.9],   // single window
+  [-3, 48, false, 0], [3, 48, true, 0.6],
+  [0, 58, true, 0.4],
+  [-3, 68, true, 0.8], [3, 68, false, 0],
+];
+
+function drawT2(ctx, W, H, t) {
+  // Layer 1: Multi-stop sky gradient (deep dusk)
+  drawSkyGradient(ctx, W, 0, 200,
+    '#080612',  // deepest
+    '#1a1a3a',  // upper
+    '#3a3a60',  // mid
+    '#7a7080'   // horizon glow
+  );
+
+  // Layer 2: Atmospheric haze (full canvas overlay, gradient)
+  for (let y = 0; y < 220; y++) {
+    if (y % 3 === 0 && y > 100) {  // sparse haze
+      const a = (y - 100) / 120 * 0.08;
+      rect(ctx, 0, y, W, 1, mix('#3a3a60', '#a8b0c0', a));
+    }
+  }
+
+  // Layer 3: Stars (80 stars with cross-plus on bright)
+  for (const s of STARS_T2) {
+    const tw = 0.6 + 0.4 * Math.sin(t * Math.PI * 6 + s.tw);
+    if (tw < 0.15) continue;
+    const c = s.b > 0.85 ? '#FAD493' : (s.b > 0.5 ? '#d8c8e8' : '#7a6890');
+    px(ctx, s.x, s.y, mix('#080612', c, tw));
+    if (s.b > 0.92) {
+      const dim = mix('#080612', c, tw * 0.4);
+      px(ctx, s.x - 1, s.y, dim);
+      px(ctx, s.x + 1, s.y, dim);
+      px(ctx, s.x, s.y - 1, dim);
+      px(ctx, s.x, s.y + 1, dim);
+    }
+  }
+
+  // Layer 4: Far mountains (lightest, atmospheric haze)
+  for (const peak of FAR_MTN.peaks) {
+    for (let dx = -peak.h * 0.7; dx < peak.h * 0.7; dx++) {
+      const slope = Math.abs(dx) / (peak.h * 0.7);
+      const yOnSlope = FAR_MTN.baseY - peak.h * (1 - slope) + peak.asym * dx;
+      for (let y = yOnSlope; y < FAR_MTN.baseY; y++) {
+        const x = peak.x + dx;
+        if (x >= 0 && x < W) {
+          // Snow cap on top
+          const snow = (y < yOnSlope + 8);
+          const c = snow ? mix('#5a6878', '#c0d0e0', 0.7) : mix('#3a4858', '#5a6878', 0.5);
+          px(ctx, x, y, c);
+        }
+      }
+    }
+  }
+
+  // Layer 5: Fog band between far and mid mountains
+  for (let y = 215; y < 235; y++) {
+    const a = (1 - Math.abs(y - 225) / 10) * 0.4;
+    rect(ctx, 0, y, W, 1, mix('#3a3a60', '#a0b0c8', a));
+  }
+
+  // Layer 6: Mid mountains (darker, more saturated)
+  for (const peak of MID_MTN.peaks) {
+    for (let dx = -peak.h * 0.6; dx < peak.h * 0.6; dx++) {
+      const slope = Math.abs(dx) / (peak.h * 0.6);
+      const yOnSlope = MID_MTN.baseY - peak.h * (1 - slope) + peak.asym * dx;
+      for (let y = yOnSlope; y < MID_MTN.baseY; y++) {
+        const x = peak.x + dx;
+        if (x >= 0 && x < W) {
+          const snow = (y < yOnSlope + 5);
+          const ridgeShadow = (Math.abs(dx) > peak.h * 0.4) && !snow;
+          const c = snow ? mix('#7a8898', '#e0e8f0', 0.6) :
+                    ridgeShadow ? '#1a2238' :
+                    mix('#2a3248', '#4a5868', 0.5);
+          px(ctx, x, y, c);
+        }
+      }
+    }
+  }
+
+  // Layer 7: Background pine forest (smallest, faded)
+  for (const tree of PINES_BG) {
+    const c = mix('#1a2230', '#3a4856', 0.4);
+    for (let dy = 0; dy < tree.h; dy++) {
+      px(ctx, tree.x, tree.y - dy, c);
+    }
+    // Tiny tree shape
+    if (tree.h > 8) {
+      px(ctx, tree.x - 1, tree.y - 2, c);
+      px(ctx, tree.x + 1, tree.y - 2, c);
+    }
+  }
+
+  // Layer 8: Near mountains (darkest, foreground feel)
+  for (const peak of NEAR_MTN.peaks) {
+    for (let dx = -peak.h * 0.5; dx < peak.h * 0.5; dx++) {
+      const slope = Math.abs(dx) / (peak.h * 0.5);
+      const yOnSlope = NEAR_MTN.baseY - peak.h * (1 - slope) + peak.asym * dx * 0.5;
+      for (let y = yOnSlope; y < NEAR_MTN.baseY + 8; y++) {
+        const x = peak.x + dx;
+        if (x >= 0 && x < W && y < 270) {
+          px(ctx, x, y, mix('#0a0e1c', '#1a2238', 0.6));
+        }
+      }
+    }
+  }
+
+  // Layer 9: Midground pine forest
+  for (const tree of PINES_MG) {
+    const c = '#0a1218';
+    for (let dy = 0; dy < tree.h; dy++) {
+      px(ctx, tree.x, tree.y - dy, c);
+      // Branches at every 2-3 rows
+      if (dy > 1 && dy % 2 === 0) {
+        const branchW = Math.max(1, Math.floor((tree.h - dy) / 2));
+        for (let bw = 1; bw <= branchW; bw++) {
+          px(ctx, tree.x - bw, tree.y - dy, c);
+          px(ctx, tree.x + bw, tree.y - dy, c);
+        }
+      }
+    }
+  }
+
+  // Layer 10: The Tower (centered, with brick texture)
+  const tx = 96;  // tower x center
+  const towerTop = 90;
+  const towerBottom = 240;
+  const towerW = 14;  // total width
+
+  // Tower body: brick pattern
+  for (let y = towerTop; y < towerBottom; y++) {
+    for (let dx = -towerW / 2; dx < towerW / 2; dx++) {
+      const x = tx + dx;
+      // Brick row (alternating offset every 4 rows)
+      const rowOffset = Math.floor((y - towerTop) / 4);
+      const brickCol = Math.floor((dx + rowOffset * 0.5 + 100) / 3);
+      const inBrick = (Math.abs(dx) - Math.abs(brickCol % 1)) < towerW / 2 - 1;
+      // Light from upper-left
+      let baseColor;
+      if (dx < -3) baseColor = '#3a3848';   // light side
+      else if (dx > 3) baseColor = '#1a1820'; // dark side
+      else baseColor = '#2a2838';
+      // Brick mortar lines (every 4 vertical)
+      const mortarRow = (y - towerTop) % 4 === 3;
+      if (mortarRow) baseColor = mix(baseColor, '#0a0810', 0.4);
+      px(ctx, x, y, baseColor);
+    }
+  }
+
+  // Tower base (wider plinth)
+  for (let y = towerBottom; y < towerBottom + 8; y++) {
+    for (let dx = -towerW / 2 - 2; dx < towerW / 2 + 2; dx++) {
+      const x = tx + dx;
+      const c = (dx < -3) ? '#3a3848' : (dx > 3) ? '#1a1820' : '#2a2838';
+      px(ctx, x, y, c);
+    }
+  }
+
+  // Tower top crenellations (5 merlons)
+  const merlonY = towerTop - 4;
+  for (let m = -3; m <= 3; m += 2) {
+    px(ctx, tx + m, merlonY, '#3a3848');
+    px(ctx, tx + m, merlonY + 1, '#3a3848');
+    px(ctx, tx + m, merlonY + 2, '#3a3848');
+    px(ctx, tx + m, merlonY + 3, '#3a3848');
+  }
+  // Flag pole
+  for (let dy = 0; dy < 8; dy++) {
+    px(ctx, tx, merlonY - 8 + dy, '#1a1820');
+  }
+  // Flag (banner, animated wave)
+  const flagWave = Math.sin(t * Math.PI * 4) * 0.5;
+  for (let dx = 1; dx <= 4; dx++) {
+    const fy = merlonY - 7 + Math.floor(flagWave * dx);
+    px(ctx, tx + dx, fy, '#a82838');
+    px(ctx, tx + dx, fy + 1, '#a82838');
+  }
+
+  // Layer 11: Tower windows with volumetric glow
+  for (const [wxOffset, wyFromTop, lit, fphase] of TOWER_WINDOWS) {
+    const wx = tx + wxOffset;
+    const wy = towerTop + wyFromTop;
+    if (lit) {
+      // Window flicker
+      const flicker = 0.7 + 0.3 * Math.sin(t * Math.PI * 8 + fphase * 6.28);
+      const winColor = mix('#1a1820', '#ff8040', flicker);
+      // Window itself (2x3 lit)
+      px(ctx, wx, wy, winColor);
+      px(ctx, wx, wy + 1, winColor);
+      px(ctx, wx, wy + 2, mix(winColor, '#a82010', 0.3));
+      // Volumetric glow halo (3-pixel radius)
+      for (let dy = -2; dy <= 3; dy++) {
+        for (let dx = -2; dx <= 2; dx++) {
+          if (dx === 0 && (dy >= 0 && dy <= 2)) continue;
+          const d = Math.sqrt(dx * dx + (dy - 1) * (dy - 1));
+          if (d > 0 && d <= 2.5) {
+            const a = (1 - d / 2.5) * flicker * 0.35;
+            const haloColor = mix('#2a2838', '#ff9050', a);
+            px(ctx, wx + dx, wy + dy, haloColor);
+          }
+        }
+      }
+    } else {
+      // Dark window (slightly darker than wall)
+      px(ctx, wx, wy, '#0a0812');
+      px(ctx, wx, wy + 1, '#0a0812');
+      px(ctx, wx, wy + 2, '#0a0812');
+    }
+  }
+
+  // Layer 12: Foreground pine trees (largest, darkest, in front of tower base)
+  for (const tree of PINES_FG) {
+    const c = '#050810';
+    // Trunk
+    for (let dy = 0; dy < tree.h; dy++) {
+      px(ctx, tree.x, tree.y - dy, c);
+    }
+    // Branches (more elaborate for foreground)
+    for (let dy = 1; dy < tree.h; dy += 2) {
+      const branchW = Math.max(1, Math.floor((tree.h - dy) / 2.5));
+      for (let bw = 1; bw <= branchW; bw++) {
+        px(ctx, tree.x - bw, tree.y - dy, c);
+        px(ctx, tree.x + bw, tree.y - dy, c);
+        // Snow on branches (slight white touch)
+        if (bw === branchW && Math.random() < 0.3) {
+          px(ctx, tree.x - bw, tree.y - dy - 1, '#a0b0c0');
+        }
+      }
+    }
+  }
+
+  // Layer 13: Ground / snow with subtle texture
+  rect(ctx, 0, 270, W, H - 270, '#5a6878');
+  for (let i = 0; i < 40; i++) {
+    const seed = i * 13 + 11;
+    const sx = (hash(seed) * W) | 0;
+    const sy = 271 + (hash(seed * 2) * 16) | 0;
+    px(ctx, sx, sy, '#c0d0e0');
+  }
+
+  // Layer 14: Falling snow (24 deterministic particles, multi-component motion)
+  for (let i = 0; i < 24; i++) {
+    const seed = i * 19 + 3;
+    const snowT = (t + hash(seed)) % 1;
+    const drift = Math.sin(snowT * Math.PI * 2 + i) * 4;
+    const sx = (hash(seed * 2) * W + drift) | 0;
+    const sy = (snowT * H * 1.1) | 0;
+    if (sy > 8 && sy < 270) {
+      const a = Math.sin(snowT * Math.PI) * 0.9;
+      px(ctx, sx, sy, mix('#1a2238', '#e0e8f0', a));
+    }
+  }
+
+  // Layer 15: Atmospheric overlay (subtle vignette + warm horizon kiss)
+  for (let y = 280; y < H; y++) {
+    const a = (y - 280) / (H - 280) * 0.3;
+    rect(ctx, 0, y, W, 1, mix('#5a6878', '#000000', a));
+  }
+}
+
+// =============================================================
+// Animation drivers
+// =============================================================
+function startCanvas(id, drawFn, periodMs) {
+  const { ctx, W, H } = setupCanvas(id);
+  const start = performance.now();
+  function frame(now) {
+    const t = ((now - start) % periodMs) / periodMs;
+    drawFn(ctx, W, H, t);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+window.addEventListener('load', () => {
+  startCanvas('c1', drawT1, 8000);
+  startCanvas('c2', drawT2, 8000);
+});
+</script>
+</body>
+</html>

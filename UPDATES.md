@@ -4,6 +4,75 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.14.0 — Detail tier system: high-detail-pipeline doc + base-image composite + Tier 2 demo)
+
+User feedback after v3.13.0: existing 64x96 covers look "primitive" compared to
+professional pixel art references (Saint11/Slynyrd-tier work, AI-generated
+pieces at 480-720px with atmospheric perspective, volumetric lighting, fine
+textures). Reference images shown were a fortress-on-cliff scene and a snowy
+night street with multi-temperature lighting and 50+ colors.
+
+This release adds the **detail tier system**:
+
+| Tier | Approach | Time/cover | % of pro reference |
+|---|---|---|---|
+| 1 (existing) | 64x96 hand-coded canvas, 8 layers | 30 min | ~20% |
+| 2 (NEW) | 192x288 hand-coded canvas, 15 layers | 2-4 h | ~60% |
+| 3 (NEW) | AI base (SDXL+LoRA) + canvas animation overlay | 15-60 min | ~85-95% |
+
+**`references/high-detail-pipeline.md`** documents the Tier 3 workflow:
+- Stage 1: AI generation (SDXL + Pixel Art XL LoRA, FLUX-based LoRAs,
+  RetroDiffusion REST API, MidJourney + post-process)
+- Stage 2: Pixel snap + palette enforcement (preprocess.py with NEAREST
+  downsample + LIBIMAGEQUANT quantize + Atkinson dither)
+- Stage 3: Manual cleanup (quality_check.py + pixel-art-quality-board)
+- Stage 4: Canvas animation overlay (static PNG <img> + transparent canvas
+  for snow/glow/flicker animations on top)
+- Stage 5: Bake composite to WebP/MP4/WebM via bake_animation.py
+
+Includes working SDXL+LoRA Python code, RetroDiffusion API examples, and
+cost/time tradeoffs (RetroDiffusion ~$0.02 per cover, SDXL local on RTX 4080+
+free but ~30-60s/cover).
+
+**`bake_animation.py` extended with `--base-image` flag**:
+Composite static PNG (Tier 3 AI base) UNDER canvas animation overlay at each
+captured frame. The static image carries heavy detail (mountains, buildings,
+textures); canvas only animates motion elements (snow, window flicker, fog
+drift). CPU stays low at runtime, file stays small after baking.
+
+```bash
+python scripts/bake_animation.py http://localhost:9132/composite-cover.html \
+  --canvas-id overlay \
+  --base-image cover_snapped.png \
+  --period-ms 8000 --fps 30 --format web -o cover_final.webp
+```
+
+**`examples/tier2-detail-demo/`** — side-by-side visual comparison of Tier 1
+vs Tier 2 of the same scene (fortress tower at dusk):
+- Tier 1: 6,144 logical pixels, 12 colors, 1 mountain layer, 30 stars,
+  1 motion source — quick prototype quality
+- Tier 2: 53,387 logical pixels (96.5% canvas coverage), 32+ colors,
+  3 mountain ranges with atmospheric perspective and snow caps,
+  pine forest with 3 depth layers (background/midground/foreground),
+  brick-textured tower with 12-window grid and individual flicker phases,
+  volumetric glow halos around lit windows (3-pixel radial, alpha-blend),
+  fog band between mountain layers, 24 multi-component snow particles,
+  red banner with sin-wave animation, snow ground with texture pattern
+
+Verified programmatically: both canvases render with full coverage, no
+console errors. Visual screenshot shows clear detail upgrade from Tier 1 to
+Tier 2 — significantly closer to professional reference quality without AI.
+
+For users who want Tier 3 quality without local GPU: RetroDiffusion REST API
+or PixelLab Python SDK provide programmatic AI generation with 50 free
+credits / paid tiers. Full pipeline documented in
+`references/high-detail-pipeline.md`.
+
+Plugin description: 22 skills, 5 evaluator agents, now with detail tier
+system spanning quick prototype to professional-grade.
+
+---
+
 ## 2026-05-10 (v3.13.0 — Animated WebP support + format decision tree)
 
 `bake_animation.py` now supports **animated WebP** as a first-class output
