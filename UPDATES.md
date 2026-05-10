@@ -4,6 +4,73 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.8.0 — new `pixel-art-studio` skill + first evaluator agent)
+
+Major addition: complete pixel-art creation toolkit as a single skill, plus the first
+Generator-Evaluator agent in the repo. Built from a 4-language research synthesis
+(EN, CN 中文, KR 한국어, RU русский) covering classical pixel-art canon plus regional
+conventions (Chinese xianxia/wuxia + 故宫/青花/五行 palettes; Korean 도트 + 오방색
+KS A 0062 standard; Russian "Punch Club rule" + Stoneshard-inspired palette).
+
+**`skills/creative/pixel-art-studio/`** — DBS-framework skill with three layers:
+
+- **Direction** (SKILL.md, ~400 lines): workflow tree for 5 use-cases (single
+  sprite / animation / image-to-pixel-art preprocessing / sprite sheet / quality
+  review). Cultural style anchors: matches user-stated style (xianxia → 故宫 palette,
+  Korean dot → 오방색, Russian indie → Stoneshard-inspired) to bundled assets.
+
+- **Blueprints** (8 reference files, ~6,000 lines): drawing techniques (cluster
+  theory, jaggies/doublies, selective outlining, pillow-shading anti-pattern),
+  palette theory (limited palettes, hue shifting, dithering algorithms, banding
+  detection), shading + materials (skin/metal/wood/water/fire/glass recipes with
+  shade counts and hue tendencies), animation (Disney 12 principles applied to
+  pixel art, frame counts, smear frames, sub-pixel motion, easing curves), quality
+  rubric (8 anti-AI-slop signals with detection heuristics), tools and libraries
+  catalog (Aseprite, pyxelate, Hitherdither, RetroDiffusion, ModelScope LoRAs),
+  cultural style guides (Western canon, CN xianxia, KR dot, RU indie), extended
+  JSON schema spec with 3 examples.
+
+- **Solutions** (6 scripts, ~2,300 lines):
+  - `render.py` — JSON to PNG/GIF/APNG/spritesheet, supports frames + tags +
+    layers, Aseprite-compatible direction modes (forward/reverse/pingpong)
+  - `quality_check.py` — orphan pixels, doublies (vertical + horizontal),
+    pillow-shading detection (boundary-vs-interior luminance + light-direction
+    asymmetry), hue rotation across luminance ramp, anti-AA-slop boundary
+    color count, animation cross-frame consistency
+  - `palette.py` — 20 bundled palettes (4 hardware-authentic, 11 Lospec
+    community, 4 cultural CN/KR, 1 indie-game RU), extraction via k-means /
+    median-cut / octree, hue-shifted ramp generation following Endesga rule
+  - `dither.py` — 6 algorithms: Bayer 2×2/4×4/8×8, Floyd-Steinberg, Atkinson,
+    ordered (clustered-dot), blue noise
+  - `preprocess.py` — image-to-pixel-art pipeline (LANCZOS pre-pass for noise
+    reduction, NEAREST final downsample, palette quantization, dithering)
+  - `animate.py` — 6 walk/idle/attack/death animation templates with
+    culturally-correct frame counts (CN 4-frame @ 200ms, KR 6-frame @ 8fps,
+    Western 4-8 frames @ 8-12fps), 6 easing curves quantized to integer pixel
+    positions for sub-pixel motion engineering
+
+**`agents/pixel-art-reviewer.md`** — first Generator-Evaluator agent in the repo.
+Reviews pixel art with fresh context (does not see how it was made). Runs
+quality_check.py + visually inspects the PNG, then writes PASS/HOLD/REJECT verdict
+with score, blocking issues, soft issues, false positives, and specific fixes.
+Calibrated skeptic: high automated scores on visually-bad art get downgraded;
+flagged orphans on intentional stippling get marked false-positive.
+
+**Why it matters:** the previous `pixel-art-gen` skill in the marketplace was
+basic JSON→PNG with no animation, no palette discipline, no quality control.
+This new skill is production-grade: 20 bundled palettes (versus 4 ad-hoc
+suggestions), automated anti-AI-slop detection (versus none), 4-language
+cultural style awareness (versus Western-only), and Generator-Evaluator review
+(versus self-evaluation).
+
+Verified: all 12 smoke tests pass — render single sprite, render 4-frame
+animation to GIF/APNG/spritesheet, palette listing (20 palettes in 4
+categories), palette extraction via median-cut, ramp generation with 40°
+hue shift, walk-template generation, easing waypoints, dither application,
+animation cross-frame quality check.
+
+---
+
 ## 2026-05-04 (v3.7.1 — test-gate-stop-hook: 3 hardening fixes from real-world deployment)
 
 Patch release. After v3.7.0 shipped, applying the hooks to three real

@@ -1,0 +1,8 @@
+; 五行色 (Wuxing) - Chinese Five Elements palette
+; Used as semantic color mapping for skill/magic effects in CN games
+; 金 metal/white, 木 wood/green, 水 water/black, 火 fire/red, 土 earth/yellow
+#fffefe
+#4f8a57
+#1a1a1a
+#c7372f
+#d4b254

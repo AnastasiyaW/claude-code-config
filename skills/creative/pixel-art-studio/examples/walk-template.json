@@ -1,0 +1,41 @@
+{
+  "description": "4-frame walk @ 8fps (Western indie default, Celeste-style)",
+  "width": 32,
+  "height": 32,
+  "background": "transparent",
+  "palette_ref": "endesga-32",
+  "frames": [
+    {
+      "id": 0,
+      "duration_ms": 125,
+      "name": "contact",
+      "pixels": []
+    },
+    {
+      "id": 1,
+      "duration_ms": 125,
+      "name": "recoil",
+      "pixels": []
+    },
+    {
+      "id": 2,
+      "duration_ms": 125,
+      "name": "passing",
+      "pixels": []
+    },
+    {
+      "id": 3,
+      "duration_ms": 125,
+      "name": "high-point",
+      "pixels": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "walk",
+      "from": 0,
+      "to": 3,
+      "direction": "forward"
+    }
+  ]
+}

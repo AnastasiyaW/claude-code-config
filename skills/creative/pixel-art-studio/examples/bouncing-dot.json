@@ -1,0 +1,49 @@
+{
+  "$schema": "pixel-art-studio/v1",
+  "width": 8,
+  "height": 8,
+  "background": "#1a1c2c",
+  "pixel_size": 32,
+  "palette_ref": "sweetie-16",
+  "frames": [
+    {
+      "id": 0, "duration_ms": 100, "name": "low",
+      "pixels": [
+        {"x": 3, "y": 6, "color": "#ffcd75"},
+        {"x": 4, "y": 6, "color": "#ffcd75"},
+        {"x": 3, "y": 7, "color": "#ef7d57"},
+        {"x": 4, "y": 7, "color": "#ef7d57"}
+      ]
+    },
+    {
+      "id": 1, "duration_ms": 100, "name": "mid",
+      "pixels": [
+        {"x": 3, "y": 4, "color": "#ffcd75"},
+        {"x": 4, "y": 4, "color": "#ffcd75"},
+        {"x": 3, "y": 5, "color": "#ef7d57"},
+        {"x": 4, "y": 5, "color": "#ef7d57"}
+      ]
+    },
+    {
+      "id": 2, "duration_ms": 100, "name": "high",
+      "pixels": [
+        {"x": 3, "y": 1, "color": "#f4f4f4"},
+        {"x": 4, "y": 1, "color": "#f4f4f4"},
+        {"x": 3, "y": 2, "color": "#ffcd75"},
+        {"x": 4, "y": 2, "color": "#ffcd75"}
+      ]
+    },
+    {
+      "id": 3, "duration_ms": 100, "name": "mid-down",
+      "pixels": [
+        {"x": 3, "y": 4, "color": "#ffcd75"},
+        {"x": 4, "y": 4, "color": "#ffcd75"},
+        {"x": 3, "y": 5, "color": "#ef7d57"},
+        {"x": 4, "y": 5, "color": "#ef7d57"}
+      ]
+    }
+  ],
+  "tags": [
+    {"name": "bounce", "from": 0, "to": 3, "direction": "forward"}
+  ]
+}
