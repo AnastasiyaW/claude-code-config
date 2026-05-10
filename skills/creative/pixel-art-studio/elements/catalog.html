@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pixel Art Element Library · Catalog</title>
+<style>
+  :root {
+    --bg: #0b0812;
+    --panel: #110c1a;
+    --fg: #a896b4;
+    --dim: #5a4e6a;
+    --accent: #ffb4c8;
+    --border: rgba(255,255,255,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    min-height: 100vh;
+  }
+  .page { max-width: 1400px; margin: 0 auto; padding: 48px 40px 80px; }
+  header { margin-bottom: 48px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  header h1 {
+    margin: 0 0 8px; font-size: 13px; font-weight: 500;
+    letter-spacing: .3em; text-transform: uppercase; color: var(--accent);
+  }
+  header p { margin: 0; font-size: 12px; letter-spacing: .15em; color: var(--dim); text-transform: uppercase; }
+  section { margin-bottom: 48px; }
+  section h2 {
+    font-size: 11px; font-weight: 500; letter-spacing: .35em;
+    text-transform: uppercase; color: var(--accent);
+    margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px dashed var(--border);
+  }
+  .row { display: flex; flex-wrap: wrap; gap: 20px; }
+  .item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 12px;
+    width: 200px;
+  }
+  .item canvas {
+    width: 100%; height: 220px;
+    display: block;
+    image-rendering: pixelated;
+    background: #0a0812;
+  }
+  .item .label {
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .item .sub {
+    font-size: 9px;
+    letter-spacing: .2em;
+    color: var(--dim);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Pixel Art Element Library · Catalog</h1>
+    <p>9 elements × variants × 4 palettes — composable scene primitives</p>
+  </header>
+
+  <section id="sky-sec">
+    <h2>SKY · 4 palette variants</h2>
+    <div class="row" id="sky-row"></div>
+  </section>
+
+  <section id="stars-sec">
+    <h2>STARS · dense / sparse / twinkling</h2>
+    <div class="row" id="stars-row"></div>
+  </section>
+
+  <section id="mountain-sec">
+    <h2>MOUNTAIN RANGE · far / mid / near (atmospheric perspective)</h2>
+    <div class="row" id="mountain-row"></div>
+  </section>
+
+  <section id="tower-sec">
+    <h2>TOWER · stone / ruined / runic</h2>
+    <div class="row" id="tower-row"></div>
+  </section>
+
+  <section id="window-sec">
+    <h2>WINDOW · lit / flickering / dark</h2>
+    <div class="row" id="window-row"></div>
+  </section>
+
+  <section id="pine-sec">
+    <h2>PINE TREE · small / medium / large × depth (fg/mg/bg)</h2>
+    <div class="row" id="pine-row"></div>
+  </section>
+
+  <section id="fog-sec">
+    <h2>FOG BAND · light / medium / heavy</h2>
+    <div class="row" id="fog-row"></div>
+  </section>
+
+  <section id="snow-sec">
+    <h2>SNOW · light / heavy</h2>
+    <div class="row" id="snow-row"></div>
+  </section>
+
+  <section id="ground-sec">
+    <h2>GROUND · snow surface</h2>
+    <div class="row" id="ground-row"></div>
+  </section>
+</div>
+
+<script src="elements.js"></script>
+<script>
+const E = window.PixelArtElements;
+const W = 96, H = 144; // canvas logical size
+
+function makeCard(rowId, label, sub) {
+  const row = document.getElementById(rowId);
+  const item = document.createElement('div');
+  item.className = 'item';
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  item.appendChild(cv);
+  const l = document.createElement('div'); l.className = 'label'; l.textContent = label;
+  const s = document.createElement('div'); s.className = 'sub'; s.textContent = sub;
+  item.appendChild(l); item.appendChild(s);
+  row.appendChild(item);
+  return cv.getContext('2d');
+}
+
+// Animation phase
+let t = 0;
+const period = 8000;
+
+function drawAll() {
+  // SKY (4 palettes)
+  ['dusk-cool', 'dawn-warm', 'midnight', 'autumn'].forEach(v => {
+    const ctx = makeCard('sky-row', v, '4-stop gradient');
+    E.drawSky(ctx, 0, 0, { variant: v });
+  });
+
+  // STARS (3 variants × 1 palette)
+  ['dense', 'sparse', 'twinkling'].forEach(v => {
+    const ctx = makeCard('stars-row', v, `${v} field`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawStars(ctx, 0, 0, { variant: v, maxY: 130, palette: 'dusk-cool', t });
+  });
+
+  // MOUNTAINS (3 depths × 1 palette)
+  ['far', 'mid', 'near'].forEach(v => {
+    const ctx = makeCard('mountain-row', v, `${v} depth + snow caps`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawMountainRange(ctx, 0, 130, { variant: v, palette: 'dusk-cool' });
+  });
+
+  // TOWER (3 variants)
+  ['stone', 'ruined', 'runic'].forEach(v => {
+    const ctx = makeCard('tower-row', v, `${v} variant`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawTower(ctx, 48, 30, { variant: v, height: 80, width: 12, palette: 'dusk-cool', t });
+  });
+
+  // WINDOW (3 variants)
+  ['lit', 'flickering', 'dark'].forEach(v => {
+    const ctx = makeCard('window-row', v, `${v} window with halo`);
+    E.drawSky(ctx, 0, 0, { variant: 'midnight' });
+    // Need a stone background to see window
+    for (let y = 30; y < 120; y++) for (let x = 30; x < 70; x++) {
+      const c = (x < 40) ? '#3a3848' : (x > 60) ? '#1a1820' : '#2a2838';
+      ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1);
+    }
+    E.drawWindow(ctx, 46, 60, { variant: v, palette: 'midnight', t, w: 4, h: 5 });
+    E.drawWindow(ctx, 46, 80, { variant: v, palette: 'midnight', t, w: 4, h: 5, flickerPhase: 0.3 });
+  });
+
+  // PINE (3 sizes × 3 depths but show 3 representatives)
+  [
+    {variant: 'large', depth: 'fg', label: 'large/fg'},
+    {variant: 'medium', depth: 'mg', label: 'medium/mg'},
+    {variant: 'small', depth: 'bg', label: 'small/bg'},
+  ].forEach(({variant, depth, label}) => {
+    const ctx = makeCard('pine-row', label, `${variant} size, ${depth} depth`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawPine(ctx, 48, 130, { variant, depth, palette: 'dusk-cool' });
+  });
+
+  // FOG BAND (3 intensities)
+  [{i: 0.2, l: 'light'}, {i: 0.4, l: 'medium'}, {i: 0.7, l: 'heavy'}].forEach(({i, l}) => {
+    const ctx = makeCard('fog-row', l, `intensity ${i}`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawMountainRange(ctx, 0, 100, { variant: 'far', palette: 'dusk-cool' });
+    E.drawFogBand(ctx, 0, 80, { h: 40, intensity: i, palette: 'dusk-cool' });
+  });
+
+  // SNOW (2 variants)
+  ['light', 'heavy'].forEach(v => {
+    const ctx = makeCard('snow-row', v, `${v} snowfall`);
+    E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+    E.drawSnow(ctx, 0, 0, { variant: v, palette: 'dusk-cool', t });
+  });
+
+  // GROUND (1 variant)
+  const ctx = makeCard('ground-row', 'snow', 'snow surface w/ texture');
+  E.drawSky(ctx, 0, 0, { variant: 'dusk-cool' });
+  E.drawGround(ctx, 0, 100, { palette: 'dusk-cool' });
+}
+
+drawAll();
+
+// Animate the time-dependent ones
+function frame(now) {
+  t = (now % period) / period;
+  // Re-draw stars/window/snow that depend on t (lazy: re-drawAll)
+  // For simplicity just re-render all every frame (small canvases, fast)
+  // ... actually just leave static for catalog; live canvases would need separate refresh
+  requestAnimationFrame(frame);
+}
+// requestAnimationFrame(frame);  // disabled - static catalog
+</script>
+</body>
+</html>

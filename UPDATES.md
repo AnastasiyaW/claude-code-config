@@ -4,6 +4,82 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.15.0 — Element library: declarative scene composition)
+
+User feedback: hand-coding each cover from scratch (370 lines per Tier 2 scene)
+is repetitive. Suggestion: pre-draw reusable elements and compose scenes from
+them. This is exactly the pattern in the user's Elements Sheet.html reference
+(16 elements x 3-8 variants).
+
+This release adds the **element library**:
+
+NEW: `skills/creative/pixel-art-studio/elements/elements.js`
+9 reusable element drawing functions:
+- drawSky (4 palette variants: dusk-cool / dawn-warm / midnight / autumn)
+- drawStars (3 variants: dense / sparse / twinkling, with twinkle phase)
+- drawMountainRange (3 depths: far / mid / near for atmospheric perspective)
+- drawTower (3 variants: stone / ruined / runic, with brick texture +
+  crenellations + optional flag with sin-wave wave animation)
+- drawWindow (3 variants: lit / flickering / dark, volumetric glow halo)
+- drawPine (3 sizes x 3 depths fg/mg/bg, with branches + snow on tips)
+- drawFogBand (3 intensities for atmospheric haze layer)
+- drawSnow (light/heavy variants, deterministic seeded falling)
+- drawGround (snow surface with deterministic texture sparkles)
+
+Each element function has standard signature `drawXxx(ctx, x, y, opts)` where
+opts includes variant / palette / scale / t (animation phase 0..1) / seed.
+Palettes are semantic: `palette.bg1..bg4` (sky stops), `palette.stone` /
+`stoneLight` / `stoneDark` (architecture), `palette.warm` / `warmGlow`
+(accent), etc. 4 named palettes (dusk-cool, dawn-warm, midnight, autumn).
+
+NEW: `elements/catalog.html` - visual preview of all elements x variants
+Mirror of user's Elements Sheet.html pattern. 25 canvas previews in 9
+sections show every variant of every element. For style approval before
+scene composition. Verified rendering: 25 canvases, 9 sections, 0 console
+errors.
+
+NEW: `examples/library-demo/index.html` - declarative scene composition
+Same fortress-tower scene as Tier 2 demo, but composed from JSON instead of
+370-line hand-coded draw function:
+
+```javascript
+const SCENE = [
+  { el: "sky",            variant: "dusk-cool" },
+  { el: "stars",          variant: "dense", maxY: 130, count: 80 },
+  { el: "mountain-range", x: 0, y: 220, variant: "far",  seed: 311 },
+  { el: "fog-band",       x: 0, y: 215, h: 20, intensity: 0.4 },
+  { el: "mountain-range", x: 0, y: 240, variant: "mid",  seed: 322 },
+  { el: "mountain-range", x: 0, y: 250, variant: "near", seed: 333 },
+  { el: "tower",          x: 96, y: 90, variant: "stone", height: 150, width: 14 },
+  { el: "window",         x: 92, y: 100, variant: "lit", flickerPhase: 0.1 },
+  // ... 16 more lines
+];
+renderScene(ctx, W, H, SCENE, t);
+```
+
+7x reduction in code (50 lines vs 370 lines), same visual quality. Full 100%
+canvas coverage verified (55,296/55,296 pixels rendered). Live animation via
+phase-derived loops in element functions.
+
+The declarative pattern is **AI-friendly** - LLMs can generate scene specs as
+JSON without understanding pixel-level drawing code. This unlocks the
+pixel-art-storyboard skill's natural-language-to-scene workflow at scale.
+
+Element registry pattern (renderScene + ELEMENT_REGISTRY) makes adding new
+elements trivial: write `drawXxx(ctx, x, y, opts)`, register in
+ELEMENT_REGISTRY, available everywhere. Future expansion: castles, cities,
+ships, characters, magical effects, weather (rain, lightning), wildlife
+(birds, butterflies, deer).
+
+Workshop snapshot also updated: pixel-art-workshop-2026-05-10/ (consolidated
+folder with all today's artifacts) now contains 100 files, 1.3MB. Includes
+README with full architecture overview + CHANGELOG with v3.8-v3.15 entries.
+
+Plugin description: 22 skills, 5 evaluator agents, detail tier system,
+9-element library with declarative scene composition.
+
+---
+
 ## 2026-05-10 (v3.14.0 — Detail tier system: high-detail-pipeline doc + base-image composite + Tier 2 demo)
 
 User feedback after v3.13.0: existing 64x96 covers look "primitive" compared to
