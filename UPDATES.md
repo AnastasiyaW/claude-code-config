@@ -4,6 +4,47 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.13.0 — Animated WebP support + format decision tree)
+
+`bake_animation.py` now supports **animated WebP** as a first-class output
+format (`--format webp` or alias `--format web`). WebP is now the **default**
+because it's the best web format: ~5x smaller than equivalent GIF, supports
+full alpha channel, and embeds as `<img>` tag (unlike WebM which requires
+`<video>` element).
+
+Format size comparison (4-second loop @ 30fps, 256x384):
+- Animated WebP: ~150-400 KB (full alpha, embed as <img>)
+- WebM-alpha:    ~200-500 KB (full alpha, requires <video>)
+- MP4:           ~200-500 KB (NO alpha, universal compat)
+- GIF:           ~1-2 MB (1-bit alpha only, embed everywhere)
+- APNG:          ~1.5-4 MB (full alpha, embed as <img>)
+- PNG sequence:  ~5-15 MB (lossless, for game engine import)
+
+New flags:
+- `--format web` (alias for `--format webp`) - now the DEFAULT
+- `--lossless` - WebP pixel-perfect mode (larger files, use for archival)
+- `--quality N` - WebP lossy quality 0-100 (default 80, barely visible
+  difference on pixel art due to flat-fill regions)
+
+Updated `references/smoother-animation-baking.md` with:
+- Decision tree for format selection by use case (web embed / chat / video
+  editor / game engine / archival)
+- Quality tuning guide for WebP lossy vs lossless on pixel art
+- Why lossy q=80 is fine for pixel art (no chroma subsampling artifacts on
+  flat-fill pixel boundaries)
+
+The user-facing recommendation flow:
+- "I want to put this on a website / in markdown" → `--format web` (WebP)
+- "I want to send this in Telegram / email" → `--format gif` (universal)
+- "I want to import into After Effects / DaVinci" → `--format webm-alpha`
+- "I want to use in Unity / Godot" → `--format png-sequence`
+
+Implementation: Pillow's native WebP encoder (no ffmpeg dependency for WebP).
+`Image.save(..., format='WebP', save_all=True, append_images=..., method=6,
+allow_mixed=True, minimize_size=True)` produces optimal animated WebP.
+
+---
+
 ## 2026-05-10 (v3.12.0 — Fantasy book covers worked example: LOTR / GoT / Name of the Wind)
 
 End-to-end validation of the v3.11.0 pipeline. Three classic fantasy covers

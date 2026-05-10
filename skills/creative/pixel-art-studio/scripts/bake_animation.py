@@ -1,45 +1,73 @@
 #!/usr/bin/env python3
-"""Bake a canvas-rendered HTML animation into GIF/WebM/MP4/PNG sequence.
+"""Bake a canvas-rendered HTML animation into WebP/GIF/WebM/MP4/PNG sequence.
 
 Uses Playwright (headless Chromium) to drive the same JS code that runs at
-runtime, then encodes via ffmpeg. Single source of truth: the JS draw
-function — Python doesn't re-render, just captures.
+runtime, then encodes via Pillow or ffmpeg. Single source of truth: the JS
+draw function — Python doesn't re-render, just captures.
+
+FORMAT GUIDE:
+
+  --format web         RECOMMENDED for websites/markdown/docs
+                       Animated WebP. ~5x smaller than GIF, full alpha,
+                       embeds as <img>. Modern browsers (96%+).
+
+  --format gif         For email / Telegram / WhatsApp / chat embeds
+                       Universal compat but ~5x larger, only 1-bit alpha.
+
+  --format webm-alpha  For full-screen video / hero headers (<video> tag)
+                       Smallest size with full alpha (yuva420p VP9).
+                       Cannot embed as <img>.
+
+  --format apng        Alternative to GIF with full alpha
+                       Larger than WebP but PNG family
+
+  --format mp4         For social media / universal video player
+                       NO ALPHA — solid background only
+
+  --format png-sequence  For game engine import / max quality post-prod
 
 Why "baking"?
 
 At runtime the animation runs at ~60fps in browser; we typically use 4-8
-keyframes for hand-coded simplicity. But for archival output (GIF/MP4/WebM),
+keyframes for hand-coded simplicity. But for archival output (WebP/GIF/MP4/WebM),
 we can step `t = 0/N, 1/N, 2/N, ..., (N-1)/N` for ANY N, capturing N frames.
 This produces SMOOTHER animation than the "live" one because we render at
 30-60fps × period_seconds total frames.
 
 Usage:
-    # Bake a single canvas to GIF (smooth 60fps × 4s = 240 frames)
+    # RECOMMENDED for web: animated WebP (smallest + alpha)
     python bake_animation.py http://localhost:9132/index-v2.html \
-      --canvas-id c1 --period-ms 4000 --fps 60 \
-      --format gif -o twilight.gif
+      --canvas-id c1 --period-ms 4000 --fps 30 \
+      --format web -o twilight.webp
 
-    # Bake to WebM with alpha channel (transparent background, video editing)
+    # For email / Telegram / chat: GIF
+    python bake_animation.py http://localhost:9132/index-v2.html \
+      --canvas-id c1 --period-ms 4000 --fps 30 --format gif -o twilight.gif
+
+    # For full-screen video editing (compositing): WebM with alpha channel
     python bake_animation.py http://localhost:9132/index-v2.html \
       --canvas-id c1 --period-ms 4000 --fps 30 \
       --format webm-alpha -o twilight.webm
 
-    # Bake all 4 covers to a sprite-sheet PNG sequence
+    # For game engine: PNG sequence
     python bake_animation.py http://localhost:9132/index-v2.html \
-      --canvas-id c1,c2,c3,c4 --period-ms 4000,8000,5000,10000 \
-      --fps 30 --format png-sequence -o frames/
+      --canvas-id c1 --period-ms 4000 --fps 30 --format png-sequence -o frames/
 
-    # Bake to MP4 (no alpha, smaller file)
+    # Universal video (no alpha): MP4
     python bake_animation.py http://localhost:9132/index-v2.html \
       --canvas-id c1 --period-ms 4000 --fps 30 --format mp4 -o twilight.mp4
 
 Requires:
     pip install playwright pillow
     playwright install chromium    (one-time)
-    ffmpeg in PATH                 (for video formats)
+    ffmpeg in PATH                 (for video formats: WebM/MP4)
 
-Note on WebM alpha: WebM with VP9 + yuva420p preserves alpha channel through
-ffmpeg. MP4 (h264) does NOT support alpha — use WebM for transparent video.
+Note on alpha support:
+    - WebP: full alpha (RGBA), embeddable as <img> — BEST for web
+    - APNG: full alpha (RGBA), embeddable as <img>
+    - WebM (VP9 yuva420p): full alpha, but requires <video> tag
+    - GIF: only 1-bit alpha (transparent or fully solid, no semi-trans)
+    - MP4 (h264): NO ALPHA — use solid background or WebM
 """
 
 from __future__ import annotations
@@ -182,6 +210,42 @@ def encode_apng(frames: list[Path], output: Path, fps: int) -> None:
     print(f"Wrote APNG: {output} ({len(frames)} frames @ {fps}fps)")
 
 
+def encode_webp(frames: list[Path], output: Path, fps: int,
+                 quality: int = 80, lossless: bool = False) -> None:
+    """Encode PNG frames as animated WebP — RECOMMENDED for web embeds.
+
+    Animated WebP is ~5x smaller than equivalent GIF, supports full alpha,
+    and embeds as `<img>` tag (unlike WebM which needs `<video>`).
+
+    Args:
+        quality: 0-100 (default 80). Only for lossy mode.
+        lossless: True for pixel-perfect (larger files). False for lossy
+                  (much smaller, slight quality reduction barely visible
+                  on pixel art).
+    """
+    images = [Image.open(f).convert("RGBA") for f in frames]
+    duration_ms = int(1000 / fps)
+    save_kwargs = {
+        "save_all": True,
+        "append_images": images[1:],
+        "duration": duration_ms,
+        "loop": 0,
+        "format": "WebP",
+        "minimize_size": True,
+        "allow_mixed": True,  # mix lossy/lossless per-frame for size
+    }
+    if lossless:
+        save_kwargs["lossless"] = True
+        save_kwargs["quality"] = 100
+    else:
+        save_kwargs["quality"] = quality
+        save_kwargs["method"] = 6  # max compression effort
+
+    images[0].save(output, **save_kwargs)
+    print(f"Wrote animated WebP: {output} ({len(frames)} frames @ {fps}fps, "
+          f"{'lossless' if lossless else f'lossy q={quality}'})")
+
+
 def encode_webm_alpha(frames: list[Path], output: Path, fps: int) -> None:
     """Encode PNG frames as WebM with alpha channel (VP9 + yuva420p).
 
@@ -237,6 +301,8 @@ def keep_png_sequence(frames: list[Path], output: Path) -> None:
 # --- Top-level --------------------------------------------------------------
 
 ENCODERS = {
+    "webp": encode_webp,
+    "web": encode_webp,         # alias — WebP is recommended for web
     "gif": encode_gif,
     "apng": encode_apng,
     "webm-alpha": encode_webm_alpha,
@@ -246,7 +312,8 @@ ENCODERS = {
 
 
 async def bake(url: str, canvas_id: str, period_ms: int, fps: int,
-                fmt: str, output: Path, viewport: tuple[int, int]) -> None:
+                fmt: str, output: Path, viewport: tuple[int, int],
+                lossless: bool = False, quality: int = 80) -> None:
     # Capture frames to a temp directory
     out_dir = output.parent / f".bake_{canvas_id}_{period_ms}ms_{fps}fps"
     frames = await capture_frames(url, canvas_id, period_ms, fps, out_dir, viewport)
@@ -257,6 +324,8 @@ async def bake(url: str, canvas_id: str, period_ms: int, fps: int,
 
     if fmt == "png-sequence":
         keep_png_sequence(frames, output)
+    elif fmt in ("webp", "web"):
+        encode_webp(frames, output, fps, quality=quality, lossless=lossless)
     else:
         ENCODERS[fmt](frames, output, fps)
 
@@ -270,9 +339,14 @@ def main() -> int:
                         help="Loop period in milliseconds (default: 4000)")
     parser.add_argument("--fps", type=int, default=30,
                         help="Output frames per second (default: 30; use 60 for buttery smooth)")
-    parser.add_argument("--format", default="gif",
+    parser.add_argument("--format", default="web",
                         choices=list(ENCODERS.keys()),
-                        help="Output format (default: gif)")
+                        help="Output format (default: web = animated WebP, recommended for web)")
+    parser.add_argument("--lossless", action="store_true",
+                        help="WebP only: lossless mode (pixel-perfect, larger files). "
+                             "Default: lossy at q=80 (much smaller, barely visible difference on pixel art)")
+    parser.add_argument("--quality", type=int, default=80,
+                        help="WebP lossy quality 0-100 (default: 80)")
     parser.add_argument("-o", "--output", required=True, help="Output file path")
     parser.add_argument("--viewport-w", type=int, default=1280, help="Browser viewport width")
     parser.add_argument("--viewport-h", type=int, default=900, help="Browser viewport height")
@@ -289,6 +363,8 @@ def main() -> int:
         fmt=args.format,
         output=output,
         viewport=(args.viewport_w, args.viewport_h),
+        lossless=args.lossless,
+        quality=args.quality,
     ))
     return 0
 

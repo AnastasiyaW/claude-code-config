@@ -44,17 +44,40 @@ Trade-off: more frames = larger file. WebM compresses well; GIF is wasteful (no 
 
 ## 3. Output format selection
 
-| Format | When to use | Caveats |
-|---|---|---|
-| **GIF** | Web preview, embed in markdown | ≤ 256 colors per frame, no semi-transparency, large files for many frames |
-| **APNG** | Web with full alpha | Less compatible than GIF, larger files |
-| **WebM (VP9, yuva420p)** | Video editing, transparent overlays | **Has alpha channel** — best for compositing |
-| **MP4 (h264)** | Universal video player, smaller | NO alpha — solid background only |
-| **PNG sequence** | Maximum quality, manual editing | Largest disk usage; for after-effects/post-prod |
+| Format | Size (4s @ 30fps) | Alpha | Embed as | Best for |
+|---|---|---|---|---|
+| **WebP animated** ⭐ | ~150-400 KB | full | `<img>` | **Web pages, Markdown, docs (DEFAULT for web)** |
+| **GIF** | ~1-2 MB | 1-bit | `<img>` | Email, Telegram, WhatsApp, chat clients |
+| **APNG** | ~1.5-4 MB | full | `<img>` | Alternative to GIF with full alpha |
+| **WebM (VP9, yuva420p)** | ~200-500 KB | full | `<video>` (tag required) | Hero animations, full-screen video, compositing |
+| **MP4 (h264)** | ~200-500 KB | NONE | `<video>` | Universal video player; NO alpha |
+| **PNG sequence** | 5-15 MB total | full | filesystem | Game engine import (Unity/Godot/Unreal), post-prod |
 
-**For book covers**: GIF for web previews, WebM with alpha for video editor import.
-**For game sprites**: PNG sequence for engine import (Unity/Godot/Unreal).
-**For social media**: MP4 (everyone can play it).
+### Decision tree
+
+- **Embedding on a website / in Markdown / docs** → `--format web` (animated WebP)
+  - Smallest file, full alpha, embeds as `<img>`. Modern browsers (96%+).
+- **Sharing in email / Telegram / chat** → `--format gif`
+  - Universal compat. Larger files, only 1-bit alpha.
+- **Hero animation / fullscreen video** → `--format webm-alpha`
+  - Smallest with alpha but requires `<video>` element.
+- **Universal video (no alpha)** → `--format mp4`
+  - Plays everywhere. Solid background only.
+- **Game engine import** → `--format png-sequence`
+  - Maximum quality, lossless, animation-engine controls timing.
+- **Archival with full alpha** → `--format apng`
+  - Pillow-native, no ffmpeg needed.
+
+**Default is `--format web` (animated WebP)** because that's what most output is for. Override only when you have a specific target (chat embed → gif, video editor → webm-alpha).
+
+### WebP quality tuning
+
+For `--format web` / `--format webp`:
+- Default: lossy q=80 (barely visible difference on pixel art, ~5x smaller than lossless)
+- `--lossless` for pixel-perfect (use when distributing the canonical asset)
+- `--quality 90` for higher fidelity if compression artifacts visible
+
+For pixel art specifically, lossy q=80 is usually fine — pixel boundaries are sharp anyway and the JPEG-style chroma subsampling artifacts that ruin photographs are barely visible on flat-fill regions.
 
 ---
 
@@ -80,22 +103,33 @@ playwright install chromium  # one-time
 ### Usage
 
 ```bash
-# Bake to GIF (smooth 30fps × 4s = 120 frames)
+# RECOMMENDED for web: animated WebP (default)
+python scripts/bake_animation.py http://localhost:9132/index-v2.html \
+  --canvas-id c1 --period-ms 4000 --fps 30 \
+  --format web -o twilight.webp
+# (or --format webp, same thing)
+
+# WebP lossless if you need pixel-perfect
+python scripts/bake_animation.py http://localhost:9132/index-v2.html \
+  --canvas-id c1 --period-ms 4000 --fps 30 \
+  --format web --lossless -o twilight.webp
+
+# GIF for email / Telegram / chat embeds
 python scripts/bake_animation.py http://localhost:9132/index-v2.html \
   --canvas-id c1 --period-ms 4000 --fps 30 \
   --format gif -o twilight.gif
 
-# Bake to WebM with alpha (transparent video for compositing)
+# WebM with alpha for video editor import
 python scripts/bake_animation.py http://localhost:9132/index-v2.html \
   --canvas-id c1 --period-ms 4000 --fps 30 \
   --format webm-alpha -o twilight.webm
 
-# Bake to PNG sequence (for engine import)
+# PNG sequence for game engine import
 python scripts/bake_animation.py http://localhost:9132/index-v2.html \
   --canvas-id c1 --period-ms 4000 --fps 30 \
   --format png-sequence -o frames/
 
-# Bake to MP4 (no alpha, smaller)
+# MP4 universal video (no alpha)
 python scripts/bake_animation.py http://localhost:9132/index-v2.html \
   --canvas-id c1 --period-ms 4000 --fps 30 \
   --format mp4 -o twilight.mp4
