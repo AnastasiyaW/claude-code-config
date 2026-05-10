@@ -4,6 +4,78 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-10 (v3.10.0 — retouch-style standardization + multi-agent quality review system)
+
+User-supplied production references (`Grass Field with City.html` + `Elements Sheet.html`)
+formalized into a style standard. Built a 4-agent quality review system that audits any
+pixel-art output against the standard with multi-dimensional decomposition (style /
+animation / composition / orchestrator).
+
+**`skills/creative/pixel-art-storyboard/references/retouch-style-guide.md`**:
+Formalizes the visual fingerprint observed in user reference files:
+- 8-layer scene composition (sky gradient → atmospheric particles → far depth → mid depth →
+  near foreground → subject → foreground motion → atmospheric overlay)
+- 3-tier palette structure (Tier A sky/atmosphere, Tier B subject ramps with hue-shift,
+  Tier C single-pixel accent)
+- Pre-generated geometry (230 stars + 4 grass layers in reference; deterministic seeded RNG)
+- Multi-component motion (windAt = travel + local + base + gust, 4 components mixed)
+- Surface detail per object (3-8 surface dots/lines on subjects ≥16px)
+- Day/night phase system with palette interpolation per `T ∈ [0,1]`
+- Atmospheric overlay final pass for scene cohesion
+- Quantitative density thresholds (50+ stars min, 4-6 colors per ramp, 3+ motion components)
+- 10-point validation checklist (retouch-pass criteria)
+
+**4 quality-review agents** (in `agents/`):
+
+- **`pixel-art-style-reviewer`** — evaluates palette tier discipline (25pt), surface detail (20pt),
+  layer depth (20pt), hue rotation across luminance ramp (15pt), accent discipline (10pt),
+  anti-AI-slop signals (10pt). Returns scored JSON verdict per dimension. Cites
+  `quality_check.py` and `palette.py --analyze` automated metrics.
+
+- **`pixel-art-animation-reviewer`** — evaluates loop seamlessness (25pt), motion physics
+  multi-component (20pt), concurrent independent loops (15pt), particle determinism (15pt),
+  period appropriateness (15pt), phase computation correctness (10pt). Reads source code
+  to verify motion math claims. Spawn-tested against running preview server when available.
+
+- **`pixel-art-composition-reviewer`** — evaluates silhouette readability test (25pt), focal
+  point clarity (20pt), visual hierarchy tier count (15pt), negative space ratio (15pt),
+  scale relationships matching narrative intent (15pt), framing/breathing margin (10pt).
+
+- **`pixel-art-quality-board`** — orchestrator that spawns 3 reviewers IN PARALLEL (Task tool
+  with 3 subagent_type calls in single message), collects verdicts, synthesizes board
+  decision (PASS / NEEDS_WORK / REJECT) with ranked fixes. Worst-of-N is the safe default
+  (any REJECT → board REJECT). Surfaces cross-dimension fixes. Calibration on declared
+  intent (minimalist 8-bit gets graded against minimalist rubric, not retouch).
+
+**Twilight covers v2 (validation example)** at
+`skills/creative/pixel-art-studio/examples/twilight-covers/index-v2.html`:
+- 8-layer composition per cover (vs 2-layer in v1)
+- 60-80 deterministic stars per cover (seeded `makeStarField(seed_, count, W, maxY)`)
+- 4-stop sky gradients (deep midnight → violet → plum → horizon glow)
+- Horizon silhouettes (tree lines, mountain ridges) on Twilight, New Moon, Eclipse
+- Multi-component motion (stem sway uses travel+local sin combo on New Moon)
+- Crescent moon + halo on New Moon; eclipse moon with shadow encroachment + halo on Eclipse
+- Warm spotlight beam (radial gradient + globalCompositeOperation 'lighter') on Breaking Dawn
+- Stars dim during dawn-breaking (last 30% of cycle) on Breaking Dawn
+- Hex parser memoization for performance (HEX_CACHE map)
+
+Verification (programmatic, screenshot tool wedged on dense canvas):
+- All 4 canvases render valid PNG dataURLs (3326-7902 bytes)
+- 6144 pixels per canvas (full coverage)
+- 0 console errors
+- `drawTwilight()` execution: 2.7ms (well within frame budget)
+
+Plugin description: 21 → 22 skills, 1 → 4 evaluator agents.
+
+**Cost note for quality-board orchestration**: running 3 parallel reviewers ≈ 3× the cost
+of single review. Justified for "is it ready to ship" decisions, public output, or
+high-stakes deliveries. For routine iteration, use single-dimension reviewers directly.
+
+Research source: visual audit of `Grass Field with City.html` + `Elements Sheet.html`
++ 100 functions of canonical canvas-pixel-art rendering code reviewed.
+
+---
+
 ## 2026-05-10 (v3.9.0 — new `pixel-art-storyboard` skill: narrative-to-canvas pipeline)
 
 Companion skill to `pixel-art-studio` (v3.8.0). Where `pixel-art-studio` handles

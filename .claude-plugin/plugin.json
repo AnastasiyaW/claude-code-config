@@ -1,7 +1,7 @@
 {
   "name": "claude-code-config",
-  "version": "3.9.0",
-  "description": "Battle-tested configuration system for Claude Code agents: 23 architectural principles, 14 safety hooks, 22 skills (incl. pixel-art-studio for sprite/animation + pixel-art-storyboard for narrative-to-canvas covers), 1 evaluator agent (pixel-art-reviewer), 15 alternative comparisons, 8 templates, diagnostic scripts. Pairs with mclaude for multi-session coordination.",
+  "version": "3.10.0",
+  "description": "Battle-tested configuration system for Claude Code agents: 23 architectural principles, 14 safety hooks, 22 skills (incl. pixel-art-studio + pixel-art-storyboard with retouch-style standardization), 4 pixel-art quality agents (style/animation/composition/quality-board orchestrator), 15 alternative comparisons, 8 templates, diagnostic scripts. Pairs with mclaude for multi-session coordination.",
   "author": {
     "name": "AnastasiyaW",
     "url": "https://github.com/AnastasiyaW"

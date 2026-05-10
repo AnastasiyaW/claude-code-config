@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Twilight v2 STATIC</title>
+<style>
+  :root {
+    --bg: #0b0812;
+    --fg: #a896b4;
+    --dim: #5a4e6a;
+    --accent: #ffb4c8;
+    --border: rgba(255,255,255,.06);
+    --cover-w: 256px;
+    --cover-h: 384px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+    min-height: 100vh;
+  }
+  .page { max-width: 1400px; margin: 0 auto; padding: 56px 40px 96px; }
+  header { margin-bottom: 56px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+  header h1 {
+    margin: 0 0 12px; font-size: 14px; font-weight: 500;
+    letter-spacing: .35em; text-transform: uppercase; color: var(--accent);
+  }
+  header p {
+    margin: 0; font-size: 12px; letter-spacing: .15em;
+    color: var(--dim); text-transform: uppercase; line-height: 1.6;
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(4, var(--cover-w));
+    gap: 32px; justify-content: center;
+  }
+  @media (max-width: 1280px) { .grid { grid-template-columns: repeat(2, var(--cover-w)); } }
+  .cover { width: var(--cover-w); display: flex; flex-direction: column; }
+  .canvas-wrap {
+    width: var(--cover-w); height: var(--cover-h);
+    background: #000;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  }
+  canvas {
+    display: block; width: 100%; height: 100%;
+    image-rendering: pixelated; image-rendering: crisp-edges;
+  }
+  .meta { margin-top: 18px; padding: 0 4px; }
+  .meta .num { font-size: 9px; letter-spacing: .3em; color: var(--dim); }
+  .meta .title {
+    font-size: 13px; letter-spacing: .2em; text-transform: uppercase;
+    color: var(--accent); margin: 6px 0 4px;
+  }
+  .meta .symbol { font-size: 10px; letter-spacing: .25em; text-transform: uppercase; color: var(--fg); }
+  .meta .year { margin-top: 8px; font-size: 9px; letter-spacing: .25em; color: var(--dim); }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>Twilight v2 · Static Frame Snapshot</h1>
+    <p>Each cover at distinct phase t (no RAF) for screenshot verification</p>
+  </header>
+  <div class="grid">
+    <div class="cover">
+      <div class="canvas-wrap"><canvas id="c1" width="64" height="96"></canvas></div>
+      <div class="meta"><div class="num">Book 01 · t=0.20</div><div class="title">Twilight</div><div class="symbol">Apple</div><div class="year">2005</div></div>
+    </div>
+    <div class="cover">
+      <div class="canvas-wrap"><canvas id="c2" width="64" height="96"></canvas></div>
+      <div class="meta"><div class="num">Book 02 · t=0.40</div><div class="title">New Moon</div><div class="symbol">Tulip</div><div class="year">2006</div></div>
+    </div>
+    <div class="cover">
+      <div class="canvas-wrap"><canvas id="c3" width="64" height="96"></canvas></div>
+      <div class="meta"><div class="num">Book 03 · t=0.30</div><div class="title">Eclipse</div><div class="symbol">Ribbon</div><div class="year">2007</div></div>
+    </div>
+    <div class="cover">
+      <div class="canvas-wrap"><canvas id="c4" width="64" height="96"></canvas></div>
+      <div class="meta"><div class="num">Book 04 · t=0.70</div><div class="title">Breaking Dawn</div><div class="symbol">Pawn → Queen</div><div class="year">2008</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Load the rendering engine via fetch from index-v2.html, then call draw* once
+fetch('/index-v2.html').then(r => r.text()).then(html => {
+  // Extract the inner script content
+  const m = html.match(/<script>([\s\S]+?)<\/script>/);
+  if (!m) { console.error('no script'); return; }
+  let src = m[1];
+  // Remove the load listener (last lines) so RAF doesn't kick off
+  src = src.replace(/window\.addEventListener\('load'[\s\S]+$/, '');
+  // Eval the engine
+  eval(src);
+  // Manually draw each at fixed phase
+  const c1 = document.getElementById('c1').getContext('2d'); drawTwilight(c1, 64, 96, 0.20);
+  const c2 = document.getElementById('c2').getContext('2d'); drawNewMoon(c2, 64, 96, 0.40);
+  const c3 = document.getElementById('c3').getContext('2d'); drawEclipse(c3, 64, 96, 0.30);
+  const c4 = document.getElementById('c4').getContext('2d'); drawBreakingDawn(c4, 64, 96, 0.70);
+});
+</script>
+</body>
+</html>
