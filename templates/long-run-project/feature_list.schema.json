@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Feature List for Long-Run Projects",
-  "description": "Machine-readable state of features in a long-running project. Pairs with PROBLEMS.md (bugs) and init.sh (health check) as the standard harness for long-run projects. See principles/21-feature-tracking.md for full context.",
+  "description": "Machine-readable state of features in a long-running project. Pairs with PROBLEMS.md (bugs) and init.sh (health check) as the standard harness for long-run projects. See principles/27-feature-tracking.md for full context.",
   "type": "object",
   "required": ["features"],
   "properties": {

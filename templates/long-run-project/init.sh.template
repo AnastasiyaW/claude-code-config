@@ -1,6 +1,6 @@
 #!/bin/bash
 # init.sh — canonical "is this project healthy?" check for long-run projects.
-# See principles/21-feature-tracking.md for context.
+# See principles/27-feature-tracking.md for context.
 #
 # Convention:
 #   - Exit 0 = baseline OK, safe to start work

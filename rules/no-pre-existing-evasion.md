@@ -60,7 +60,7 @@ Not "looks right". Not "should work". Command and output, in writing.
 
 ## WIP=1 + VCR Blocking (for projects using feature_list.json)
 
-Source: Learn Harness Engineering, lectures 07-08. See principle 21 (Feature Tracking) for the full framework.
+Source: Learn Harness Engineering, lectures 07-08. See principle 27 (Feature Tracking) for the full framework.
 
 **WIP=1**: in projects with a `feature_list.json` (see `templates/long-run-project/`), at most **one** feature may have `status: "in-progress"` at any time. Starting a second feature while the first is still in progress is forbidden — even with the rationale "the first one is waiting on something." If it's waiting, mark it `blocked` with reason in `evidence`, then start the new one.
 

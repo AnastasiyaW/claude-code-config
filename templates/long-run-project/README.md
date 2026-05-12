@@ -97,11 +97,11 @@ For these, free-form notes in handoffs are fine.
 
 ## Source and license
 
-Templates adapted from [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering) (MIT license), specifically `skills/harness-creator/templates/`. See `principles/21-feature-tracking.md` for the full framework integration into our stack.
+Templates adapted from [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering) (MIT license), specifically `skills/harness-creator/templates/`. See `principles/27-feature-tracking.md` for the full framework integration into our stack.
 
 ## Related
 
-- `principles/21-feature-tracking.md` — full framework explanation
+- `principles/27-feature-tracking.md` — full framework explanation
 - `principles/02-proof-loop.md` — verification approach (Anti-Fabrication)
 - `principles/16-project-chronicles.md` — strategic project history
 - `rules/long-run-problems-log.md` — companion PROBLEMS.md convention (in the rules/ folder, not here)

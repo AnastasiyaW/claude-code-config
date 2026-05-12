@@ -47,7 +47,7 @@ Source: [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/l
 
 After reviewing the [Learn Harness Engineering course](https://walkinglabs.github.io/learn-harness-engineering/) (walkinglabs, MIT-licensed), we integrated four genuinely useful pieces into our existing stack. Most of the course (~80%) overlaps with our existing principles 01-20, but these four close real gaps:
 
-NEW: principles/21-feature-tracking.md
+NEW: principles/27-feature-tracking.md
 - The three-artifact harness for long-run projects: PROBLEMS.md (incidents) + feature_list.json (scope) + init.sh (health check)
 - Machine-readable feature state with 4 statuses (not-started / in-progress / blocked / done)
 - WIP=1 invariant: at most one feature in-progress at any time

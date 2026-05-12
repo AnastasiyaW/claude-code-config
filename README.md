@@ -1,6 +1,6 @@
 # Claude Code Configuration System
 
-A practical configuration kit for Claude Code agents. 25 architectural principles, 19 safety hooks, 20 skills, 10 templates, 14 conditional rules. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code agents. 27 architectural principles, 19 safety hooks, 21 skills, 11 templates, 15 conditional rules. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -64,7 +64,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 
 ## What This Gives You
 
-**23 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**27 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -86,6 +86,10 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 - **Zero-day vulnerabilities buried in source tree?** LLM + rules + SAST pipeline ([Vulnerability Detection Pipeline](principles/20-vulnerability-detection-pipeline.md))
 - **User needs to choose between visual options (UI, design, diagrams)?** HTML fragment server + file-based event queue ([Visual Context Pattern](principles/22-visual-context-pattern.md))
 - **Output keeps reverting to generic defaults (Inter font, SELECT *, etc.)?** Anti-attractor procedure + three-layer enforcement ([Anti-pattern as Config](principles/23-anti-pattern-as-config.md))
+- **Merge conflict resolved "by logic" and lost half the work?** Two-agent isolated reconciliation + verified-data priority ([Merge Conflict Resolution](principles/24-merge-conflict-resolution.md))
+- **Built a coordination primitive from scratch?** Map it to the classical analog first (Chubby lease, WAL, SMTP) and inherit 30 years of failure-mode literature ([Coordination Primitives Mapping](principles/25-coordination-primitives-mapping.md))
+- **Bug fix detoured into "this was already broken before me"?** Five valid deferral reasons + mandatory durable proof artifacts ([No-Pre-Existing Evasion](principles/26-no-pre-existing-evasion.md))
+- **Long-run project's scope and progress scattered across 30+ handoffs?** Three-artifact harness (PROBLEMS.md + feature_list.json + init.sh) with WIP=1 invariant and L1/L2/L3 evidence requirements ([Feature Tracking](principles/27-feature-tracking.md))
 
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically:
 
@@ -106,7 +110,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [test-muting-guard](hooks/test-muting-guard.py) | `PreToolUse` | Blocks adding `@skip`, `.only()`, `@Ignore` to existing tests |
 | [backup-retention-cleanup](hooks/backup-retention-cleanup.py) | `Stop` | Cleans up old backup branches (14-day retention) |
 
-**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md).
+**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md), [long-run project harness pack](templates/long-run-project/) (drop-in `feature_list.schema.json` + `feature_list.template.json` + `init.sh.template` for any project crossing 5+ features and 5+ sessions).
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -118,6 +122,34 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [Context in long sessions](alternatives/context-management.md) | JIT Loading, Full Context Upfront, Compaction, Fresh Sessions |
 | [Session transitions](alternatives/session-handoff.md) | Manual HANDOFF.md, Auto hooks, Session Journal, ContextHarness, Memory |
 | [Reasoning-quality regression](alternatives/reasoning-regression-debugging.md) | Config reset, Stop-phrase guard, Metric monitoring, Fresh-session A/B, Proof Loop |
+
+---
+
+## Long-Run Project Harness (new in v3.17/v3.18)
+
+If you have a project that crosses 5+ features and 5+ sessions of work, three drop-in artifacts close the gap that PROBLEMS.md + handoffs + chronicles alone leave open:
+
+| Artifact | Question it answers | Where |
+|---|---|---|
+| `init.sh` | Is the project healthy right now? (binary check, <3 min target) | [templates/long-run-project/init.sh.template](templates/long-run-project/init.sh.template) |
+| `feature_list.json` | What features exist and what state are they in? (machine-readable) | [templates/long-run-project/feature_list.schema.json](templates/long-run-project/feature_list.schema.json) + [.template.json](templates/long-run-project/feature_list.template.json) |
+| `PROBLEMS.md` | What is broken right now? Recovery procedures? | Already covered in [rules](rules/) — pairs with the two above |
+
+Hard rules attached to this pack:
+
+- **WIP=1**: at most one feature in `status: "in-progress"` at any time
+- **L1+L2+L3 evidence**: `status: "done"` requires `evidence` field referencing Syntax/Static + Runtime + System artifacts (durable files, not "tests pass" claims)
+- **`done` is one-way**: regression becomes a new feature, never roll back
+
+**To audit whether your project needs this pack — and which subsystem to fix first — invoke the new [`harness-audit`](skills/operational/harness-audit/) skill:**
+
+```
+/harness-audit
+```
+
+or trigger phrases like *"audit my harness"*, *"score my CLAUDE.md"*, *"is my project ready for long-run"*. The skill produces a 5-subsystem scorecard (1-5 per dimension), identifies the bottleneck, and outputs a prioritized 3-step improvement plan with effort estimates and pointers to the templates above. Read-only — no changes applied unless you approve.
+
+See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the full framework. Templates and concepts adapted from [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering) (MIT license), integrated with our existing Proof Loop, Multi-Agent Decomposition, and No-Pre-Existing Evasion principles.
 
 ---
 
@@ -247,6 +279,7 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Writing | `humanize-russian` | Transform AI text into natural Russian prose |
 | Writing | `article-structure-review` | Audit article structure: hook strength, narrative arc, conclusion clarity |
 | Operational | `desktop-sessions-discovery` | Find/restore Claude desktop app sessions hidden after account switch (issue #48511) — 4 scripts (inventory/find/restore/HTML registry) for Mac/Win/Linux |
+| Operational | `harness-audit` | Score a project's agent harness across 5 subsystems (Instructions / State / Verification / Scope / Lifecycle), identify the bottleneck, produce a prioritized 3-step improvement plan with effort estimates. Read-only query skill — no changes applied without explicit user approval. |
 
 ---
 
@@ -280,14 +313,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 25 个架构原则、16 对比方案、20 个技能、19 个即用型 Hook 脚本和 10 个项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 27 个架构原则、16 对比方案、21 个技能、19 个即用型 Hook 脚本和 11 个项目模板。
 
 **核心功能:**
-- `principles/` - 25 个独立架构原则，每个解决一个具体失败模式
+- `principles/` - 27 个独立架构原则，每个解决一个具体失败模式
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
 - `hooks/` - 19 个即用型 Hook 脚本（安全防护、会话管理、技能路由）
-- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆和项目编年史模板
-- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具）
+- `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆、项目编年史和长期项目脚手架（feature_list.json + init.sh）
+- `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具，包括新的 `harness-audit` 五子系统评估）
 
 **安装:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` 或直接复制所需文件。
 
@@ -297,14 +330,14 @@ Principles are updated with new research findings, real-world incidents, and com
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 25 архитектурных принципов, 16 сравнений подходов, 20 навыков, 19 hook-скриптов и 10 шаблонов.
+Система конфигурации для Claude Code агентов. 27 архитектурных принципов, 16 сравнений подходов, 21 навык, 19 hook-скриптов и 11 шаблонов.
 
 **Что внутри:**
-- `principles/` - 25 принципов, каждый предотвращает конкретный тип отказа
+- `principles/` - 27 принципов, каждый предотвращает конкретный тип отказа
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
 - `hooks/` - 19 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention и др.)
-- `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник
-- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты для самого Claude)
+- `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник + **long-run harness pack** (drop-in `feature_list.json` + `init.sh` для проектов с 5+ фичами)
+- `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты для самого Claude, включая новый `harness-audit` — 5-подсистемная оценка любого проекта)
 
 **Установка:** `claude plugin install https://github.com/AnastasiyaW/claude-code-config` или копирование нужных файлов.
 
