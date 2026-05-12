@@ -58,6 +58,24 @@ Every bug-fix must have *durable proof*:
 
 Not "looks right". Not "should work". Command and output, in writing.
 
+## WIP=1 + VCR Blocking (for projects using feature_list.json)
+
+Source: Learn Harness Engineering, lectures 07-08. See principle 21 (Feature Tracking) for the full framework.
+
+**WIP=1**: in projects with a `feature_list.json` (see `templates/long-run-project/`), at most **one** feature may have `status: "in-progress"` at any time. Starting a second feature while the first is still in progress is forbidden — even with the rationale "the first one is waiting on something." If it's waiting, mark it `blocked` with reason in `evidence`, then start the new one.
+
+**VCR Blocking** (Verified Completion Rate): a feature cannot transition `not-started → in-progress` while a previous feature is still `in-progress`. The previous feature must reach `done` (with full evidence) or `blocked` (with a named blocker) first.
+
+**Why this rule exists**: without WIP=1, agents under context pressure quietly open a second feature when the first hits friction. Days later, both are half-done and neither has verified evidence. WIP=1 forces an explicit choice: finish the current, block it formally, or roll it back to `not-started`. No fuzzy middle.
+
+**Acceptable ways to switch features**:
+
+1. Current feature is **technically blocked** → set `status: "blocked"` with the blocker named in `evidence`, then start a new one
+2. **Priorities changed** (user redirected) → roll current back to `not-started`, note the pivot in handoff, start new
+3. **Never** two `in-progress` simultaneously
+
+**Connection to the 3-Layer Validation Gate**: `status: "done"` requires `evidence` referencing L1 (syntax/static), L2 (runtime/tests), and L3 (system/e2e) artifacts. VCR is the gate that enforces this — if evidence is empty, you don't get to mark `done`, and the next feature can't enter `in-progress`.
+
 ## Workflow when a bug is discovered mid-task
 
 ```

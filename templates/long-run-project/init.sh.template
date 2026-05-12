@@ -1,0 +1,92 @@
+#!/bin/bash
+# init.sh — canonical "is this project healthy?" check for long-run projects.
+# See principles/21-feature-tracking.md for context.
+#
+# Convention:
+#   - Exit 0 = baseline OK, safe to start work
+#   - Exit non-zero = fix baseline FIRST, do not add scope
+#   - Should complete in <3 minutes (target metric)
+#   - Should not require interactive input
+#   - Should not call paid APIs or deploy
+#
+# Customize per project. Sections below are placeholders — uncomment + adapt.
+
+set -e
+
+echo "=== Project Initialization ==="
+echo "Working directory: $(pwd)"
+echo "Git HEAD: $(git rev-parse --short HEAD 2>/dev/null || echo 'not a git repo')"
+echo ""
+
+# --- 1. Dependencies (language-specific, pick one) ---
+
+# Python with uv (fast, recommended):
+# uv pip install -r requirements.txt
+
+# Python with pip:
+# pip install -e ".[dev]"
+
+# Node with bun (fast, recommended):
+# bun install
+
+# Node with npm:
+# npm install
+
+# Rust:
+# cargo build --release
+
+
+# --- 2. L1 — Static checks (syntax / types / lint) ---
+echo "=== L1: Static checks ==="
+
+# Python:
+# ruff check . && mypy src/
+
+# Node/TypeScript:
+# npm run check  # typically tsc --noEmit
+# OR: bunx tsc --noEmit
+
+# Rust:
+# cargo clippy --all-targets -- -D warnings
+
+
+# --- 3. L2 — Tests (runtime behavior) ---
+echo "=== L2: Tests ==="
+
+# Python:
+# pytest tests/ -x --tb=short --timeout=60
+
+# Node:
+# npm test
+# OR: bun test
+
+# Rust:
+# cargo test --release
+
+
+# --- 4. Build artifact (optional, if applicable) ---
+# Only include if there's a build step that catches additional issues
+# beyond what L1+L2 already cover.
+
+# Node:
+# npm run build
+
+# Rust (already built in step 1):
+# (nothing)
+
+# Python:
+# Usually skip. If you have a CLI entry point, smoke-test it:
+# python -c "import mypackage; print(mypackage.__version__)"
+
+
+echo ""
+echo "=== Initialization Complete ==="
+echo ""
+echo "Next steps:"
+echo "  1. Read feature_list.json to see current feature state"
+echo "  2. Find the ONE feature with status='in-progress' (or pick one"
+echo "     from 'not-started' if there is no in-progress feature)"
+echo "  3. WIP=1: do not start a second feature while one is in-progress"
+echo "  4. Re-run ./init.sh before claiming a feature 'done'"
+echo ""
+echo "If init.sh failed: fix baseline FIRST, do not add new scope."

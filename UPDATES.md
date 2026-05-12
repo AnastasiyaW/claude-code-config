@@ -4,6 +4,61 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-12 (v3.17.0 — Long-run project harness: feature_list.json + init.sh + 3-layer validation gate)
+
+After reviewing the [Learn Harness Engineering course](https://walkinglabs.github.io/learn-harness-engineering/) (walkinglabs, MIT-licensed), we integrated four genuinely useful pieces into our existing stack. Most of the course (~80%) overlaps with our existing principles 01-20, but these four close real gaps:
+
+NEW: principles/21-feature-tracking.md
+- The three-artifact harness for long-run projects: PROBLEMS.md (incidents) + feature_list.json (scope) + init.sh (health check)
+- Machine-readable feature state with 4 statuses (not-started / in-progress / blocked / done)
+- WIP=1 invariant: at most one feature in-progress at any time
+- Evidence field at status='done' must reference L1 (static) + L2 (runtime) + L3 (system) durable artifacts
+- done → anything else is forbidden (regressions become new fix features)
+- Bootstrap procedure for existing long-run projects (extract from handoffs + chronicles)
+- Mechanical enforcement sketch via Stop hook (defence-in-depth)
+- Anti-patterns: 50+ entries (use BACKLOG.md instead), vague evidence, init.sh that downloads multi-GB models
+
+NEW: templates/long-run-project/
+- feature_list.schema.json — drop-in JSON Schema (Draft 07)
+- feature_list.template.json — worked example with all 4 statuses + dependencies + evidence
+- init.sh.template — bash skeleton with commented language-specific sections (Python/Node/Rust)
+- README.md — bootstrap instructions, status transitions, evidence requirements, when-to-skip guidance
+
+NEW: rules/long-run-harness.md (Russian, mirrors private ~/.claude/rules/long-run-harness.md)
+- Convention: every [LONG-RUN] project gets feature_list.json + init.sh in repo root
+- Target metric: <3 min from fresh clone to ./init.sh exit 0
+- Anti-patterns specific to our stack (downloading torch in init.sh without --index-url, etc.)
+- Source attribution to walkinglabs/learn-harness-engineering
+
+UPDATED: rules/no-pre-existing-evasion.md
+- Added "WIP=1 + VCR Blocking" section
+- Connects to 3-Layer Validation Gate via evidence requirements
+- Lists acceptable ways to switch features (block / rollback / never two in-progress)
+
+This release also reflects updates landed in our private stack (mirrored here for reference):
+
+PRIVATE UPDATE: ~/.claude/CLAUDE.md "Proof Loop Pattern"
+- Added explicit "3-Layer Validation Gate" subsection
+- L1 (Syntax/Static) → L2 (Runtime) → L3 (System/E2E), no skipping
+- "L3 without L2 = autoreject" rule with real-world case (UI state mismatch caught only by browser smoke, not by curl-only L3 probes)
+- Default policies per project size (full 3 layers for prod, L1+L2 for utilities, L1-only for pure refactors)
+- Every layer requires a durable artifact (no claim without file path)
+
+What we deliberately did NOT take from the course:
+
+- AGENTS.md as a separate file (we already use CLAUDE.md as the routing layer)
+- Modular CLAUDE.md split into docs/* (we already have .claude/rules/ doing exactly this)
+- OpenTelemetry observability (overkill for our scale; we have structured logs where they matter)
+- 5-subsystem audit as a separate skill (covered by existing project-health workflows)
+- Memory taxonomy (our 4-type system — user/feedback/project/reference — is equivalent)
+- Multi-agent coordination patterns (our principles 01, 06, 18 are richer)
+
+The course is excellent for teams without an existing harness. For us, ~80% was already mature. These four additions are the genuine gaps it surfaced.
+
+Source: [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering), MIT license. Templates lifted from `skills/harness-creator/templates/` with modifications.
+
+---
+
 ## 2026-05-10 (v3.16.0 — Scaling architecture for 10K+ elements + dataset learning pipeline)
 
 User questions: (1) how to store and orchestrate when library has 10,000+

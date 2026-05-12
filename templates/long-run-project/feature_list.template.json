@@ -1,0 +1,36 @@
+{
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Example: User authentication",
+      "description": "Email + password login with JWT session tokens, password reset flow via email",
+      "dependencies": [],
+      "status": "done",
+      "evidence": "L1: tsc clean (commit a3f2c1) + ruff check passed; L2: pytest tests/test_auth.py 12/12 passed (.agent/evidence/test-output-2026-05-10.txt); L3: manual login + reset flow verified in staging (screenshot: .agent/evidence/auth-flow.png)"
+    },
+    {
+      "id": "feat-002",
+      "name": "Example: Document upload",
+      "description": "Accept PDF and DOCX uploads up to 50MB, store in S3, return signed URL",
+      "dependencies": ["feat-001"],
+      "status": "in-progress",
+      "evidence": ""
+    },
+    {
+      "id": "feat-003",
+      "name": "Example: Document indexing",
+      "description": "After upload, split document into chunks, generate embeddings, store in vector DB",
+      "dependencies": ["feat-002"],
+      "status": "not-started",
+      "evidence": ""
+    },
+    {
+      "id": "feat-004",
+      "name": "Example: Email notifications",
+      "description": "Send transactional emails for signup, password reset, indexing completion",
+      "dependencies": ["feat-001"],
+      "status": "blocked",
+      "evidence": "Blocked by PROBLEMS.md #3: SMTP credentials rotation required, ops team has not provided new ones yet. Asked 2026-05-08."
+    }
+  ]
+}

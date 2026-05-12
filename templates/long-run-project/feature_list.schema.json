@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Feature List for Long-Run Projects",
+  "description": "Machine-readable state of features in a long-running project. Pairs with PROBLEMS.md (bugs) and init.sh (health check) as the standard harness for long-run projects. See principles/21-feature-tracking.md for full context.",
+  "type": "object",
+  "required": ["features"],
+  "properties": {
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "description", "status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique feature identifier in feat-NNN format",
+            "pattern": "^feat-\\d{3,}$"
+          },
+          "name": {
+            "type": "string",
+            "description": "Short feature name (3-7 words)"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this feature does in user-facing terms"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Feature IDs that must be 'done' before this one can start. Empty array if no dependencies."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["not-started", "in-progress", "blocked", "done"],
+            "description": "Current implementation state. WIP=1 invariant: only one feature may have status='in-progress' at any time."
+          },
+          "evidence": {
+            "type": "string",
+            "description": "When status='done': references to L1 (syntax/static), L2 (runtime/tests), L3 (system/e2e) artifacts proving the feature works. When status='blocked': what blocks it (PROBLEMS.md entry id, external dependency, etc)."
+          }
+        }
+      }
+    }
+  }
+}
