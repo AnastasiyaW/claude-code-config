@@ -4,6 +4,45 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-12 (v3.18.0 — Harness audit skill + Coordinator/Fork/Swarm triad)
+
+Follow-up to v3.17.0. After integrating the four most useful pieces from Learn Harness Engineering, went deeper into the course `references/` to extract one more skill and one principle extension.
+
+NEW: skills/operational/harness-audit/ (the 5-subsystem assessment as a callable skill)
+- Score a project across 5 subsystems: Instructions / State / Verification / Scope / Lifecycle (1-5 each)
+- Adapted to OUR concrete stack (CLAUDE.md + .claude/rules/ + PROBLEMS.md + feature_list.json + init.sh + hooks)
+- Identify the lowest-scoring subsystem as the bottleneck
+- Produce a prioritized 3-step improvement plan with effort estimates and pointers to our templates
+- references/checklist-per-subsystem.md — concrete binary checks (hard + soft) per subsystem
+- references/scoring-rubric.md — anchored 1-5 levels, tiebreakers, 3 calibration examples (fresh prototype / mature project / OSS skill repo)
+- Designed as a query-only skill — produces scorecard, does not make changes
+- Skip criterion: short-term projects (<5 features or <5 sessions) — overhead not warranted
+
+EXTENDED: principles/06-multi-agent-decomposition.md
+- Added "Three Delegation Patterns: Context Sharing as the Dimension" section
+- Coordinator / Fork / Swarm triad distinguished by **context sharing level** (none / full / shared-state)
+- Hard constraints per pattern:
+  - Coordinator: must synthesize before re-dispatch (no "based on your findings, do X")
+  - Fork: single-level only (recursive forks multiply context exponentially)
+  - Swarm: flat roster only (teammates cannot spawn teammates)
+- Self-contained worker prompt template (applies across all three patterns)
+- Reinforces our existing "Never delegate understanding" rule with structured framing
+
+What we considered taking but didn't (after reading 5 reference patterns + 6 project READMEs):
+
+- **memory-persistence-pattern.md** — already mirrors our 4-type taxonomy and two-step save invariant
+- **context-engineering-pattern.md** — already covered by practice_context_engineering with Select/Write/Compress/Isolate operations
+- **tool-registry-pattern.md** — theory for runtime builders; we are runtime consumers via hooks
+- **lifecycle-bootstrap-pattern.md** — same — runtime-builder content, not skill-consumer content
+- **Project 05's Planner+Generator+Evaluator 3-role pattern** — already in our Proof Loop principle (02) with 4 roles (Spec-freezer + Builder + Verifier + Fixer)
+- **Project 06 capstone benchmarking scripts** — useful concept but not adopted as a pattern; we measure harness value qualitatively per project
+
+Honest assessment: after deep reading, the course confirmed ~90% of our stack is current with state-of-the-art harness engineering. The remaining genuine gaps were the four items from v3.17.0 plus this audit skill plus the multi-agent triad framing. Diminishing returns from here.
+
+Source: [walkinglabs/learn-harness-engineering](https://github.com/walkinglabs/learn-harness-engineering), MIT license. 5-subsystem framework from their `skills/harness-creator/SKILL.md` Phase 2 assessment. Multi-agent triad from their `skills/harness-creator/references/multi-agent-pattern.md`.
+
+---
+
 ## 2026-05-12 (v3.17.0 — Long-run project harness: feature_list.json + init.sh + 3-layer validation gate)
 
 After reviewing the [Learn Harness Engineering course](https://walkinglabs.github.io/learn-harness-engineering/) (walkinglabs, MIT-licensed), we integrated four genuinely useful pieces into our existing stack. Most of the course (~80%) overlaps with our existing principles 01-20, but these four close real gaps:

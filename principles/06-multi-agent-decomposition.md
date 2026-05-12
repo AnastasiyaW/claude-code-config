@@ -129,6 +129,72 @@ This means:
 
 ---
 
+## Three Delegation Patterns: Context Sharing as the Dimension
+
+**Source:** [Learn Harness Engineering](https://walkinglabs.github.io/learn-harness-engineering/) (walkinglabs, MIT), `skills/harness-creator/references/multi-agent-pattern.md`.
+
+The Coordinator pattern above is one of three delegation patterns. They differ primarily in **how much context the child inherits from the parent**, which determines both safety and parallelism behavior.
+
+| Pattern | Context sharing | Best for | Hard constraint |
+|---|---|---|---|
+| **Coordinator** | None — workers start fresh, see only the explicit prompt | Complex multi-phase work (research → synthesize → implement → verify); when worker output must be unbiased by parent reasoning | Coordinator must **synthesize** worker results into precise specs before next dispatch — never write "based on your findings, do X" |
+| **Fork** | Full — child inherits the parent's full session history | Quick parallel splits where loaded context is expensive to rebuild (e.g., two implementation attempts of the same spec) | **Single-level only.** Recursive forks multiply context cost exponentially. Block at call time, not just at prompt assembly. |
+| **Swarm** | Peer-to-peer through a shared task list | Long-running independent workstreams where teammates pick work from a queue (researcher, implementer, reviewer roles) | **Flat roster only.** Teammates cannot spawn other teammates. The roster is fixed at swarm creation. |
+
+### Why context sharing is the right axis
+
+The wrong axis is "single agent vs multi-agent" — that question is answered by task scope (function vs system level, covered above). Once you've decided to decompose, the next question is **what each child agent sees**, and that determines:
+
+- **Bias propagation**: a Fork child sees parent's reasoning history, including dead ends — useful for "explore N alternatives from the same starting point", harmful for independent verification
+- **Context cost**: Coordinator children start at zero tokens; Fork children start at parent's token count
+- **Coordination overhead**: Coordinator requires synthesis between phases; Swarm requires a shared task queue; Fork has no coordination after spawn
+- **Failure recovery**: Coordinator child crash just retries; Fork child crash loses parent's accumulated state if not snapshotted; Swarm child crash leaves task in queue for re-pickup
+
+### The "do not delegate understanding" rule (across all three patterns)
+
+The most common anti-pattern in multi-agent work is the coordinator pushing synthesis onto the worker:
+
+> ❌ "Based on your research findings, fix the authentication system."
+
+The coordinator hasn't done its job. The worker now has to re-do the research synthesis the coordinator skipped, in a smaller context window, without seeing the full set of findings.
+
+> ✓ "Research identified 3 auth flows: login, logout, token refresh. Implement ONLY the token refresh handler using the JWT strategy at [synthesized findings]. Return: implementation diff + test results."
+
+The coordinator digests the prior phase output first, then dispatches a self-contained, scope-bounded task to the worker. This is the same principle as "Never delegate understanding" in our CLAUDE.md user guidance.
+
+### Self-contained worker prompt structure
+
+Whether the worker is a Coordinator child, a Fork child, or a Swarm teammate, the prompt should be self-contained:
+
+```markdown
+## Context (Synthesized by Coordinator)
+**Task**: <one line>
+**Background**: <2-3 lines from prior-phase synthesis>
+**Decision**: <what was already decided that the worker must respect>
+
+## Your Role
+You are a <researcher | implementer | reviewer | ...>.
+
+## Constraints
+- <existing patterns to follow>
+- <files NOT to touch>
+- <tools NOT to use>
+
+## Your Tools
+<filtered tool set — researcher doesn't need write; implementer doesn't need broad search>
+
+## Deliverable
+Return:
+1. <specific artifact 1>
+2. <specific artifact 2>
+
+Do NOT return: <things outside scope — architectural debates, alternative designs, etc.>
+```
+
+This template applies across the three patterns. The pattern (Coordinator/Fork/Swarm) only changes **what the worker has loaded already**, not how the prompt is structured.
+
+---
+
 ## Decomposition Guidelines
 
 ### When to stay single-agent
