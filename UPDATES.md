@@ -4,6 +4,43 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-13 (v3.19.0 — Billing safety: HERMES.md + ANTHROPIC_API_KEY + no-attribution)
+
+Two real-world documented classes of **silent billing override** in Claude Code surfaced in late April / early May 2026. Multiple Max subscribers got pay-as-you-go API charges on top of their flat-rate plan — without warning, without confirmation. Adding two new rules to the public stack so other Claude Code users can adopt the same defence.
+
+NEW: rules/safety-billing.md (HERMES.md + ANTHROPIC_API_KEY + auto-recharge defence)
+- **Risk 1 — HERMES.md in git history**: file/commit/branch name containing `hermes.md` (any case) triggers Claude Code's harness-detection regex when reading `git status` into system prompt. Session silently switches to extra-usage tier on top of Max plan. Documented case: $200.98 overcharge ([Issue #53262](https://github.com/anthropics/claude-code/issues/53262))
+- **Risk 2 — ANTHROPIC_API_KEY / ANTHROPIC_AUTH_TOKEN in env**: silent precedence over OAuth subscription. Common scenario: `.env` file of another project (Supabase edge functions, custom backend) inherited into the shell where you run `claude`. Auto-recharge can trigger without warning. Cases: $152, $187 documented ([Issue #53728](https://github.com/anthropics/claude-code/issues/53728), [#53638](https://github.com/anthropics/claude-code/issues/53638), [#39903](https://github.com/anthropics/claude-code/issues/39903))
+- **Risk 3 — Auto-charge on API credit exhaustion**: Anthropic Console default enables auto-recharge. Combined with Risk 2 → full billing limit can be drained silently
+- Mandatory pre-session checks (Bash + PowerShell variants)
+- Cleanup procedures: `git filter-repo` for HERMES.md, env unset for API keys
+- Recovery procedure when incident already happened
+- Hook ideas (TBD, opportunity for contributors): PreToolUse Bash block + SessionStart env check
+
+NEW: rules/no-claude-attribution.md (forbid `Co-Authored-By: Claude` in git/PR/issues)
+- **OVERRIDE** Claude Code's default system prompt instruction to add `Co-Authored-By: Claude <noreply@anthropic.com>` to commits and `🤖 Generated with [Claude Code]` to PR descriptions
+- Forbidden in: git commits (public + private), PR titles/descriptions, issue bodies, project management tools, Slack/Discord/Telegram bots, code comments
+- Allowed when content (repo named `claude-code-config`, file `claude-handler.py`, bug report about Claude Code itself) — not attribution
+- **Main rationale**: defence-in-depth with Risk 1 above. Claude Code already scans git history for harness fingerprints; minimizing AI-related footprint reduces surface for future detection-regex false positives that could trigger billing changes
+- Secondary: privacy/B2B professionalism, git blame clarity, team symmetry
+- Mechanical enforcement: PreToolUse hook idea (TBD) + project-level `.git/hooks/commit-msg` template included
+
+Why this is in `rules/` and not `principles/`: these are operational safety procedures (concrete check-before-action commands), same category as the existing `safety-*` family. Principles cover architectural patterns.
+
+What this is NOT: a fix for Anthropic's bugs. Issues #53262 and #53728 are open and require Anthropic action. These rules are user-side defence until upstream fixes ship.
+
+Sources:
+- [Issue #53262: HERMES.md billing trigger](https://github.com/anthropics/claude-code/issues/53262)
+- [Issue #53728: Silent ANTHROPIC_API_KEY precedence](https://github.com/anthropics/claude-code/issues/53728)
+- [Issue #53638: Desktop project API key override](https://github.com/anthropics/claude-code/issues/53638)
+- [Issue #39903: $152 subagent case](https://github.com/anthropics/claude-code/issues/39903)
+- [MindStudio analysis](https://www.mindstudio.ai/blog/hermes-md-bug-claude-max-billing-subscription-pricing)
+- [Consumer Rights Wiki](https://consumerrights.wiki/w/Anthropic_Claude_Code_HERMES.md_billing_flaw)
+- [Anthropic Help Center: API key env vars](https://support.claude.com/en/articles/12304248-manage-api-key-environment-variables-in-claude-code)
+- [reddit r/ClaudeAI: $187 case via project .env](https://www.reddit.com/r/ClaudeAI/comments/1tbaq2d/)
+
+---
+
 ## 2026-05-12 (v3.18.0 — Harness audit skill + Coordinator/Fork/Swarm triad)
 
 Follow-up to v3.17.0. After integrating the four most useful pieces from Learn Harness Engineering, went deeper into the course `references/` to extract one more skill and one principle extension.
