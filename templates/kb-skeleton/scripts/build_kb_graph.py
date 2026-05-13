@@ -408,7 +408,17 @@ def _safe(name: str) -> str:
 
 
 def _escape_mermaid(text: str) -> str:
-    return text.replace('"', "'").replace("\n", " ")
+    # Mermaid label syntax breaks on: closing bracket, pipe (subgraph delim),
+    # semicolon (statement separator), backticks (code escape). Parentheses
+    # are OK inside quoted labels. Newlines become spaces.
+    return (
+        text.replace('"', "'")
+        .replace("\n", " ")
+        .replace("]", ")")
+        .replace("|", "/")
+        .replace(";", ",")
+        .replace("`", "'")
+    )
 
 
 def _status_marker(status: str) -> str:
@@ -429,7 +439,10 @@ def _status_marker(status: str) -> str:
 
 
 def main(argv: list[str]) -> int:
-    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    # __doc__ is None under `python -OO` (docstrings stripped). Fall back to a
+    # one-liner so the parser still constructs.
+    desc = (__doc__ or "Build feature-layer KB graph.").split("\n\n")[0]
+    parser = argparse.ArgumentParser(description=desc)
     parser.add_argument(
         "--repo", type=Path, default=Path.cwd(),
         help="Repository root (default: current dir, walks up to find one)",

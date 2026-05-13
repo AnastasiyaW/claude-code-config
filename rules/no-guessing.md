@@ -117,8 +117,8 @@ User просила сделать схему FlowView "реалистичной
 report о per-locale separation, Stripe/Yookassa, missing nodes.
 Я применила Phase-1 patch на основе их выводов.
 
-**Что прошло мимо**: на сервере Contabo уже лежит
-`/opt/oisgold-broker/flowview/checklist-items.json` (139 KB, 359 items)
+**Что прошло мимо**: на одном из серверов проекта уже лежал
+`/opt/<project>/flowview/checklist-items.json` (139 KB, 359 items)
 + `.checklist-status.json` (158 KB, last verified 2026-04-21). Каждый
 item имеет `verify` команду + `expect` + `status`. Это **формальная
 спецификация архитектуры в виде исполняемых команд** — ground truth
@@ -272,19 +272,19 @@ Verdict: PROCEED / HOLD / REJECT
 
 ### 2026-04-28 — Cleanup CF tunnels (текущий day)
 
-**Generator (я)**: предложила удалить tunnels `75ef5db0` (happyin-h200-00) и `ec8fcb90` (ois-comfyui), потому что их connections=0 в `cloudflared tunnel list`.
+**Generator (я)**: предложила удалить tunnels `<tunnel-id-A>` (`<gpu-tunnel-old>`) и `<tunnel-id-B>` (`<inference-tunnel>`), потому что их connections=0 в `cloudflared tunnel list`.
 
 **Что сделала перед удалением (good)**:
-- Probe всех 4 hostname'ов на `ec8fcb90` → все 530 (origin not reachable)
-- Confirmed `75ef5db0` был назначен на terminated fal-h200-07
+- Probe всех 4 hostname'ов на `<tunnel-id-B>` → все 530 (origin not reachable)
+- Confirmed `<tunnel-id-A>` был назначен на terminated GPU pod
 - User explicit подтвердил scope
 
 **Что бы спросил Independent Verifier (hypothetical)**:
-- "А есть ли cloudflared connector на каком-то RunPod pod который ещё может resurrect tunnel? Проверь runpod ps на active pods."
+- "А есть ли cloudflared connector на каком-то GPU pod который ещё может resurrect tunnel? Проверь активные pods."
 - "Если 530 — это origin error, а если бы был 502/503 (origin reachable но broken)? Различай deletion-safe (530) от temporary-down (502/503)."
-- "Memory note 21 апреля сказала oisfiles был жив. Сейчас 28-е. Что изменилось — pod был terminated 22-25 числа?"
+- "Memory note 21 апреля сказала `<files-service>` был жив. Сейчас 28-е. Что изменилось — pod был terminated 22-25 числа?"
 
-Если бы Verifier нашёл что `oisfiles.happyin.work` resurrect-able — мы могли бы оставить tunnel и удалить только DNS records. Удача что пять прошло без vrs.
+Если бы Verifier нашёл что `<files-subdomain>` resurrect-able — мы могли бы оставить tunnel и удалить только DNS records. Удача что пять прошло без vrs.
 
 ### Replit Lemkin incident (Aug 2026)
 

@@ -41,7 +41,7 @@ NEW: skills/architecture/feature-new/SKILL.md (slash command `/feature-new <laye
 
 NEW: templates/kb-skeleton/scripts/build_kb_graph.py
 - Stdlib-only parser of `docs/layers/**` markdown structure
-- Generates `docs/_graph/tree.md` -- full Mermaid graph of layers + features + dependency edges
+- Generates `docs/_graph/tree.md` -- full Mermaid graph of layers + features + cross-reference edges (any F-NNN mentioned in a feature body, not just declared depends-on)
 - Generates `docs/_graph/backlinks.json` -- reverse index for "who references this feature/invariant/decision"
 - Generates `docs/_graph/health.md` -- consistency report (dangling F-NNN refs, feature_list.json sync, missing titles/statuses)
 - `--check-only` flag for CI integration (nonzero exit on errors)
