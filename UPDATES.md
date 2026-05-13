@@ -4,6 +4,43 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-13 (v3.21.0 — Mechanical enforcement for no-claude-attribution: two hook scripts)
+
+Follow-up to v3.19.0 (`rules/no-claude-attribution.md`). The rule alone is an instruction-layer defence — it works while the assistant remembers it, but can be lost under context pressure. The two new hooks add mechanical enforcement (IAEA-style defence-in-depth: instruction + automation).
+
+NEW: hooks/claude-attribution-guard.py (`PreToolUse` on Bash)
+- Inspects only Bash commands that produce git/GitHub artifacts: `git commit`, `git commit --amend`, `gh pr create|edit|comment`, `gh pr merge`, `gh issue create|comment`. Other Bash commands pass through silently.
+- Scans the command (including heredoc bodies) for forbidden attribution patterns: `Co-Authored-By: Claude/Anthropic/AI`, `<noreply@anthropic.com>`, `🤖 Generated with [Claude Code]`, `Generated with claude.ai/code`, `Authored by Claude`, etc.
+- On match returns `{"decision": "block", "reason": "..."}` with a fix recipe.
+- OVERRIDEs Claude Code's default system-prompt instruction to add these footers — works because rules declared in `~/.claude/CLAUDE.md` have higher priority than the base system prompt.
+- Bypass for intentional exceptions: in-command marker `# claude-bypass: attribution` or env var `CLAUDE_ALLOW_ATTRIBUTION=1`.
+
+NEW: hooks/pre-push-claude-attribution.py (git `pre-push` hook)
+- Final gate before commits reach the remote. The PreToolUse hook above catches commits made inside a Claude Code session, but cannot see commits made from a plain terminal, from IDE git integrations, or before the rule was adopted.
+- Reads git's standard pre-push stdin format (`<local_ref> <local_sha> <remote_ref> <remote_sha>`), enumerates commits in the push range, scans message bodies for the same attribution patterns.
+- New-branch case handled (`remote_sha = 0000...`): enumerates commits reachable from local that are not on any remote, capped at 200.
+- Install once globally:
+  ```bash
+  mkdir -p ~/.claude/scripts/git-hooks
+  cat > ~/.claude/scripts/git-hooks/pre-push <<'EOF'
+  #!/bin/bash
+  set -e
+  STDIN_DATA="$(cat)"
+  echo "$STDIN_DATA" | python ~/.claude/scripts/pre-push-claude-attribution.py
+  EOF
+  chmod +x ~/.claude/scripts/git-hooks/pre-push
+  git config --global core.hooksPath ~/.claude/scripts/git-hooks
+  ```
+- Bypass (env var only, in-command markers don't apply at git layer): `CLAUDE_ALLOW_PUSH_ATTRIBUTION=1 git push ...`
+
+Both hooks tested with 5+3 unit cases before adoption: block on attributed commits, allow clean commits, respect bypass, ignore non-git Bash, allow empty push ranges.
+
+Defence-in-depth stack now: (1) text rule in CLAUDE.md, (2) PreToolUse Bash guard, (3) git pre-push guard. Three independent layers — instruction loss does not defeat the system because the lower layers fire mechanically.
+
+For the policy details and the HERMES.md / Issue #53262 background that motivates the policy, see [rules/no-claude-attribution.md](rules/no-claude-attribution.md) and [rules/safety-billing.md](rules/safety-billing.md).
+
+---
+
 ## 2026-05-13 (v3.20.0 — Principle 28 Feature-Layer Architecture: project knowledge as a navigable tree)
 
 A new orthogonal slice added to the stack: **per-project layer documentation** with hyperlinked feature narratives. The gap this fills: long-running projects accumulate knowledge in three uncoordinated places (cross-cutting KB, machine-readable state, scattered git log), but **no single artifact** captures one feature's design rationale + implementation plan + verification + retrospective as a coherent narrative. ULTRAPACK ([btseytlin/ultrapack](https://github.com/btseytlin/ultrapack)) solved this with `docs/tasks/<slug>.md`; this update integrates the same idea into our existing kb-skeleton structure with explicit cross-tier hyperlinks (global KB to layer KB to feature doc) and project-wide F-NNN ID space.

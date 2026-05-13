@@ -41,6 +41,8 @@ Add any hook to your `~/.claude/settings.json`:
 |---|---|---|
 | [destructive-command-guard.py](destructive-command-guard.py) | `PreToolUse` | Warns before destructive commands (`rm -rf`, `DROP TABLE`, `git push --force`, `git reset --hard`). Returns `{"decision": "block"}` with explanation. |
 | [secret-leak-guard.py](secret-leak-guard.py) | `PreToolUse` | Blocks Write/Edit operations that would introduce secrets (API keys, tokens, passwords) into tracked files. |
+| [claude-attribution-guard.py](claude-attribution-guard.py) | `PreToolUse` | Blocks `git commit` / `gh pr create` / `gh issue create` carrying `Co-Authored-By: Claude` or `🤖 Generated with Claude Code` footers. OVERRIDEs Claude Code default system-prompt instruction. See [rules/no-claude-attribution.md](../rules/no-claude-attribution.md) for the policy and [rules/safety-billing.md](../rules/safety-billing.md) for the HERMES.md / Issue #53262 background. |
+| [pre-push-claude-attribution.py](pre-push-claude-attribution.py) | git `pre-push` | Final gate before commits reach the remote. Scans the push range for the same attribution patterns and blocks the push. Install via `git config --global core.hooksPath` so it catches commits made outside Claude Code sessions too. Bypass: `CLAUDE_ALLOW_PUSH_ATTRIBUTION=1`. |
 
 ### Quality & Context
 
