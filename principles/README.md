@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 23 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 28 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -241,6 +241,16 @@ Local HTTP server + HTML fragments + file-based event queue lets an agent presen
 **When to use:** Any decision where "would the user understand this better by seeing it than reading it?" is yes. UI mockup selection, spatial / architectural diagrams, visual comparisons. NOT for simple yes/no text decisions.
 
 **Source:** Distilled from obra/superpowers visual-companion skill (2026-04)
+
+---
+
+### [28 - Feature-Layer Architecture](28-feature-layer-architecture.md)
+
+Three-tier project knowledge model: Global KB (cross-project principles) -> Layer KB (per-project bounded concerns like security, data, ui) -> Feature narrative (ULTRAPACK-style task.md per feature). Adds the missing narrative artifact above kb-skeleton: where one feature's design rationale, plan, verification, and retrospective live together with hyperlinked cross-references to invariants and global principles.
+
+**When to use:** Multi-month projects with 5+ active concerns. Codebases approaching 50K+ lines. Teams across timezones or sessions. Complements (not replaces) `feature_list.json` (machine state), `PROBLEMS.md` (incidents), and chronicles (strategy).
+
+**Source:** ULTRAPACK (github.com/btseytlin/ultrapack) task.md pattern + this repo's kb-skeleton extension
 
 ---
 

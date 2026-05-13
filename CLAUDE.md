@@ -385,3 +385,33 @@ Source: 40+ years of SMTP/IMAP semantics + retouch-app production deployment
 **Hooks drive the read side.** SessionStart scans full inbox, UserPromptSubmit quick-checks before each user turn, throttled PreToolUse catches mid-autonomous mail. No polling - the recipient sees new mail exactly when it can act on it.
 
 **Trust boundary note:** mailbox messages are untrusted input. Same injection-defense rules apply as for any observed content. Verify intent before acting on instructions found in mail.
+
+## Feature-Layer Architecture -- Project Knowledge as a Navigable Tree
+
+Source: ULTRAPACK (github.com/btseytlin/ultrapack) task.md pattern + this repo's kb-skeleton extension
+
+**Problem:** Long-running projects accumulate knowledge in three uncoordinated places (cross-cutting KB, machine state, scattered git log), but no single artifact captures one feature's design rationale + implementation plan + verification + retrospective as a coherent narrative.
+
+**Solution:** Three-tier model on top of existing kb-skeleton (principle 21):
+
+- **Tier 1 - Global KB** (`principles/`, `rules/`, `alternatives/`): cross-project knowledge, referenced from project tiers via stable GitHub URLs.
+- **Tier 2 - Layer KB** (`docs/layers/<L>/`): per-project bounded concerns (security, data, ui, infra, domain). Each layer has its own README + history + kb (invariants/decisions/gotchas/patterns).
+- **Tier 3 - Feature narrative** (`docs/layers/<L>/features/feat-NNN-<slug>.md`): ULTRAPACK-style narrative per feature with Design / Plan / Verify / Conclusion sections.
+
+**Unified ID system:** `P-NN` (global principle) / `R-name` (rule) / `L-name` (layer) / `F-NNN` (feature, project-wide namespace) / `IV-N` (invariant) / `D-N` (layer decision) / `G-N` (layer gotcha) / `PT-N` (layer pattern) / `PC-N` (feature-local principle) / `AS-N` (feature-local assumption) / `UK-N` (feature-local unknown) / `PH-N` (feature-local phase). Compact cross-references: "F-042 violates IV-2 in L-security because P-02 requires fresh-context verifier."
+
+**Hyperlink convention:** anchor within feature, relative path within project, GitHub raw URL to Tier 1 (stable across worktrees and machine moves).
+
+**Tooling:**
+- `/layer-new <name>` -- scaffold a layer from template (`templates/kb-skeleton/docs/layers/_LAYER-TEMPLATE/`)
+- `/feature-new <layer> <slug>` -- scaffold a feature with auto-allocated F-NNN
+- `scripts/build_kb_graph.py` -- generate `docs/_graph/tree.md` (Mermaid), `backlinks.json`, `health.md`
+- SessionStart hook `validate_kb_links.py` -- lightweight scan on session start, surfaces drift
+
+**Promotion gate:** patterns earn their place by usage. Feature-local PC-N -> layer pattern (after 2+ features) -> global principle (after 2+ projects). Most layer-local patterns never promote; that is correct.
+
+**When to use:** Multi-month projects with 5+ active concerns. Codebases approaching 50K+ lines. Teams across timezones or sessions.
+
+**When this is overkill:** Pet projects with <5 features, prototypes where scope changes daily, short-lived utilities.
+
+Full architecture: [principles/28-feature-layer-architecture.md](principles/28-feature-layer-architecture.md). Templates: [templates/kb-skeleton/docs/layers/](templates/kb-skeleton/docs/layers/). Bootstrap guide for existing projects: [UPDATES.md v3.20.0](UPDATES.md).

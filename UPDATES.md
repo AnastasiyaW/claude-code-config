@@ -4,6 +4,84 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-13 (v3.20.0 — Principle 28 Feature-Layer Architecture: project knowledge as a navigable tree)
+
+A new orthogonal slice added to the stack: **per-project layer documentation** with hyperlinked feature narratives. The gap this fills: long-running projects accumulate knowledge in three uncoordinated places (cross-cutting KB, machine-readable state, scattered git log), but **no single artifact** captures one feature's design rationale + implementation plan + verification + retrospective as a coherent narrative. ULTRAPACK ([btseytlin/ultrapack](https://github.com/btseytlin/ultrapack)) solved this with `docs/tasks/<slug>.md`; this update integrates the same idea into our existing kb-skeleton structure with explicit cross-tier hyperlinks (global KB to layer KB to feature doc) and project-wide F-NNN ID space.
+
+NEW: principles/28-feature-layer-architecture.md
+- Three-tier model: Global KB (cross-project) -> Layer KB (per-project bounded concern) -> Feature (per-project narrative)
+- A layer is a bounded concern (security, data, ui, infrastructure, domain) -- organizational, NOT directory-based
+- A feature lives in a primary layer, may touch secondary layers (explicit link declarations)
+- Unified ID system: P-NN / R-name / A-name (Tier 1), L-name / F-NNN / IV-N / D-N / G-N / PT-N (Tier 2-3)
+- Hyperlink convention: anchor within feature, relative within project, GitHub raw URLs to Tier 1
+- Promotion gate: feature-local pattern -> layer pattern -> global principle (by usage, not intent)
+- Relationship table to existing principles 07, 11, 18, 21
+
+NEW: templates/kb-skeleton/docs/layers/ (extends existing kb-skeleton)
+- `_LAYER-TEMPLATE/` -- complete scaffold for one bounded concern
+- `_LAYER-TEMPLATE/README.md` -- layer overview with linked principles + features table
+- `_LAYER-TEMPLATE/history.md` -- reverse-chronological evolution log
+- `_LAYER-TEMPLATE/kb/{invariants,decisions,gotchas,patterns}.md` -- layer-scoped KB mirroring project-wide kb structure
+- `_LAYER-TEMPLATE/features/_FEATURE-TEMPLATE.md` -- ULTRAPACK-style narrative (Design / Plan / Verify / Conclusion) with extended cross-references to layer invariants and global principles
+- `docs/layers/README.md` -- layer index template with cross-layer Mermaid graph placeholder
+
+NEW: skills/architecture/layer-new/SKILL.md (slash command `/layer-new <name>`)
+- Scaffolds `docs/layers/<name>/` with full template tree
+- Validates layer name (kebab-case, not generic file-system names)
+- Updates `docs/layers/README.md` layer index automatically
+- Idempotent: second call is a no-op with clear message
+- Falls back to GitHub fetch if template missing on current machine
+
+NEW: skills/architecture/feature-new/SKILL.md (slash command `/feature-new <layer> <slug>`)
+- Auto-allocates next F-NNN ID (project-wide namespace, not per-layer)
+- Creates `docs/layers/<layer>/features/feat-<NNN>-<slug>.md` from template
+- Updates layer README features table
+- Appends entry to `feature_list.json` if present (with explicit `encoding="utf-8"` per UTF-8 posting rule)
+- Validates slug format and rejects collision with existing IDs
+
+NEW: templates/kb-skeleton/scripts/build_kb_graph.py
+- Stdlib-only parser of `docs/layers/**` markdown structure
+- Generates `docs/_graph/tree.md` -- full Mermaid graph of layers + features + dependency edges
+- Generates `docs/_graph/backlinks.json` -- reverse index for "who references this feature/invariant/decision"
+- Generates `docs/_graph/health.md` -- consistency report (dangling F-NNN refs, feature_list.json sync, missing titles/statuses)
+- `--check-only` flag for CI integration (nonzero exit on errors)
+- Cross-platform: Windows-safe with `encoding="utf-8"` everywhere
+
+NEW: scripts/validate_kb_links.py (registered in SessionStart hook)
+- Lightweight scan on every session start (<200ms)
+- Silent skip when project has no `docs/layers/` (most projects)
+- Reports: layer count, per-layer feature count + status breakdown, placeholder detection (`<layer-name>` leftover)
+- Cross-checks `feature_list.json` membership with on-disk features
+- Output injected into agent context so fresh sessions see KB status before reading code
+
+UPDATED: settings.json
+- Added `validate_kb_links.py` to SessionStart hooks (after existing `check_handoff.py` and `detect_new_courses.py`)
+
+Why this is in `principles/`, `templates/`, `skills/`, and `scripts/` -- not in `rules/`:
+- This is an **architectural pattern** (principle 28), not an operational safety rule
+- The templates and skills are tools to adopt the pattern, not guardrails that block dangerous actions
+- The SessionStart hook is purely informational -- it never blocks, only reports state
+
+What this is NOT:
+- A replacement for `feature_list.json` (machine state stays separate from human narrative)
+- A replacement for `PROBLEMS.md` (incident log stays separate from feature-scoped retrospective)
+- A replacement for ULTRAPACK -- the spirit is borrowed, the integration extended for kb-skeleton compatibility
+
+Sources of inspiration:
+- [ULTRAPACK by btseytlin](https://github.com/btseytlin/ultrapack) -- minimalist task.md narrative pattern
+- [ULTRAPACK example task: ultrapack-v1.md](https://github.com/btseytlin/ultrapack/blob/main/docs/tasks/ultrapack-v1.md)
+- [hr-breaker bug fix task](https://github.com/btseytlin/hr-breaker/blob/main/docs/tasks/fix-non-ascii-resume-upload.md) -- demonstrates handsoff decisions documentation
+- Principle 21 -- Knowledge Base Enforcement (the triangle of fix/test/invariant this extends)
+
+Adoption path for an existing long-running project:
+1. Copy `templates/kb-skeleton/docs/layers/` into the project's `docs/`
+2. For each major bounded concern (security, data, ui, infra...), run `/layer-new <name>`
+3. For 2-3 in-flight features, run `/feature-new <layer> <slug>` and migrate narrative content
+4. Add `doc:` and `layer:` fields to existing `feature_list.json` entries
+5. Run `python scripts/build_kb_graph.py` once to verify and generate `docs/_graph/`
+
+---
+
 ## 2026-05-13 (v3.19.0 — Billing safety: HERMES.md + ANTHROPIC_API_KEY + no-attribution)
 
 Two real-world documented classes of **silent billing override** in Claude Code surfaced in late April / early May 2026. Multiple Max subscribers got pay-as-you-go API charges on top of their flat-rate plan — without warning, without confirmation. Adding two new rules to the public stack so other Claude Code users can adopt the same defence.
