@@ -1,6 +1,6 @@
 # Architectural Principles for AI Agent Systems
 
-A collection of 28 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
+A collection of 29 battle-tested principles for building reliable, high-quality AI agent workflows. Each principle is self-contained and can be adopted independently, but they compose well together.
 
 ---
 
@@ -14,6 +14,8 @@ Start here if you are installing claude-code-config into a specific project. Eac
 | **Web app (React, Vue, Next.js)** | 04, 05 Structured Reasoning, 09, 10 Agent Security | 08 Skills Best Practices, 11 Documentation Integrity |
 | **ML / training / inference pipeline** | 03 Autoresearch, 04, 09, 12 Low-Signal Residual Training | 05, 13 Research Pipeline, 16 Project Chronicles |
 | **Library / published package** | 04, 08 Skills Best Practices, 09, 10 | 11, 17 DBS Skill Creation |
+| **New custom AI agent (any domain)** | 29 MVP Agent Blueprint, rules/agent-tool-design.md, rules/agent-budgets.md | 01 Harness Design, 02 Proof Loop, 10 Agent Security |
+| **Agent that ingests external content** | 10 Agent Security, rules/context-trust-labels.md | 29 MVP Agent Blueprint, 02 Proof Loop |
 | **Multi-agent / parallel sessions** | 01 Harness Design, 06 Multi-Agent Decomposition, 09, 18 Multi-Session Coordination, 19 Inter-Agent Communication | 02 Proof Loop, 14 Managed Agents, 22 Visual Context Pattern |
 | **Long-running project (weeks+)** | 02 Proof Loop, 07 Codified Context, 16 Project Chronicles | 11 Documentation Integrity, 21 Knowledge Base Enforcement |
 | **Security-sensitive codebase** | 09 Supply Chain Defense, 10 Agent Security, 15 Red Lines, 20 Vulnerability Detection Pipeline | 02 Proof Loop, 21 Knowledge Base Enforcement |
@@ -264,6 +266,16 @@ Three-layer enforcement stack for preventing LLM regression to generic defaults:
 
 ---
 
+### [29 - MVP Agent Blueprint](29-mvp-agent-blueprint.md)
+
+Structured 15-section flow for designing a brand-new agent from scratch in any domain. Covers domain intake, autonomy level selection (5 levels), core loop, tool registry with risk classes, permission matrix, planning mode, goal-like loop, context/memory/compaction, skills/connectors, prompt caching, observability, build order, and first release checklist. Complements principle 01 (Harness Design) which assumes an agent already exists.
+
+**When to use:** When building a NEW agent for a specific domain (support, finance, ops, sales, research, any workflow automation) — not when improving an existing one. Use for new Agent SDK apps, custom Python orchestrators, new MCP servers, new Cloudflare Workers with tool calls. Pairs with the `rules/agent-tool-design.md`, `rules/context-trust-labels.md`, and `rules/agent-budgets.md` operational rules.
+
+**Source:** Denis Sergeevitch -- "agents-best-practices" skill (MIT, https://github.com/DenisSergeevitch/agents-best-practices), `references/mvp-agent-blueprint.md`. Adapted to our stack with cross-references to principles 01, 07, 10, 21 and the three new operational rules.
+
+---
+
 ## Decision Matrix
 
 Use this table to pick the right principle for your situation:
@@ -307,6 +319,10 @@ Use this table to pick the right principle for your situation:
 | "Need the user to choose between UI or design options" | 22 Visual Context Pattern | 01 Harness Design |
 | "Agent output keeps defaulting to Inter / SELECT * / bare except" | 23 Anti-pattern as Config | 04 Deterministic Orchestration |
 | "Cloud design tool vs terminal-first design workflow?" | 22 Visual Context Pattern | alternatives/design-md-pattern.md |
+| "Need to design a brand-new agent from scratch" | 29 MVP Agent Blueprint | 01 Harness Design, 10 Agent Security |
+| "What tool risk classes / permission decisions should I model?" | 29 MVP Agent Blueprint | rules/agent-tool-design.md |
+| "External webhook content might inject instructions" | rules/context-trust-labels.md | 10 Agent Security |
+| "Agent loop has no budget and runs away" | rules/agent-budgets.md | 29 MVP Agent Blueprint |
 
 ### Composition Patterns
 

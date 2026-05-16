@@ -4,6 +4,68 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-16 (v3.22.0 — Principle 29 MVP Agent Blueprint + 3 operational rules from agents-best-practices)
+
+A new principle and three operational rules adapted from Denis Sergeevitch's [agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices) skill (MIT). The gap this fills: principles 01 (Harness Design) and 02 (Proof Loop) describe **how an agent should work** once it exists, but we had no structured flow for **designing a brand-new agent from scratch** -- the moment when "I want an agent that does X" turns into a deployable first version. This update adds that flow plus three always-on rules for the design choices you make at that moment.
+
+**Why we adopted this externally rather than writing our own.** Denis's skill is provider-neutral, generalizes beyond coding (research, finance, support, ops, sales, healthcare, education, procurement), and is MIT-licensed -- exactly the surface we were missing. We took 5 of his ~14 reference files, kept attribution, summarized into one principle + three rules instead of bulk-copying, and wired the rest into our existing principle map.
+
+NEW: principles/29-mvp-agent-blueprint.md
+- 15-section MVP blueprint output template (Objective -> MVP scope -> Autonomy -> Core loop -> Instructions -> Tools -> Planning -> Goal loop -> Memory/Compaction -> Skills/Connectors -> Caching -> Safety -> Observability -> Implementation path -> First release checklist)
+- 5 autonomy levels (answer-only / draft-only / approval-gated / policy-bounded auto / long-running goal) with explicit "pick the lowest level that creates value" guidance
+- 5-step domain intake (Domain / Primary user / Job-to-be-done / Inputs / Outputs)
+- Build order (loop -> tools -> permissions -> structured results -> budgets -> tracing -> planning -> compaction -> skills -> connectors -> goal loops -> subagents)
+- Composition recipes with principles 01, 07, 10, 21
+- Cross-link to upstream MIT skill for full depth (provider API patterns, complete tool schemas, prompt templates)
+
+NEW: rules/agent-tool-design.md
+- 15-class tool risk taxonomy (`read_only` -> `privileged_admin`)
+- 7-type permission decision object (`allow` / `deny` / `ask_user` / `approval_required` / `require_stronger_auth` / `run_in_sandbox` / `run_as_draft_only`)
+- Draft/commit naming pattern with 4 conventional pairs (`draft_X -> send_X`, `prepare_X -> apply_X`, `propose_X -> commit_X`, `recommend_X -> execute_X`)
+- Structured tool result format with mandatory `next_valid_actions` field (cuts retry loops 2-3x in observed deployments)
+- 5-level tool visibility model (`base` / `task` / `skill` / `connector` / `deferred` / `sensitive`)
+- Pre-merge checklist for new tools
+
+NEW: rules/context-trust-labels.md
+- 3-level trust hierarchy (`trusted` / `semi_trusted` / `untrusted`) with explicit examples per level
+- Verbatim boundary statement to wrap untrusted content (recommendation: use the same exact sentence each time so the model learns to recognize the boundary)
+- 6-item "what untrusted content cannot do" list (override permissions, change scope, bypass approval, etc.)
+- Real-world detection pattern: prompt injection in fetched markdown content -- caught by untrusted-by-default + verify-before-act
+- Helper Python wrapper recommendation for Agent SDK code
+
+NEW: rules/agent-budgets.md
+- 10 mandatory budget types every agent loop must declare (`max_model_turns`, `max_tool_calls`, `max_parallel_tool_calls`, `max_wall_time_seconds`, `max_input_tokens`, `max_output_tokens`, `max_total_cost`, `max_tool_result_chars`, `max_retries_per_model_call`, `max_retries_per_tool_call`)
+- Recommended defaults with rationale per budget
+- Stop format (JSON object) when a budget is hit -- includes `next_safe_action` so the user can decide to extend or stop
+- Failure modes that this rule catches (overnight autoresearch loops, unbounded poll loops in serverless handlers, stuck cron tasks)
+
+UPDATED: rules/long-run-harness.md
+- Added "First Release Checklist" -- 15 pass/fail items grouped into Code-level / Process-level / Knowledge-level / Safety-level. Project must pass all 15 before being marked `[LONG-RUN]`. Adapted from Denis's "First release checklist" + our 3-Layer Validation Gate.
+
+UPDATED: principles/01-harness-design.md
+- Added "See also" pointer to principle 29 at the top: "principle 29 produces the first version's spec, principle 01 governs how it iterates"
+
+UPDATED: principles/README.md
+- Bumped principle count 28 -> 29
+- Added 2 rows to "Pick by project type" table (new custom AI agent, agent that ingests external content)
+- Added principle 29 entry with cross-references to 01, 07, 10, 21 + the three new rules
+- Added 4 rows to Decision Matrix for the new design language
+
+UPDATED: CLAUDE.md
+- Added "Agent-Legible Environment" foundational principle quote at the top of the Harness Design region
+- Added "Designing New Agents -- Structured Flow" section linking to principle 29 + the three new rules
+
+**What we deliberately did NOT take from upstream:**
+- Provider API patterns (Responses-style, Chat Completions, Anthropic) -- our existing agent-sdk-dev plugins cover this
+- Goal-like loop / planning mode in full depth -- overlaps with our principles 03 (autoresearch), 04 (deterministic orchestration), 16 (project chronicles)
+- Bulk copy of all 14 upstream reference files -- would create a maintenance fork and stale; the principle file links to upstream for full depth instead
+
+**Local installation note** (not in this repo, but relevant for users): the upstream skill can be cloned directly into `~/.claude/skills/agents-best-practices/` so it triggers automatically on phrases like "build me an agent". This repo only carries the adapted summary + the operational rules, since rules need to be version-controlled with the rest of the stack while the skill itself can update independently from upstream.
+
+**Source:** [DenisSergeevitch/agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices) v1.2.0 (MIT). Reference files synthesized: `mvp-agent-blueprint.md`, `tools-and-permissions.md`, `system-prompts-instructions.md`, `context-memory-compaction.md`, `agentic-loop.md`, `agent-legibility-feedback-loops.md`. Original skill cloned at 2026-05-16.
+
+---
+
 ## 2026-05-13 (v3.21.0 — Mechanical enforcement for no-claude-attribution: two hook scripts)
 
 Follow-up to v3.19.0 (`rules/no-claude-attribution.md`). The rule alone is an instruction-layer defence — it works while the assistant remembers it, but can be lost under context pressure. The two new hooks add mechanical enforcement (IAEA-style defence-in-depth: instruction + automation).

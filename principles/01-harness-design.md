@@ -2,6 +2,8 @@
 
 **Source:** Anthropic Engineering -- "Harness design for long-running apps"
 
+> **See also:** [principle 29 - MVP Agent Blueprint](29-mvp-agent-blueprint.md) for the structured flow when you are *designing a brand-new agent from scratch* (vs improving an existing harness which is what this principle covers). The two principles compose: principle 29 produces the first version's spec, principle 01 governs how it iterates.
+
 ## Overview
 
 A harness is the orchestration layer around an AI agent that structures its work, evaluates its output, and manages its context. The core insight: models suffer from self-evaluation bias -- they praise their own work even when quality is mediocre. Separating generation from evaluation is the single most impactful architectural decision.

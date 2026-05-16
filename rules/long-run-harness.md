@@ -117,6 +117,43 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 - Research / exploratory work — scope меняется, нет смысла фиксировать как features
 - Утилиты-однострочники (`scripts/`)
 
+## First Release Checklist — gate перед `[LONG-RUN]` mark
+
+Источник (адаптировано): Denis Sergeevitch / agents-best-practices (MIT) `references/mvp-agent-blueprint.md` "First release checklist" + наш 3-Layer Validation Gate (см. `principles/01-harness-design.md`).
+
+Перед тем как пометить проект `[LONG-RUN]`, **все 15 пунктов** должны быть зелёные. Это **не** то же самое что `init.sh` пробежал — `init.sh` проверяет L1+L2. Этот checklist шире, включает governance артефакты.
+
+### Code-level (зелёный = mechanical artifact existing)
+
+- [ ] **Один primary job-to-be-done** объявлен в первой строке CLAUDE.md
+- [ ] **`init.sh` exists и exits 0** локально на чистой машине за <3 мин
+- [ ] **`feature_list.json` exists** с min 5 фичами (включая 1+ `done` с заполненным `evidence`)
+- [ ] **WIP=1 проверка** — ровно 0 или 1 фича `in-progress` в `feature_list.json`
+- [ ] **`PROBLEMS.md` exists** (даже пустой) — incident log готов
+- [ ] **`.gitignore` корректный** — `node_modules/`, `dist/`, `.env*`, `__pycache__/`, weights, datasets
+
+### Process-level
+
+- [ ] **Autonomy level explicit** — answer-only / draft-only / approval-gated / autonomous-within-policy. Документировано в CLAUDE.md
+- [ ] **High-risk actions draft-only OR approval-gated** — список risk-classes в CLAUDE.md (см. `rules/agent-tool-design.md`)
+- [ ] **Step/cost/time budgets declared** для всех agents которые проект запускает (см. `rules/agent-budgets.md`)
+- [ ] **Trust labels applied** для external content (см. `rules/context-trust-labels.md`)
+
+### Knowledge-level
+
+- [ ] **CLAUDE.md ≤ 200 строк** — краткий map, не encyclopedia. Детали в `.claude/rules/` или `docs/`
+- [ ] **Session-handoff workflow** установлен — handoff обязателен между сессиями
+- [ ] **Project-level `.claude/rules/` initialized** — min: PROBLEMS-format, handoff-format
+- [ ] **Validation signals declared** — что значит "feature works": какой test/probe/UI check
+
+### Safety-level
+
+- [ ] **Secrets не в git, не в CLAUDE.md, не в скриптах** — pre-push scan настроен (см. `rules/safety-secrets.md`)
+
+Если checklist не пройден полностью — проект остаётся в обычном режиме (не помечается `[LONG-RUN]`). Можно переходить итеративно — закрыл item, отметил, повторил.
+
+**Anti-pattern:** "помечу `[LONG-RUN]` сейчас, доделаю checklist завтра". Метка триггерит специальные правила (long-run-problems-log, project-chronicles, handoff-mandatory). Без gate они работают на пустом фундаменте — это deceptive state, не safety net.
+
 ## Связь с другими правилами
 
 - **`no-pre-existing-evasion.md`** — добавляет WIP=1 + VCR Blocking как property над `feature_list.json`

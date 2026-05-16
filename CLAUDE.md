@@ -83,6 +83,37 @@ Bad: `"Helps with servers."` -- Good: `"Use when: service hangs, GPU health chec
 
 **Critical validations belong in scripts**, not words. Code is deterministic; language is not.
 
+## Agent-Legible Environment -- Foundational Principle (2026-05-16)
+
+Source: Denis Sergeevitch -- "agents-best-practices" skill (MIT, https://github.com/DenisSergeevitch/agents-best-practices), `references/agent-legibility-feedback-loops.md`.
+
+> **What the agent cannot inspect, retrieve, validate, or act on through approved tools is operationally absent from the agent's world.**
+
+This single sentence unifies our codified context, documentation integrity, knowledge base enforcement, and feature-layer architecture practices. If knowledge is not stored in a durable artifact accessible to the agent through an approved tool -- it does not exist for the agent. Knowledge in conversation, in a human's head, in unindexed folders, "I'll remember this" -- all operationally absent.
+
+Application:
+- When you find a knowledge gap, do not "remember" it -- **encode it into a durable artifact** (rule, principle, knowledge-vault entry, comment-as-citation)
+- Before "the agent should do X", verify the agent can **inspect / retrieve / validate / act** through approved tools
+- Mechanical invariants beat prompt advice (recurring guidance -> validators / hooks / linters)
+
+Full depth: [principle 29](principles/29-mvp-agent-blueprint.md) section on agent-legibility, plus the upstream skill if cloned.
+
+## Designing New Agents -- Structured Flow (2026-05-16)
+
+When the user says "build me an agent that does X", "design an agent harness for Y", "create MVP agent for Z domain" -- use the structured flow from [principle 29 - MVP Agent Blueprint](principles/29-mvp-agent-blueprint.md).
+
+Output is a 15-section MVP blueprint: domain intake -> autonomy level (5 levels) -> core loop -> tool registry with risk classes -> permission matrix -> planning mode -> goal loop -> context/memory/compaction -> skills/connectors -> cache -> observability -> build order -> first release checklist.
+
+**When to use:** new Agent SDK app, custom orchestrator, new MCP server, new Cloudflare Worker with tool calls. **Not for:** improvement of an existing harness (use principle 01 instead) or regular Claude Code sessions (harness is already given).
+
+Three operational rules extracted for **always-on** use:
+
+- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming pattern, structured tool results with `next_valid_actions`
+- [`rules/context-trust-labels.md`](rules/context-trust-labels.md) -- trusted/semi_trusted/untrusted labels with verbatim boundary statement, prompt injection defense
+- [`rules/agent-budgets.md`](rules/agent-budgets.md) -- 10 mandatory budget types every agent loop must declare
+
+These complement (do not replace) the harness design philosophy below.
+
 ## Harness Design -- Multi-Agent Architecture Principles
 
 Source: Anthropic Engineering -- "Harness design for long-running apps"
