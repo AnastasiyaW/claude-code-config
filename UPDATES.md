@@ -4,6 +4,37 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-16 (v3.25.0 — alternatives/skill-management-tools: evaluation of ai-dotfiles + Skiller)
+
+Two community projects surfaced today solving variants of "manage Claude Code skills across machines and projects":
+
+- **ai-dotfiles** (https://github.com/pavel-gorlov/ai-dotfiles) — Python CLI, "npm for Claude Code config", symlink-based with vendor system for 3rd party (github / skills.sh / paks / buildwithclaude / tonsofskills). Solves the manual-mirror pain point cleanly.
+- **Skiller** (https://github.com/beautyfree/skiller) — Electron GUI managing skills across 30+ AI agent tools (Claude Code, Cursor, Codex, Gemini CLI, etc.).
+
+Evaluated both for adoption. **Neither adopted right now**, but both documented as alternatives with honest "when each fits" guidance.
+
+NEW alternatives/skill-management-tools.md
+- Problem framing: when manual cp + git push becomes friction
+- ai-dotfiles section: how it works (catalog, manifest, symlinks, vendor system, settings/MCP merge, gitignore sync), where it fits well, why this repo does NOT adopt right now (symlinks are a hard "no" per `НИКАКИХ СИМЛИНКОВ` rule; supply chain — 4 days old, 0 stars, pipx bypasses min-release-age=7; public-vs-private boundary question)
+- Skiller section: how it works (Electron GUI, 30+ agent normalization, selective install), where it fits (multi-tool users), why this repo does NOT adopt (Claude Code-primary, CLI-first, single abstraction level limitation)
+- "This repo's current approach" — explicit description of manual cp + git push flow we use, with no symlinks, explicit ATTRIBUTION.md per cloned external skill
+- "When to switch" — concrete thresholds (>5 commits/week, >5 project-level .claude/ dirs, third machine, frequent 3rd-party installs) when reconsideration is warranted
+- Cross-refs to managed-agents.md, orchestration.md, principles 08/17
+
+UPDATED alternatives/README.md
+- Added skill-management-tools.md row to comparison table
+- Flagged drift: README table has 7 entries but directory contains 16 comparison files; documented as known manual maintenance step
+
+**Why document and not adopt:**
+
+- ai-dotfiles is technically a good solution to a real pain point we have. But adoption requires either changing our global "no symlinks" rule (which was made deliberately — see CLAUDE.md history) or forking the tool to use file copies. Either is a larger investment than the current manual approach's friction justifies (3 commits today is high-water-mark, not steady state).
+- Skiller's value proposition is cross-tool normalization. We are Claude Code-primary. Different problem.
+- Both are worth knowing about for community members with different constraints (multiple machines, multiple AI tools, frequent 3rd-party install) where adoption math flips.
+
+**Out-of-scope but noted:** other projects in the same announcement batch (Palatine Speech, Palatine Spectra, Stepik agents course, Sublex) target different domains (B2B speech, industrial CV, beginner agent course, YouTube subtitles) and were not evaluated for this repo's scope.
+
+---
+
 ## 2026-05-16 (v3.24.0 — rules/agent-streaming, principle 02/14 enrichments, sanitization pass)
 
 Same-day follow-up to v3.23.0. Adds the 8th operational rule (streaming buffering, forward-looking), enriches two existing principles with relationship/decision content, and does a sanitization pass on residual references to specific deployments and persons in older changelog entries.
