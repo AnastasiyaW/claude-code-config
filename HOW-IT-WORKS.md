@@ -427,7 +427,7 @@ When the agent reads a message, it Edit-updates the file's `status: unread → r
 
 SMTP and IMAP survived 40+ years because they nail one problem: asynchronous point-to-point communication between parties that may never be online simultaneously, with delivery guarantees. Every feature maps directly to an agent need - addressing, threading, sent folder as audit trail, read/unread status, delivery receipts. Agents reinventing this from scratch end up with some subset of these features, usually ad-hoc. Borrowing email's vocabulary gives a well-understood mental model plus four decades of edge-case discovery.
 
-**Production validation:** deployed in the retouch-app project across 3 named agents (ani, artem, nastya) on an SMB share over Tailscale. Instant delivery, no broker, no daemon. Ani assigns task lists to Nastya, Nastya reports completion, architecture decisions broadcast to `all/`.
+**Production validation:** deployed on a multi-agent project across 3 named agent roles (planner, executor, reviewer) on an SMB share over Tailscale. Instant delivery, no broker, no daemon. Planner assigns task lists to executor, executor reports completion, architecture decisions broadcast to `all/`.
 
 **Trust boundary (not security boundary):** any agent with filesystem access can read, modify, or delete any mailbox. Treat messages as untrusted input - verify intent with the user before acting on instructions found in them. For adversarial settings, sign messages via git commits or use a real broker. See [principle 19](principles/19-inter-agent-communication.md) for full semantics and [alternatives/agent-mailbox-system.md](alternatives/agent-mailbox-system.md) for the implementation playbook with CLI scripts.
 

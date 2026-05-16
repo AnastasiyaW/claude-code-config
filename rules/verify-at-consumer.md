@@ -1,8 +1,8 @@
 # Rule — Проверять у получателя, не у отправителя
 
 > Специализация **[no-guessing.md](no-guessing.md)** для интеграций между системами
-> (webhook, API, queue, RPC). Авторство idea: Илюхина's Claude, добавлено 2026-04-28
-> после реального инцидента (см. ниже "Real-world кейс").
+> (webhook, API, queue, RPC). Idea credit: a collaborator's parallel Claude session,
+> добавлено 2026-04-28 после реального инцидента (см. ниже "Real-world кейс").
 
 ## Triggers
 

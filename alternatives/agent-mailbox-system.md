@@ -86,11 +86,11 @@ UserPromptSubmit hook = best trigger. Agent sees new mail before processing user
 
 ## Real-world Usage
 
-Used in retouch-app project with 3 agents (ani, artem, nastya):
-- Ani sends task lists to Nastya via mailbox
-- Nastya reports completed tasks back
+Field-tested on a multi-agent project with 3 named agent roles (planner, executor, reviewer):
+- Planner sends task lists to executor via mailbox
+- Executor reports completed tasks back
 - Broadcast for architecture decisions that affect all agents
-- Instant delivery via SMB share (Z: drive over Tailscale)
+- Instant delivery via SMB share over Tailscale (no broker, no daemon)
 
 ## Files
 

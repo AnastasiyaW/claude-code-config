@@ -159,7 +159,7 @@ What am I trying to do?
 ## Prior art
 
 - [aydensmith/mclaude](https://github.com/aydensmith/mclaude) (v0.3.0) - hooks + file-based multi-session collaboration, includes message passing semantics
-- [alternatives/agent-mailbox-system.md](../alternatives/agent-mailbox-system.md) - field-tested implementation with CLI (`mail.py send/check/broadcast`), used in production on retouch-app across 3 named agents (ani, artem, nastya)
+- [alternatives/agent-mailbox-system.md](../alternatives/agent-mailbox-system.md) - field-tested implementation with CLI (`mail.py send/check/broadcast`), validated in a multi-agent production deployment with 3 named agent roles (planner, executor, reviewer)
 - SMTP/IMAP themselves - the canonical reference for the semantics this principle borrows
 - Erlang's process mailboxes - similar shape (per-process inbox, pattern matching on message shape), but for in-memory message passing between processes in the same VM. File-based version survives session restarts
 

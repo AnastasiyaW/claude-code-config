@@ -106,7 +106,7 @@ Output is a 15-section MVP blueprint: domain intake -> autonomy level (5 levels)
 
 **When to use:** new Agent SDK app, custom orchestrator, new MCP server, new Cloudflare Worker with tool calls. **Not for:** improvement of an existing harness (use principle 01 instead) or regular Claude Code sessions (harness is already given).
 
-Seven operational rules extracted for **always-on** use:
+Eight operational rules extracted for **always-on** use:
 
 - [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming pattern, structured tool results, deferred loading 4 detail levels, hosted vs client tools decision matrix
 - [`rules/context-trust-labels.md`](rules/context-trust-labels.md) -- trusted/semi_trusted/untrusted labels with verbatim boundary statement, prompt injection defense
@@ -115,6 +115,7 @@ Seven operational rules extracted for **always-on** use:
 - [`rules/agent-observability.md`](rules/agent-observability.md) -- 16 trace fields per model call, 7-question audit format, 6-step incident response, cost monitoring
 - [`rules/agent-plan-artifact.md`](rules/agent-plan-artifact.md) -- planning mode (runtime, not paragraph), plan artifact format (10 fields), plan-validate-execute pattern
 - [`rules/agent-approval-records.md`](rules/agent-approval-records.md) -- approval request/result JSON schemas, scope/expiration enforcement, no self-approval
+- [`rules/agent-streaming.md`](rules/agent-streaming.md) -- buffering rules for incremental tool calls when using stream=True; abort handling; output guardrail modes
 
 These complement (do not replace) the harness design philosophy below.
 
@@ -405,7 +406,7 @@ Source: Distributed systems coordination primitives + Anthropic Issues #19364 an
 
 ## Inter-Agent Communication -- Directed Asynchronous Messaging
 
-Source: 40+ years of SMTP/IMAP semantics + retouch-app production deployment
+Source: 40+ years of SMTP/IMAP semantics + a production multi-agent deployment
 
 **Problem:** handoffs and locks (principle 18) cover **shared state**, but not **directed messaging** between sessions. "Hey session beta, look at this" has no home in a broadcast handoff or a mutex.
 

@@ -2,6 +2,8 @@
 
 **Source:** OpenClaw-RL paper (arxiv 2603.10165) + DenisSergeevitch/repo-task-proof-loop
 
+> **Relationship to [principle 01 - Harness Design](01-harness-design.md):** Generator-Evaluator (principle 01) is the **general pattern** -- two agents, one builds and one judges, applied to any task. Proof Loop is its **specialization for tasks with testable outcomes**: it adds frozen acceptance criteria (spec freeze before build), strict 4-role decomposition (Spec-freezer, Builder, Verifier, Fixer), and a hard requirement that verification happens in a **fresh session** that never saw the build. Use principle 01 for subjective tasks (design quality, copywriting) where evaluation is judgment-heavy. Use principle 02 for tasks where "did it work" has a yes/no answer with a durable artifact (test pass, log entry, file content, API response). They compose: a Proof Loop can use Generator-Evaluator inside its Builder role for the implementation step.
+
 > **Note on OpenClaw:** As of April 4, 2026, Anthropic subscriptions (Claude Pro/Max) no longer cover third-party harness tools including the OpenClaw CLI. The **pattern described here is independent of the tool** - the arxiv paper and the protocol are freely usable. If you want to run OpenClaw as a product, you now need a direct API key or a pay-as-you-go bundle. The Proof Loop pattern itself works with any agent infrastructure.
 
 ## Overview

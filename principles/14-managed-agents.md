@@ -40,6 +40,29 @@ Every managed agent exposes a single function. The brain agent calls it with nat
 | Vendor lock-in tolerance | Acceptable | Unacceptable - use Agent SDK |
 | Team size | Small teams, fast iteration | Large teams with infra capacity |
 
+### Extended Decision Matrix: 12 criteria for Managed vs Self-Built Harness
+
+When deciding between Anthropic Managed Agents (or any provider's managed offering) vs a self-built harness following [principle 01](01-harness-design.md):
+
+| Criterion | Managed Agents | Self-built (principle 01 + 29) |
+|---|---|---|
+| **Standard workload** (code exec, web browse, file ops in sandbox) | ✅ preferred — no infra investment | overhead unjustified |
+| **Custom tools** that need tenant-specific permissions | ❌ no access to your permission model | ✅ required |
+| **Regulated data** (HIPAA, GDPR, financial) | ❌ data leaves your trust boundary | ✅ required |
+| **Custom audit / compliance** logging beyond provider's defaults | ❌ provider's audit, not yours | ✅ required |
+| **Financial / payment / billing** actions | ❌ provider lacks domain-specific approval flow | ✅ required |
+| **Communication sends** through your SMTP / Twilio / messaging stack | ❌ no access to your credentials | ✅ required |
+| **Identity / access management** changes (key rotation, permission grants) | ❌ provider isn't part of your IAM trust chain | ✅ required |
+| **Multi-tenant isolation** with per-tenant boundaries | ❌ provider doesn't know your tenant model | ✅ required |
+| **Quick prototype / POC** with standard tools | ✅ ship in days, not weeks | over-engineered for prototype |
+| **Sustained high-volume** workload where $0.08/session-hour adds up | self-hosted may be cheaper at scale | ✅ amortize infra cost |
+| **Vendor lock-in tolerance low** (regulated industries, sovereign cloud, multi-cloud strategy) | ❌ provider-specific runtime | ✅ portable |
+| **Team has no infra capacity** (no SRE, no Kubernetes expertise) | ✅ infrastructure handled for you | ❌ becomes operational burden |
+
+**Rule of thumb:** Start with Managed Agents when ≥3 «✅ Managed» columns hit, and your workload doesn't touch any «❌ Managed» row. As soon as one «❌ Managed» row applies (regulated data, custom audit, financial actions, tenant model, IAM), you need a self-built harness for at least that portion.
+
+**Hybrid pattern (common in production):** Use Managed Agents for **standard sub-tasks** (research, web browse, code execution in sandbox) **invoked by** a self-built brain that owns business authorization, approval flow, audit log, and tenant-specific permissions. The managed agent is treated as just-another-tool from the self-built brain's perspective — with the same risk taxonomy, approval gating, and trust boundary rules from [rules/agent-tool-design.md](../rules/agent-tool-design.md) applied to its results.
+
 ### Relationship to Other Patterns
 
 **vs Harness Design (Principle 01):** Managed Agents implement the Generator-Evaluator pattern at infrastructure level. The brain = generator, hands = executor. But the evaluator role still needs explicit design - Managed Agents don't auto-evaluate quality.

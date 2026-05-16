@@ -313,5 +313,5 @@ Mechanically нельзя force запустить Agent tool из hook (hooks �
 - **Proof Loop** (OpenClaw-RL) — verifier = fresh-context evaluator
 - **Defence-in-depth** (IAEA INSAG-10) — verifier = независимый layer защиты
 - **Trajectory sharing** (HACRL) — verifier verdicts в decisions.jsonl = shared trajectory между temporal instances агента
-- **[verify-at-consumer.md](verify-at-consumer.md)** — специализация для integrations: правда об контракте живёт в коде получателя, не в spec doc или коде отправителя. Авторство idea: Илюхина's Claude, real case file_uploaded webhook 2026-04-28
+- **[verify-at-consumer.md](verify-at-consumer.md)** — специализация для integrations: правда об контракте живёт в коде получателя, не в spec doc или коде отправителя. Idea credit: a collaborator's parallel Claude session, real case file_uploaded webhook 2026-04-28
 

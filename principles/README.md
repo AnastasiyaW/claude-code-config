@@ -212,7 +212,7 @@ Directed asynchronous messaging between parallel Claude sessions using classical
 
 **When to use:** When one session needs to address a specific other session with a question, task, or architecture decision. Not needed for simple broadcast announcements (use handoffs) or for resource claims (use locks).
 
-**Source:** 40+ years of SMTP/IMAP semantics, aydensmith/mclaude, retouch-app production deployment with 3 named agents
+**Source:** 40+ years of SMTP/IMAP semantics, aydensmith/mclaude, a multi-agent production deployment with 3 named agent roles
 
 ---
 
@@ -327,6 +327,8 @@ Use this table to pick the right principle for your situation:
 | "How do I trace and debug agent behavior in production?" | rules/agent-observability.md | rules/agent-evals.md |
 | "How should plans for risky actions be structured?" | rules/agent-plan-artifact.md | rules/agent-approval-records.md |
 | "How do I record approvals so they're audit-able and scope-bounded?" | rules/agent-approval-records.md | rules/agent-plan-artifact.md |
+| "Implementing streaming tool calls without partial execution bugs" | rules/agent-streaming.md | rules/agent-tool-design.md |
+| "Should I use Anthropic Managed Agents or build my own harness?" | 14 Managed Agents | 01 Harness Design, 29 MVP Agent Blueprint |
 
 ### Composition Patterns
 

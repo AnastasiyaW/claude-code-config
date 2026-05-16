@@ -158,9 +158,9 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 
 - **`no-pre-existing-evasion.md`** — добавляет WIP=1 + VCR Blocking как property над `feature_list.json`
 - **`CLAUDE.md` 3-Layer Validation Gate** — определяет какие artifacts должны быть в `evidence` поле для `status: "done"`
-- **`CODE_Claude/.claude/rules/long-run-problems-log.md`** — PROBLEMS.md и feature_list.json параллельные, не конфликтуют
-- **`CODE_Claude/.claude/rules/session-handoff.md`** — handoff включает ссылку на текущую in-progress фичу
-- **`CODE_Claude/.claude/rules/project-chronicles.md`** — chronicle entry при закрытии каждой фичи
+- **project-level `.claude/rules/long-run-problems-log.md`** — PROBLEMS.md и feature_list.json параллельные, не конфликтуют
+- **project-level `.claude/rules/session-handoff.md`** — handoff включает ссылку на текущую in-progress фичу
+- **project-level `.claude/rules/project-chronicles.md`** — chronicle entry при закрытии каждой фичи
 
 ## Mechanical enforcement (TBD)
 

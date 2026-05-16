@@ -4,6 +4,59 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-16 (v3.24.0 — rules/agent-streaming, principle 02/14 enrichments, sanitization pass)
+
+Same-day follow-up to v3.23.0. Adds the 8th operational rule (streaming buffering, forward-looking), enriches two existing principles with relationship/decision content, and does a sanitization pass on residual references to specific deployments and persons in older changelog entries.
+
+NEW rules/agent-streaming.md (8th rule in the agent-builder series)
+- 5 buffering rules for incremental tool calls when using `stream=True`
+- Minimal Python buffer pattern with `pending_tool_use` accumulator
+- Abort handling: synthetic tool result with `stream_aborted` type
+- 3 output-guardrail modes (post-buffer / token-level / hybrid) with tradeoff analysis
+- Forward-looking: current Agent SDK apps are synchronous; this rule prevents the typical "partial tool execution" bug when streaming is first introduced
+
+UPDATED principles/02-proof-loop.md
+- Added "Relationship to principle 01" callout at the top explaining the composition: principle 01 = general Generator-Evaluator for subjective tasks, principle 02 = specialization for testable tasks with frozen spec + 4 strict roles + fresh-context verifier. They compose -- Proof Loop can use Generator-Evaluator inside its Builder role.
+
+UPDATED principles/14-managed-agents.md
+- New "Extended Decision Matrix: 12 criteria for Managed vs Self-Built Harness" replaces a 5-row table with a 12-row decision matrix covering: standard workload, custom tools, regulated data, custom audit, financial actions, communication sends, IAM, multi-tenant isolation, prototype speed, sustained high-volume cost, vendor lock-in tolerance, infra team capacity
+- Documents the hybrid pattern (Managed Agents for standard sub-tasks invoked by self-built brain owning business authorization)
+
+UPDATED CLAUDE.md
+- "Designing New Agents" bumped from 7 rules to 8 rules
+- One sanitization fix in CLAUDE.md inter-agent communication section
+
+UPDATED principles/README.md
+- 2 new rows in decision matrix (streaming, Managed vs self-built)
+- One sanitization fix in principle 19 reference
+
+UPDATED HOW-IT-WORKS.md, alternatives/agent-mailbox-system.md, principles/19-inter-agent-communication.md
+- Sanitization: replaced specific deployment name + 3 person-name role assignments with generic role descriptions (planner / executor / reviewer). The pattern stays intact; the case study just becomes provider-neutral.
+
+UPDATED rules/no-guessing.md, rules/verify-at-consumer.md
+- Replaced "Илюхина's Claude" attribution with "a collaborator's parallel Claude session" (idea attribution preserved, person name removed)
+
+UPDATED rules/long-run-harness.md
+- Replaced 3 broken `CODE_Claude/.claude/rules/...` cross-refs with `project-level .claude/rules/...` (these were paths from the original author's workspace; in public repo they read as broken pointers)
+
+UPDATED UPDATES.md (historic entries)
+- v3.7.1 entry: replaced 3 specific project mentions with generic descriptors
+- v3.20.x entry: "Илюхина's Claude" attribution updated
+- Inter-Agent Mail v3.18 entry: production validation reference made provider-neutral
+
+**Local-only changes (not in public repo, documented here for reference):**
+- `~/.claude/scripts/block_secrets.py` got a top-of-file marker explaining it's disabled in settings.json and documenting the architectural decision (replaced by outbound-gate `pre_push_public_repo_scan.py`). This is preventive: a future session greppping for `block_secrets` will see the breadcrumb and not "fix" what was intentionally turned off.
+- `~/.claude/CLAUDE.md` slimmed from 992 lines to ~580 lines (-41%) by replacing duplicated principle content with short summaries + links to public principles. Personal/project-specific content (BILLING SAFETY, CUDA/PyTorch, Vikunja conventions, Frontend Design Catalog, etc.) preserved at full depth. Backup saved at `~/.claude/CLAUDE.md.backup-2026-05-16`.
+
+**Why the local CLAUDE.md was bloated:** principles 01/02/03/04/05/06/07/11/14/28 each had a 25-80 line section in CLAUDE.md repeating content also present in the public principle files. This created drift risk (which version is canonical?) and burned KV-cache space (~400 lines of duplicated prose loaded every session). The public principles ARE the canonical source; CLAUDE.md should be a map with anchored summaries, not a wiki.
+
+**Code review notes:**
+- All cross-references between 8 agent-builder rules + 2 enriched principles validated (0 broken)
+- Personal data scan: 0 hits in new content; pre-existing references in older changelog entries sanitized in this round
+- Public CLAUDE.md size after this round: 467 lines (within ~150-line AGENTS.md target by approximately 3x; further trimming would require deleting content rather than slimming and was not done)
+
+---
+
 ## 2026-05-16 (v3.23.0 — 4 more operational rules from agents-best-practices + agent-tool-design extension)
 
 Same-day follow-up to v3.22.0. After analyzing what else from upstream was actually a **gap** (not redundant with our existing principles), four more rules were extracted, plus the existing `rules/agent-tool-design.md` got two new sections.
@@ -1040,8 +1093,8 @@ animation cross-frame quality check.
 ## 2026-05-04 (v3.7.1 — test-gate-stop-hook: 3 hardening fixes from real-world deployment)
 
 Patch release. After v3.7.0 shipped, applying the hooks to three real
-workloads (a sandbox calculator project, pinterest-parser with empty
-tests scaffold, retouch-app/server in Go, plus the CODE_Claude umbrella
+workloads (a sandbox calculator project, a scraper project with empty
+tests scaffold, a Go server project, plus a wider umbrella
 workspace) surfaced three structural bugs. Each one would have caused
 false BLOCK on legitimate sessions; each was caught and fixed before
 the hook spread to wider use.
@@ -1299,7 +1352,7 @@ Verdict: `verified-deleted` / `still-present` / `could-not-verify` → `~/.claud
 
 ### Added: `rules/verify-at-consumer.md`
 
-Специализация no-guessing для интеграций (webhook, API, queue, RPC). Idea credit: Илюхина's Claude. Real case 2026-04-28:
+Специализация no-guessing для интеграций (webhook, API, queue, RPC). Idea credit: a collaborator's parallel Claude session. Real case 2026-04-28:
 
 | Layer | What we saw |
 |---|---|
@@ -2021,7 +2074,7 @@ The original doc (April 12) covered basic send/receive/broadcast. Production sur
 - `README.md`: 18 → 19 in 3 places (English, 中文, Russian), added principle 19 to bulleted list, added mini decision tree in handoff section for "which coordination primitive"
 - `AGENTS.md`: 18 → 19
 - `principles/README.md`: 18 → 19, full entry for principle 19, 3 decision-matrix rows added (ask another session, broadcast architecture decision, delivery confirmation)
-- `HOW-IT-WORKS.md`: new "Inter-Agent Mail" section with concrete mechanism + production validation from retouch-app
+- `HOW-IT-WORKS.md`: new "Inter-Agent Mail" section with concrete mechanism + production validation from a multi-agent deployment
 - `CLAUDE.md`: added "Inter-Agent Communication" summary section for global config
 
 ### Composition
