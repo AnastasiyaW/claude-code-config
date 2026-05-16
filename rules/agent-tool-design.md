@@ -1,4 +1,4 @@
-# Agent Tool Design - risk taxonomy + permission decisions + draft/commit
+# Agent Tool Design — risk taxonomy + permission decisions + draft/commit
 
 ## Принцип (2026-05-16)
 
@@ -27,7 +27,7 @@
 | `write_internal` | mutate own DB/state | approval-gated |
 | `write_external` | mutate чужую систему через API | approval required |
 | `financial` | money movement, billing, refunds | approval + strong auth |
-| `communication` | send email/SMS/Slack/Telegram | draft -> approval -> send |
+| `communication` | send email/SMS/Telegram/Slack | draft → approval → send |
 | `identity_access` | rotate keys, grant/revoke perms | approval + strong auth |
 | `security_sensitive` | TLS certs, encryption keys | approval + audit |
 | `process_execution` | shell, subprocess, eval | sandbox + allowlist |
@@ -36,7 +36,6 @@
 | `privileged_admin` | sudo, root, IAM admin | manual only |
 
 Обязательно declarable в tool schema:
-
 ```yaml
 tool: send_customer_email
 risk_class: communication
@@ -70,7 +69,7 @@ Decision **обязательно записывается** в trace (audit log
 
 Любое необратимое или внешне-видимое действие **разделяется** на 2 tools:
 
-| Один tool (anti-pattern) | Два tools (pattern) |
+| ❌ Один tool | ✅ Два tools |
 |---|---|
 | `send_customer_email(case_id, body)` | `draft_customer_email(case_id) -> send_customer_email(draft_id, approval_token)` |
 | `apply_database_change(sql)` | `prepare_database_change(intent) -> apply_database_change(plan_id, approval_token)` |
@@ -80,11 +79,10 @@ Decision **обязательно записывается** в trace (audit log
 Draft tool обычно `allow`, commit tool обычно `approval_required`.
 
 **Naming convention** (выберите одно по проекту, держитесь его):
-
-- `draft_X` -> `send_X`
-- `prepare_X` -> `apply_X`
-- `propose_X` -> `commit_X`
-- `recommend_X` -> `execute_X`
+- `draft_X` → `send_X`
+- `prepare_X` → `apply_X`
+- `propose_X` → `commit_X`
+- `recommend_X` → `execute_X`
 
 ## 4. Structured Tool Results
 
@@ -102,7 +100,6 @@ Tool **никогда не возвращает** raw blob. Минимум:
 ```
 
 Для error:
-
 ```json
 {
   "status": "error",
@@ -115,9 +112,8 @@ Tool **никогда не возвращает** raw blob. Минимум:
 `next_valid_actions` критично: модель видит **что делать дальше** без догадок. Снижает retry loops в 2-3 раза по эмпирическим замерам.
 
 **Результат должен быть bounded**:
-
 - `max_result_chars: 8000` (default)
-- Если больше -> store externally + return `evidence_ref`
+- Если больше → store externally + return `evidence_ref`
 - Никогда не возвращать 10k rows когда нужно 5
 
 ## 5. Tool Visibility (5 уровней)
@@ -133,16 +129,87 @@ Tool **никогда не возвращает** raw blob. Минимум:
 | `deferred` | через `search_tools(query)` | большой каталог редких tools |
 | `sensitive` | hidden until needed AND approved | destructive/admin |
 
-В Claude Code это уже есть на уровне `ToolSearch` (deferred) - для собственных Agent SDK apps надо реализовать аналог.
+В Claude Code это уже есть на уровне `ToolSearch` (deferred) — для собственных Agent SDK apps надо реализовать аналог.
+
+## 6. Deferred Tool Loading — 4 detail levels
+
+При большом каталоге tools (50+) — exposed tools должен быть `search_tools(query, detail_level)` который возвращает progressive disclosure:
+
+| Detail level | Что возвращает | Когда использовать |
+|---|---|---|
+| `name_only` | `["tool_a", "tool_b", ...]` | Initial discovery, model выбирает что дальше investigate |
+| `name_and_description` | `[{name, short_description, risk_class}]` | После filter by relevance, ~20 candidates |
+| `full_schema` | full input/output schema | После выбора 1-3 финальных кандидатов |
+| `examples` | `[{input_example, output_example}]` | Когда schema ambiguous, нужен concrete usage |
+
+Pattern:
+```
+1. Model: search_tools("send email", detail_level="name_only")
+   -> ["draft_customer_email", "send_customer_email", "draft_internal_email", ...]
+2. Model: search_tools("send email", detail_level="name_and_description")
+   -> [{name: "send_customer_email", short_description: "Send to external customer (approval-gated)", risk_class: "communication"}, ...]
+3. Model: load_tool_schema("send_customer_email")
+   -> full input/output schema
+4. Model: send_customer_email(...)
+   -> permission check -> approval flow
+```
+
+Это **критично** для MCP server design (multiple servers exposing 100+ tools combined). Все tools sequenced upfront = context bloat + cache thrash + misuse risk.
+
+## 7. Hosted vs Client Tools — decision matrix
+
+Когда строим Agent SDK app, у нас выбор: использовать **provider hosted tools** (OpenAI's web search, Anthropic's code execution, MCP remote servers) vs реализовать **client tools** (наш код, наш sandbox, наша auth).
+
+| Criterion | Hosted tool | Client tool |
+|---|---|---|
+| Public / common workload (web search, image gen, code exec в sandbox) | ✅ предпочтительно | overhead не оправдан |
+| Private business APIs (наш CRM, наш DB, наша БД пользователей) | ❌ нет access | ✅ обязательно |
+| Tenant-specific permissions / multi-tenant | ❌ provider не знает наш tenant model | ✅ обязательно |
+| Regulated data (HIPAA, GDPR, financial) | ❌ data leaves trust boundary | ✅ обязательно |
+| Financial actions (payment, billing, refund) | ❌ не аудируемо в нашем audit log | ✅ обязательно |
+| Communication sends (наш SMTP, наш Twilio account) | ❌ нет access | ✅ обязательно |
+| State-changing operations в наших системах | ❌ нет access | ✅ обязательно |
+| Custom audit / compliance requirements | hosted = их audit, не наш | ✅ обязательно |
+
+**Hosted tools полезны** когда: данные can leave trust boundary, audit handled by provider достаточно, и нет tenant-specific permission model. Например: web search для public research, code execution в provider sandbox для один-off transformations.
+
+**НЕ outsourc'ить business authorization** на hosted tool. Permission engine + approval records (см. agent-approval-records.md) должны жить в **нашем** коде.
+
+## 8. Strict Schemas (provider + harness)
+
+Когда provider supports strict function schemas (OpenAI strict mode, Anthropic input_schema validation) — **всегда включить** + **дополнительно validate в harness** перед execute.
+
+```python
+# Provider validates structure
+tool_schema = {
+    "type": "object",
+    "properties": {
+        "record_id": {"type": "string", "pattern": "^rec_[A-Za-z0-9]{16}$"},
+        "new_status": {"type": "string", "enum": ["open", "pending", "resolved"]},
+        "reason": {"type": "string", "minLength": 10, "maxLength": 500},
+    },
+    "required": ["record_id", "new_status", "reason"],
+    "additionalProperties": False,  # КРИТИЧНО: reject unknown fields
+}
+
+# Harness validates semantics после provider validation
+def validate_args(args):
+    if not record_exists(args["record_id"]):
+        raise ValidationError(f"record_id {args['record_id']} not found")
+    if args["new_status"] == "resolved" and current_status(args["record_id"]) != "pending":
+        raise ValidationError("can only resolve from pending state")
+    return args
+```
+
+**Не полагаться** только на provider validation: schema check ≠ business semantics check. Двойная защита (provider syntax + harness semantics) ловит >90% misuse cases.
 
 ## Mechanical enforcement
 
-Это design rule, не runtime hook. Применяется **когда пишется новый Agent SDK app или harness**.
+Это design rule, не runtime hook. Применяется **когда мы пишем новый Agent SDK app или harness**.
 
 Чек-лист перед merge нового tool:
-
 - [ ] `risk_class` declared (одна из 15)
-- [ ] Если `risk_class >= write_external` - есть парная draft tool
+- [ ] Если `risk_class >= write_external` — есть парная draft tool
 - [ ] Output schema typed, с `next_valid_actions`
 - [ ] `max_result_chars` лимит установлен
 - [ ] Permission policy записана в registry config (не в коде tool)
@@ -150,12 +217,12 @@ Tool **никогда не возвращает** raw blob. Минимум:
 
 ## Anti-patterns
 
-- `execute_anything(command)` или `call_api(url, method, body)` - broad tools, классическая supply chain
-- Tool возвращает `str` или `dict[str, Any]` без schema - модель угадывает структуру
-- Send-style tool без draft pair - нет точки approval
-- Permission check внутри tool (прямо в `execute()`) - должен быть **снаружи**, в permission engine
-- Все tools видимы сразу - context bloat + neighbor misuse
-- Result size unbounded - context overflow при большом возврате
+- ❌ `execute_anything(command)` или `call_api(url, method, body)` — broad tools, классическая supply chain
+- ❌ Tool возвращает `str` или `dict[str, Any]` без schema — модель угадывает структуру
+- ❌ Send-style tool без draft pair — нет точки approval
+- ❌ Permission check внутри tool (прямо в `execute()`) — должен быть **снаружи**, в permission engine
+- ❌ Все tools видимы сразу — context bloat + neighbor misuse
+- ❌ Result size unbounded — context overflow при большом возврате
 
 ## Связь с другими правилами
 
@@ -163,6 +230,8 @@ Tool **никогда не возвращает** raw blob. Минимум:
 - `rules/no-guessing.md` - `next_valid_actions` снижает гадание модели о следующем шаге
 - `principles/01-harness-design.md` - этот rule operationализирует "tool guardrails" слой harness
 - `principles/10-agent-security.md` - permission decision object и draft/commit pattern - часть defence-in-depth
+- `rules/agent-approval-records.md` - approval token format, scope, expiration
+- `rules/agent-observability.md` - tool_calls / permission_decisions - обязательные trace fields
 
 ## Источники
 

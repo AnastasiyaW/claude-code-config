@@ -106,11 +106,15 @@ Output is a 15-section MVP blueprint: domain intake -> autonomy level (5 levels)
 
 **When to use:** new Agent SDK app, custom orchestrator, new MCP server, new Cloudflare Worker with tool calls. **Not for:** improvement of an existing harness (use principle 01 instead) or regular Claude Code sessions (harness is already given).
 
-Three operational rules extracted for **always-on** use:
+Seven operational rules extracted for **always-on** use:
 
-- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming pattern, structured tool results with `next_valid_actions`
+- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming pattern, structured tool results, deferred loading 4 detail levels, hosted vs client tools decision matrix
 - [`rules/context-trust-labels.md`](rules/context-trust-labels.md) -- trusted/semi_trusted/untrusted labels with verbatim boundary statement, prompt injection defense
 - [`rules/agent-budgets.md`](rules/agent-budgets.md) -- 10 mandatory budget types every agent loop must declare
+- [`rules/agent-evals.md`](rules/agent-evals.md) -- 13 mandatory eval categories + 13 adversarial test cases + when to add regression evals
+- [`rules/agent-observability.md`](rules/agent-observability.md) -- 16 trace fields per model call, 7-question audit format, 6-step incident response, cost monitoring
+- [`rules/agent-plan-artifact.md`](rules/agent-plan-artifact.md) -- planning mode (runtime, not paragraph), plan artifact format (10 fields), plan-validate-execute pattern
+- [`rules/agent-approval-records.md`](rules/agent-approval-records.md) -- approval request/result JSON schemas, scope/expiration enforcement, no self-approval
 
 These complement (do not replace) the harness design philosophy below.
 

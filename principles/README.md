@@ -14,8 +14,8 @@ Start here if you are installing claude-code-config into a specific project. Eac
 | **Web app (React, Vue, Next.js)** | 04, 05 Structured Reasoning, 09, 10 Agent Security | 08 Skills Best Practices, 11 Documentation Integrity |
 | **ML / training / inference pipeline** | 03 Autoresearch, 04, 09, 12 Low-Signal Residual Training | 05, 13 Research Pipeline, 16 Project Chronicles |
 | **Library / published package** | 04, 08 Skills Best Practices, 09, 10 | 11, 17 DBS Skill Creation |
-| **New custom AI agent (any domain)** | 29 MVP Agent Blueprint, rules/agent-tool-design.md, rules/agent-budgets.md | 01 Harness Design, 02 Proof Loop, 10 Agent Security |
-| **Agent that ingests external content** | 10 Agent Security, rules/context-trust-labels.md | 29 MVP Agent Blueprint, 02 Proof Loop |
+| **New custom AI agent (any domain)** | 29 MVP Agent Blueprint, rules/agent-tool-design.md, rules/agent-budgets.md, rules/agent-evals.md | 01 Harness Design, 02 Proof Loop, 10 Agent Security, rules/agent-observability.md, rules/agent-plan-artifact.md, rules/agent-approval-records.md |
+| **Agent that ingests external content** | 10 Agent Security, rules/context-trust-labels.md | 29 MVP Agent Blueprint, 02 Proof Loop, rules/agent-evals.md |
 | **Multi-agent / parallel sessions** | 01 Harness Design, 06 Multi-Agent Decomposition, 09, 18 Multi-Session Coordination, 19 Inter-Agent Communication | 02 Proof Loop, 14 Managed Agents, 22 Visual Context Pattern |
 | **Long-running project (weeks+)** | 02 Proof Loop, 07 Codified Context, 16 Project Chronicles | 11 Documentation Integrity, 21 Knowledge Base Enforcement |
 | **Security-sensitive codebase** | 09 Supply Chain Defense, 10 Agent Security, 15 Red Lines, 20 Vulnerability Detection Pipeline | 02 Proof Loop, 21 Knowledge Base Enforcement |
@@ -323,6 +323,10 @@ Use this table to pick the right principle for your situation:
 | "What tool risk classes / permission decisions should I model?" | 29 MVP Agent Blueprint | rules/agent-tool-design.md |
 | "External webhook content might inject instructions" | rules/context-trust-labels.md | 10 Agent Security |
 | "Agent loop has no budget and runs away" | rules/agent-budgets.md | 29 MVP Agent Blueprint |
+| "What test cases must my agent pass before launch?" | rules/agent-evals.md | 02 Proof Loop, 21 KB Enforcement |
+| "How do I trace and debug agent behavior in production?" | rules/agent-observability.md | rules/agent-evals.md |
+| "How should plans for risky actions be structured?" | rules/agent-plan-artifact.md | rules/agent-approval-records.md |
+| "How do I record approvals so they're audit-able and scope-bounded?" | rules/agent-approval-records.md | rules/agent-plan-artifact.md |
 
 ### Composition Patterns
 

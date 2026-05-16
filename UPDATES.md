@@ -4,6 +4,77 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-16 (v3.23.0 — 4 more operational rules from agents-best-practices + agent-tool-design extension)
+
+Same-day follow-up to v3.22.0. After analyzing what else from upstream was actually a **gap** (not redundant with our existing principles), four more rules were extracted, plus the existing `rules/agent-tool-design.md` got two new sections.
+
+The decision rule applied: take everything that **fills a real operational gap** (no canonical format, no checklist, no contract), skip what duplicates existing principles 01/02/07/10/16/21/28.
+
+NEW rules/agent-evals.md
+- 13 mandatory eval categories (task_success, tool_selection_precision, unnecessary_tool_calls, permission_correctness, approval_correctness, prompt_injection_resistance, context_compaction_retention, retrieval_relevance, output_format_adherence, failure_recovery, cost_and_latency, human_intervention_rate, false_confidence)
+- 13 specific adversarial test cases that must be in eval set from day 1 (retrieved-document-injection, exfiltration-request-in-email, malformed-tool-output, expired-connector-auth, etc.)
+- Trace grading questions for periodic spot-check
+- Eval workflow (CI integration, threshold, regression on incident)
+- Connects to principle 21 -- every accepted code-review finding gains a regression eval
+
+NEW rules/agent-observability.md
+- 16 mandatory trace fields per model call (run_id, instructions_loaded, tools_visible, tool_calls, permission_decisions, approval_requests, approval_results, tokens, cache breakdown, latency, cost_estimate, etc.)
+- What NOT to log (hidden reasoning, full tool args with secrets, raw user content)
+- 7-question audit format -- a trace must answer all 7 from-the-trace
+- Periodic grading questions (manual spot-check, ~1-2 runs per week)
+- 6-step incident response (pause -> preserve -> identify -> patch -> regression eval -> gradual re-enable)
+- Cost monitoring alerts (cost-per-task baseline, cache hit rate, tools_visible cardinality, compaction count, approval response time)
+
+NEW rules/agent-plan-artifact.md
+- Planning mode = runtime mode, not paragraph in prompt -- mutation tools mechanically blocked
+- 8 specific triggers for entering planning mode + when NOT to enter
+- Plan artifact 10-field format stored as durable file (not conversation message)
+- Plan approval bound to plan_id + version -- version bump invalidates approval
+- Plan-Validate-Execute pattern (gather source-of-truth -> create plan -> validate against source -> request approval -> execute one step at a time -> validate after each)
+
+NEW rules/agent-approval-records.md
+- Approval request format (JSON schema with approval_id, approval_type, action, target, risk, preview_ref, expected_result, rollback, scope, scope_details, context, requested_by)
+- Approval result format (JSON schema with status, approved_by, timestamp, scope, expires_at, auth_method)
+- 4 scope rules (exact-action-not-category, single-use-unless-explicit, expiration-mandatory, scope-changes-require-new-approval)
+- 5 re-approval triggers (plan version bump, target changed, risk class escalated, time elapsed, scope boundary)
+- Audit log immutable append-only storage convention
+- Anti-pattern: model self-approval -- permission engine MUST verify approver != requester
+
+EXTENDED rules/agent-tool-design.md
+- New section 6: Deferred Tool Loading 4 detail levels (`name_only`, `name_and_description`, `full_schema`, `examples`) -- critical for MCP server design with 50+ tools combined
+- New section 7: Hosted vs Client Tools decision matrix -- 8 criteria mapping (private business APIs, regulated data, financial actions, communication sends -> always client; web search, image gen, code-exec sandbox -> hosted OK)
+- New section 8: Strict Schemas (provider validation + harness double-check) -- provider validates structure, harness validates business semantics
+
+UPDATED CLAUDE.md
+- "Designing New Agents" section bumped from 3 rules to 7 rules with full descriptions
+
+UPDATED principles/README.md
+- Project-type table updated: 4 new rules added to "New custom AI agent" baseline + supporting
+- Decision matrix +4 rows for the new rules
+
+**Why all 4 new rules + section extensions in one release:** the 4 rules form an interconnected operational layer:
+- agent-tool-design.md says **what** tools look like
+- agent-plan-artifact.md says **when** to plan vs execute
+- agent-approval-records.md says **how** approvals are recorded
+- agent-evals.md says **how** to test all of the above
+- agent-observability.md says **how** to verify it ran correctly in production
+
+Splitting them would create artificial cross-version dependencies. Better to ship the layer atomically.
+
+**What we deliberately did NOT take in this round:**
+- Provider API patterns (Responses-style, Chat Completions, Anthropic) -- our agent-sdk-dev plugins still cover this
+- Goal-like loop in full depth -- overlaps with principles 03 (autoresearch CORAL/HyperAgent) and 04 (deterministic orchestration)
+- Source links file -- already linked from principle 29
+
+**Source:** Same as v3.22.0 -- [DenisSergeevitch/agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices) v1.2.0 (MIT). Files synthesized this round: `security-evals-observability.md` (evals + observability + approvals), `planning-and-goals.md` (plan artifact), `tools-and-permissions.md` (deferred loading + strict schemas), `provider-api-patterns.md` (hosted vs client tools).
+
+**Code review notes:**
+- All cross-references between the 5 new/updated rule files validated (each rule references the others where conceptually linked, no circular dependency, no contradiction)
+- Personal data scan: 0 hits in new content
+- Reconciled the 3 different existing places mentioning "approval" (CLAUDE.md harness section, rules/safety-*, principles/10) by making `agent-approval-records.md` the canonical format spec; older mentions remain as conceptual references
+
+---
+
 ## 2026-05-16 (v3.22.0 — Principle 29 MVP Agent Blueprint + 3 operational rules from agents-best-practices)
 
 A new principle and three operational rules adapted from Denis Sergeevitch's [agents-best-practices](https://github.com/DenisSergeevitch/agents-best-practices) skill (MIT). The gap this fills: principles 01 (Harness Design) and 02 (Proof Loop) describe **how an agent should work** once it exists, but we had no structured flow for **designing a brand-new agent from scratch** -- the moment when "I want an agent that does X" turns into a deployable first version. This update adds that flow plus three always-on rules for the design choices you make at that moment.
