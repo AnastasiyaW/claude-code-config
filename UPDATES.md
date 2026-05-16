@@ -4,6 +4,63 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-16 (v3.26.0 — closing remaining gaps from agents-best-practices: event model, skill install checklist, connector code-exec)
+
+Preventive close of the 3 remaining items from the v3.23.0 evaluation. We previously took 85% of upstream content (the parts with immediate use case). This release takes the remaining 15% (forward-looking) so the integration is complete and future surface-area additions only add NEW concepts, not catch-up on existing ones.
+
+NEW rules/agent-event-model.md (10th operational rule)
+- 13 canonical event types for harness state persistence: user_message, assistant_message, tool_call, tool_result, approval_request, approval_result, plan_update, goal_update, skill_invocation, memory_load, context_compaction, connector_call, error, final_answer
+- Append-only `events.jsonl` storage layout with separate artifacts/ folder for bulky payloads referenced by `evidence_ref`
+- Cross-event correlation via `parent_event_id` (tool_result → tool_call, approval_result → approval_request)
+- 5 operations made trivial with event model vs without (replay, audit, compaction, eval grading, cost analysis)
+- "Implement by trigger, not upfront" guidance: start with 5 minimal events, add others as production surfaces the need
+
+NEW rules/agent-skill-install-checklist.md (11th operational rule)
+- Pre-install checklist: source verification, repo activity, license, README-to-code map, version pinning, min-release-age
+- During-install: sandbox unknown scripts, permission manifest read, ATTRIBUTION.md trail, no symlinks rule
+- Post-install: inventory update, first-use trial in isolated context, trust label assignment, removal procedure documentation
+- Periodic audit (monthly or post-incident)
+- Incident response 6-step for compromised skill (pause-rename, diff since install, audit affected sessions, cleanup, post-mortem, update this checklist)
+- Real-world worked example: Denis Sergeevitch's `agents-best-practices` install in this same session (which checklist items passed, which were borderline)
+
+EXTENDED rules/agent-tool-design.md (section 9 added)
+- **Connector Code-Execution Pattern** for MCP server / connector catalogs with 50+ tools or large data
+- Instead of exposing 50 raw tools — expose single `connector_exec(code: str)` that runs Python/JS in sandbox with pre-loaded connector library
+- 5 measurable benefits (selective tool loading, pre-context filtering, intermediate state, fewer tool-call loops, sensitive data isolation)
+- Sandbox constraints (CPU/memory limits, network allowlist, filesystem allowlist, no subprocess, egress logging, credentials isolation)
+- When to apply / when NOT to apply with explicit thresholds
+
+UPDATED CLAUDE.md
+- "Designing New Agents" bumped from 8 rules to 10 rules (added agent-event-model, agent-skill-install-checklist)
+
+UPDATED principles/README.md
+- 3 new rows in decision matrix (event persistence, 3rd-party install verification, MCP 50+ tools)
+- "New custom AI agent" project-type row: added event-model to baseline, added streaming + skill-install to supporting
+
+**Why preventive and not on-trigger:**
+
+In v3.23.0 evaluation we marked these 3 items as "wait for trigger" (first event-sourced agent, third 3rd-party install per month, first MCP server with 50+ tools). User asked to take them preventively. Reasoning: the cost of cold content (~400 lines of markdown that may sit unused) is low — they don't consume context until referenced via skill activation or rule load. The benefit of completeness is real: future evaluations of agent-builder tools won't need to "what did we already cover?" inventory pass.
+
+**Cumulative state after this release:**
+
+- 11 always-on agent-builder rules (`rules/agent-*.md`)
+- 1 deep-dive principle (29 MVP Agent Blueprint)
+- 1 cloned upstream skill (locally, not in this repo)
+- 1 alternatives comparison (skill-management-tools.md)
+- 4 enriched existing principles (01, 02, 14, 28 indirectly via long-run-harness)
+- 1 foundational quote in CLAUDE.md (agent-legibility)
+- 5 releases on 2026-05-16 (v3.22.0 → v3.26.0)
+
+Content from Denis Sergeevitch's `agents-best-practices` upstream skill: **fully integrated** at the synthesis level. Remaining 0% gap — items deliberately not taken: provider API patterns (covered by agent-sdk-dev plugins), source links file (linked from principle 29), coverage-audit meta-doc.
+
+**Code review notes:**
+- All 11 agent-builder rules cross-reference each other consistently
+- Personal data scan on 3 new files: 0 hits
+- All cross-references in new content validated
+- Public CLAUDE.md now lists 10 rules in "Designing New Agents" section; principles/README.md decision matrix has 9 rows for agent-builder concerns
+
+---
+
 ## 2026-05-16 (v3.25.0 — alternatives/skill-management-tools: evaluation of ai-dotfiles + Skiller)
 
 Two community projects surfaced today solving variants of "manage Claude Code skills across machines and projects":

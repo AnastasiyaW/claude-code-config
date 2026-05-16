@@ -203,6 +203,69 @@ def validate_args(args):
 
 **Не полагаться** только на provider validation: schema check ≠ business semantics check. Двойная защита (provider syntax + harness semantics) ловит >90% misuse cases.
 
+## 9. Connector Code-Execution Pattern (для tool сatalog'ов 50+)
+
+Когда connector (MCP server, external API gateway) exposes **много tools** (50+) или возвращает **large data** (10MB+ JSON, видео метаданные, full DB dumps) — стандартный flow «model → tool_call → tool_result → model» становится дорогим:
+
+- Context bloat: 50 tool descriptions × 200 токенов = 10K токенов на каждый call даже если используется 1 tool
+- Cache thrash: dynamic tool set ломает stable prefix (см. CLAUDE.md «KV-Cache»)
+- Tool-call loops: model видит partial data, делает второй call для filter, потом третий для aggregate — 3 round-trips где нужен 1
+
+**Решение: connector wraps tool catalog в sandboxed code-execution environment.**
+
+Вместо exposing 50 raw tools — expose **один tool** `connector_exec(code: str)` который запускает Python/JS в sandbox с pre-loaded connector library:
+
+```python
+# Model emit's единственный tool_call:
+connector_exec("""
+import salesforce
+accounts = salesforce.list_accounts(filter='renewal_pending')
+top_5 = sorted(accounts, key=lambda a: a.arr, reverse=True)[:5]
+for a in top_5:
+    cases = salesforce.list_cases(account_id=a.id, status='open')
+    print(f"{a.name}: ${a.arr}, {len(cases)} open cases")
+""")
+```
+
+**Benefits:**
+
+| Benefit | Метрика |
+|---|---|
+| **Selective tool loading** | загружаем только tools которые **code references**, не все 50 |
+| **Pre-context filtering** | aggregation / filter в sandbox, model получает финальный summary |
+| **Intermediate state persistence** | sandbox session reuses между tool_calls в одной conversation |
+| **Reduced tool-call loops** | 1 connector_exec вместо 3 sequential tool_calls |
+| **Sensitive data isolation** | raw API responses не покидают sandbox; model видит только printed output |
+
+**Sandbox constraints (обязательно):**
+
+- **Resource limits**: CPU timeout 30s, memory cap 256MB
+- **Network allowlist**: только URLs нужные connector library
+- **Filesystem allowlist**: read-only `/connector/lib/`, write-only `/tmp/<session_id>/`
+- **No subprocess spawn** (`os.system`, `subprocess.run` blocked)
+- **Egress logging**: каждый outbound API call залогирован к trace fields (см. `agent-observability.md`)
+- **Credentials isolation**: connector library использует credentials из sandbox env, не возвращает их к model context
+
+**Когда применять:**
+
+- MCP server с >50 tools combined (или multiple MCP servers с tool count > 50)
+- Connector возвращает large structured data which model needs to filter/aggregate
+- Multi-step workflows на one external system (5+ sequential tool_calls)
+
+**Когда НЕ применять:**
+
+- < 20 tools total — overhead sandbox не оправдан
+- Single tool_call workflows (1 API call → 1 answer)
+- Tools с side effects (write, send, delete) — sandbox должен expose их как **отдельные** typed tools с permission gates (см. секция 7 hosted vs client), не через generic `exec`
+
+**Связь с другими секциями:**
+
+- Секция 5 (Tool Visibility) — `connector_exec` это один `base` tool вместо 50 `connector` tools
+- Секция 6 (Deferred Loading) — внутри sandbox, не requires deferred loading на model уровне
+- Секция 7 (Hosted vs Client) — sandbox = client tool **always** (private credentials, custom audit)
+- `~/.claude/rules/agent-budgets.md` — sandbox имеет свои budgets отдельно от model loop budgets
+- `~/.claude/rules/agent-observability.md` — egress log как trace fields обязательно
+
 ## Mechanical enforcement
 
 Это design rule, не runtime hook. Применяется **когда мы пишем новый Agent SDK app или harness**.
@@ -232,6 +295,7 @@ def validate_args(args):
 - `principles/10-agent-security.md` - permission decision object и draft/commit pattern - часть defence-in-depth
 - `rules/agent-approval-records.md` - approval token format, scope, expiration
 - `rules/agent-observability.md` - tool_calls / permission_decisions - обязательные trace fields
+- `rules/agent-event-model.md` - tool_call / tool_result events как persistence model
 
 ## Источники
 

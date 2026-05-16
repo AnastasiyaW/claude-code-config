@@ -14,7 +14,7 @@ Start here if you are installing claude-code-config into a specific project. Eac
 | **Web app (React, Vue, Next.js)** | 04, 05 Structured Reasoning, 09, 10 Agent Security | 08 Skills Best Practices, 11 Documentation Integrity |
 | **ML / training / inference pipeline** | 03 Autoresearch, 04, 09, 12 Low-Signal Residual Training | 05, 13 Research Pipeline, 16 Project Chronicles |
 | **Library / published package** | 04, 08 Skills Best Practices, 09, 10 | 11, 17 DBS Skill Creation |
-| **New custom AI agent (any domain)** | 29 MVP Agent Blueprint, rules/agent-tool-design.md, rules/agent-budgets.md, rules/agent-evals.md | 01 Harness Design, 02 Proof Loop, 10 Agent Security, rules/agent-observability.md, rules/agent-plan-artifact.md, rules/agent-approval-records.md |
+| **New custom AI agent (any domain)** | 29 MVP Agent Blueprint, rules/agent-tool-design.md, rules/agent-budgets.md, rules/agent-evals.md, rules/agent-event-model.md | 01 Harness Design, 02 Proof Loop, 10 Agent Security, rules/agent-observability.md, rules/agent-plan-artifact.md, rules/agent-approval-records.md, rules/agent-streaming.md, rules/agent-skill-install-checklist.md |
 | **Agent that ingests external content** | 10 Agent Security, rules/context-trust-labels.md | 29 MVP Agent Blueprint, 02 Proof Loop, rules/agent-evals.md |
 | **Multi-agent / parallel sessions** | 01 Harness Design, 06 Multi-Agent Decomposition, 09, 18 Multi-Session Coordination, 19 Inter-Agent Communication | 02 Proof Loop, 14 Managed Agents, 22 Visual Context Pattern |
 | **Long-running project (weeks+)** | 02 Proof Loop, 07 Codified Context, 16 Project Chronicles | 11 Documentation Integrity, 21 Knowledge Base Enforcement |
@@ -329,6 +329,9 @@ Use this table to pick the right principle for your situation:
 | "How do I record approvals so they're audit-able and scope-bounded?" | rules/agent-approval-records.md | rules/agent-plan-artifact.md |
 | "Implementing streaming tool calls without partial execution bugs" | rules/agent-streaming.md | rules/agent-tool-design.md |
 | "Should I use Anthropic Managed Agents or build my own harness?" | 14 Managed Agents | 01 Harness Design, 29 MVP Agent Blueprint |
+| "How to persist agent state for replay / audit / compaction?" | rules/agent-event-model.md | rules/agent-observability.md |
+| "Installing a 3rd-party skill — what should I verify first?" | rules/agent-skill-install-checklist.md | 09 Supply Chain Defense, 10 Agent Security |
+| "MCP server has 50+ tools and burns context on every call" | rules/agent-tool-design.md section 9 (connector code-exec) | rules/agent-tool-design.md section 6 (deferred loading) |
 
 ### Composition Patterns
 

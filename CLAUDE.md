@@ -106,16 +106,18 @@ Output is a 15-section MVP blueprint: domain intake -> autonomy level (5 levels)
 
 **When to use:** new Agent SDK app, custom orchestrator, new MCP server, new Cloudflare Worker with tool calls. **Not for:** improvement of an existing harness (use principle 01 instead) or regular Claude Code sessions (harness is already given).
 
-Eight operational rules extracted for **always-on** use:
+Ten operational rules extracted for **always-on** use:
 
-- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming pattern, structured tool results, deferred loading 4 detail levels, hosted vs client tools decision matrix
+- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming, structured tool results, deferred loading levels, hosted vs client tools, connector code-execution pattern (section 9)
 - [`rules/context-trust-labels.md`](rules/context-trust-labels.md) -- trusted/semi_trusted/untrusted labels with verbatim boundary statement, prompt injection defense
 - [`rules/agent-budgets.md`](rules/agent-budgets.md) -- 10 mandatory budget types every agent loop must declare
 - [`rules/agent-evals.md`](rules/agent-evals.md) -- 13 mandatory eval categories + 13 adversarial test cases + when to add regression evals
-- [`rules/agent-observability.md`](rules/agent-observability.md) -- 16 trace fields per model call, 7-question audit format, 6-step incident response, cost monitoring
+- [`rules/agent-observability.md`](rules/agent-observability.md) -- 16 trace fields per model call, 7-question audit format, 6-step incident response
 - [`rules/agent-plan-artifact.md`](rules/agent-plan-artifact.md) -- planning mode (runtime, not paragraph), plan artifact format (10 fields), plan-validate-execute pattern
 - [`rules/agent-approval-records.md`](rules/agent-approval-records.md) -- approval request/result JSON schemas, scope/expiration enforcement, no self-approval
-- [`rules/agent-streaming.md`](rules/agent-streaming.md) -- buffering rules for incremental tool calls when using stream=True; abort handling; output guardrail modes
+- [`rules/agent-streaming.md`](rules/agent-streaming.md) -- buffering rules for incremental tool calls when stream=True; abort handling; output guardrail modes
+- [`rules/agent-event-model.md`](rules/agent-event-model.md) -- 13 typed events for harness state persistence (replay/audit/compaction/evals)
+- [`rules/agent-skill-install-checklist.md`](rules/agent-skill-install-checklist.md) -- pre/during/post install + audit + incident response for 3rd-party skills
 
 These complement (do not replace) the harness design philosophy below.
 
