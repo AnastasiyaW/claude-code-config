@@ -4,6 +4,22 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-21 (v3.27.0 — alternatives/agents-md-rule-loading: JIT skills vs always-on rule blob)
+
+NEW alternatives/agents-md-rule-loading.md
+
+Triggered by Gloaguen et al. 2026 ("Evaluating AGENTS.md: Are Repository-Level Context Files Helpful for Coding Agents?", arXiv 2602.11988): repository context files -- both auto-generated and human-written -- reduce coding-agent task success and add 20%+ cost by pushing agents toward broader exploration. Compares three ways to load a rule corpus:
+
+- Approach A: always-on blob (the paper's measured failure mode)
+- Approach B: path-scoped rules (`paths:` frontmatter, file-glob triggered)
+- Approach C: skills as JIT (description in context, body on demand) + lean indexed root file
+
+Recommendation: tier the corpus -- a small always-on core (safety + core methodology), path-scoped rules for file-correlated guidance, skills for topic-bound guidance, an index in the root file so nothing is lost. Includes verified Claude Code loading mechanics: `rules/` files load unconditionally; `paths:` is the only conditional-activation field; skills use progressive disclosure; `@path` imports load at launch and do not save context.
+
+Caveat documented: prompt caching makes always-loaded content cheap but not harmless -- the success-rate degradation is behavioral, not cost. Framed as an `alternatives/` comparison (not a principle) because the conclusion is evidence-backed but pending A/B validation.
+
+---
+
 ## 2026-05-16 (v3.26.0 — closing remaining gaps from agents-best-practices: event model, skill install checklist, connector code-exec)
 
 Preventive close of the 3 remaining items from the v3.23.0 evaluation. We previously took 85% of upstream content (the parts with immediate use case). This release takes the remaining 15% (forward-looking) so the integration is complete and future surface-area additions only add NEW concepts, not catch-up on existing ones.
