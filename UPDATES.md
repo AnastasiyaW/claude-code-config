@@ -4,6 +4,30 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-05-28 (v3.28.0 — silent-failure-detection: plugin CLI prerequisite verifier)
+
+NEW [`rules/silent-failure-detection.md`](rules/silent-failure-detection.md)
+NEW [`scripts/verify_plugin_prerequisites.py`](scripts/verify_plugin_prerequisites.py)
+
+A class of harness gap that does not announce itself: a Claude Code plugin is `enabled: true` in `settings.json`, but its hooks shell out to an external CLI (semgrep, gh, stripe, language servers) that is not installed on the host. Hook exits non-zero, Claude Code logs it and continues. User keeps the illusion of protection while the actual layer is a silent no-op.
+
+Real case that surfaced this: the official `semgrep@claude-plugins-official` plugin was enabled on a Windows machine. Its `hooks.json` invokes `semgrep mcp -k post-tool-cli-scan` on every Write/Edit. `shutil.which("semgrep")` was `None`. Every Write/Edit for the entire session had been failing silently. The gap was caught only by an unrelated `where.exe semgrep` audit.
+
+Resolution = a SessionStart hook that reads `enabledPlugins` from `settings.json`, looks up known CLI requirements per plugin, and `shutil.which`-checks each one. Missing → printed to stdout for the agent and the user to see. Informational only (exit 0), does not block the session.
+
+Conservative map: only plugins whose own `hooks.json` or `.mcp.json` invokes a documented external CLI. Extension protocol is in the rule (open the plugin's hooks.json, find external-binary commands, add to the map).
+
+Specializes [`system-verification-independent.md`](rules/system-verification-independent.md) ("name ≠ behavior") to the harness itself — silent-failure detection of the protection layer.
+
+Known gaps documented in the rule:
+- MCP server failures inside third-party plugins (Node missing, etc.) not yet covered
+- Hook failures due to missing env / permissions / wrong cwd not covered
+- Bundled-Python-script crashes not covered
+
+These are documented explicitly so the rule does not provide false confidence.
+
+---
+
 ## 2026-05-21 (v3.27.0 — alternatives/agents-md-rule-loading: JIT skills vs always-on rule blob)
 
 NEW alternatives/agents-md-rule-loading.md
