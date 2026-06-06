@@ -2837,3 +2837,8 @@ The `mderk/memento` repo appears to have been removed from GitHub. All reference
 ### Initial release
 
 8 architectural principles, 4 alternative comparison docs, 10 skills, CLAUDE.md template. Covers: harness design, proof loops, autoresearch, deterministic orchestration, structured reasoning, multi-agent decomposition, codified context, skills best practices.
+
+## Core Working Rules added (2026-06-07)
+
+Five hard user-directive rules added to rules/: secrets-as-data, quality-no-monkey-patch, finish-the-task, quality-over-tokens-independent-verify, deletion-confirm-and-verify. Registered in CLAUDE.md 'Core Working Rules'. Mirror existing safety hooks (stop-phrase-guard, human-confirmation-guard, verify-deleted-guard, pre-push public-repo scan).
+

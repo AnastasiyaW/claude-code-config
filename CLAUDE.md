@@ -1,5 +1,14 @@
 # Claude Global Rules
 
+## Core Working Rules (always-on, mechanical)
+
+Hard user directives, codified as drop-in `rules/` + mirrored on hooks:
+- [`rules/secrets-as-data.md`](rules/secrets-as-data.md) -- secrets are working data, used freely; do NOT scrub tokens or nag about rotation; the only hard line is **nothing leaks into a PUBLIC repo** (pre-push scan).
+- [`rules/quality-no-monkey-patch.md`](rules/quality-no-monkey-patch.md) -- no monkey-patches without extreme need; rewrite cleanly with understanding, then verify.
+- [`rules/finish-the-task.md`](rules/finish-the-task.md) -- finish the task; nothing left "for next session"/"for later"; only exception is near context-overflow -> write a handoff. Enforced by `stop-phrase-guard` + `session-handoff-*`.
+- [`rules/quality-over-tokens-independent-verify.md`](rules/quality-over-tokens-independent-verify.md) -- optimize for quality, NOT token economy; complex/irreversible work gets independent fresh-context agent verification (Generator-Evaluator).
+- [`rules/deletion-confirm-and-verify.md`](rules/deletion-confirm-and-verify.md) -- any deletion needs explicit unambiguous user confirmation; after a delete/copy, re-verify it actually happened. Enforced by `human-confirmation-guard` + `verify-deleted-guard`.
+
 ## Quality of Solutions -- Core Principle
 
 We do not pick the easiest path. We pick the best, highest-quality, most stable solution.
