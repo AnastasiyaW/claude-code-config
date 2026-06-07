@@ -185,6 +185,9 @@ def main() -> int:
     cmd, label = detected
 
     try:
+        # CI=1 forces watch-capable runners (vitest, jest, playwright) into
+        # run-once non-interactive mode, preventing a watch-mode hang that would
+        # otherwise sit until TEST_TIMEOUT_SEC. FORCE_COLOR=0 keeps output clean.
         result = subprocess.run(
             cmd,
             cwd=cwd,
@@ -193,6 +196,7 @@ def main() -> int:
             text=True,
             encoding="utf-8",
             errors="replace",
+            env={**os.environ, "CI": "1", "FORCE_COLOR": "0"},
         )
     except subprocess.TimeoutExpired:
         print(f"[test-gate] {label} timeout after {TEST_TIMEOUT_SEC}s - skipping",
