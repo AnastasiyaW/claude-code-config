@@ -87,6 +87,25 @@ PHRASE_CATEGORIES: list[tuple[str, list[str]]] = [
             r"pick this up in a fresh session",
         ],
     ),
+    (
+        "deferral_via_next_step_question",
+        [
+            # Ending the turn by asking "what next" / offering a menu of options /
+            # asking permission, instead of just doing the planned work in order.
+            # User directive 2026-06-07: "не откладываем, делаем всё по очереди".
+            r"что (дальше|делаем дальше|теперь делаем|по плану дальше)\b",
+            r"что (приоритетн|важнее|выбираешь|предпочитаешь)",
+            r"что из (этого|них|трёх|двух|перечисленн|предложенн)",
+            r"скаж(ешь|и)[^.?!\n]{0,40}(сделаю|продолжу|заведу|подниму|пройд|починю|дам команду|возьмусь)",
+            r"хочешь[^.?!\n]{0,40}(сделаю|сделать|продолжу|заведу|подниму|починю|возьмусь)",
+            r"по любому из (этих|трёх|двух|них|пунктов)",
+            r"\bили (всё ок|отдыхаем|ждём|двигаемся дальше)\b",
+            r"what (would you like|next|should i (do|tackle))\b",
+            r"\bsay the word\b",
+            r"let me know (which|if you|what you)\b",
+            r"pick (one|an option|which)\b",
+        ],
+    ),
 ]
 
 # Suppress false positives: if the agent is explicitly ACKNOWLEDGING the phrase
@@ -101,6 +120,10 @@ META_DISCUSSION_MARKERS = [
     "AMD investigation",
     "behavioral tell",
     "reasoning regression",
+    "finish-the-task",
+    "next-step-guard",
+    "deferral_via_next_step",
+    "не откладыва",
 ]
 
 
@@ -219,8 +242,11 @@ def main() -> int:
             f"behavioral tells that signal degraded reasoning ({details}). "
             f"Before ending, either (a) actually finish the work, or (b) "
             f"explicitly explain what is blocking and what concrete next "
-            f"step is needed. See alternatives/reasoning-regression-debugging.md "
-            f"for context. After writing a genuine conclusion, you may end."
+            f"step is needed. Per rules/finish-the-task.md: do NOT end by asking "
+            f"'что дальше?' or offering a menu of options while planned work "
+            f"remains — keep doing it in order; the ONLY legitimate stop is a real "
+            f"external blocker (name it explicitly, not as a 'shall I?') or context "
+            f"overflow (write a handoff). After a genuine conclusion, you may end."
         ),
     }
     print(json.dumps(response))
