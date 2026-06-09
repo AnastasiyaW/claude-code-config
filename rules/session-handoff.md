@@ -10,7 +10,7 @@ Two modes. Pick one based on how you work:
 | Mode | When to use | Storage |
 |---|---|---|
 | **Single-file** (simpler) | One chat at a time, occasional session breaks | `.claude/HANDOFF.md` |
-| **Multi-session** (safer for parallel chats) | Multiple Claude Code chats running simultaneously on the same project | `.claude/handoffs/<unique>.md` + `INDEX.md` |
+| **Multi-session** (safer for parallel chats) | Multiple Claude Code chats running simultaneously on the same project | `.claude/handoffs/<project-slug>/<unique>.md` + `INDEX.md` |
 
 **Most users need single-file.** If you never run parallel chats, the simpler mode is enough - one file, overwrite-on-write, no coordination overhead.
 
@@ -43,7 +43,9 @@ If the user didn't explicitly trigger a handoff, write one anyway. Complements t
 
 ## Multi-session protocol
 
-**Storage:** `.claude/handoffs/` directory with one file per chat, plus an append-only `INDEX.md`.
+**Storage:** `.claude/handoffs/<project-slug>/` — one subdirectory per project, one file per chat, plus a single append-only `INDEX.md` at the handoffs root.
+
+`<project-slug>` is the kebab-case name of the project actually worked on (not the cwd name). Reuse an existing subdirectory if one fits; create it if not. This keeps unrelated projects from interleaving when many sessions share one working directory (e.g. a hub directory): the SessionStart hook shows the latest handoff *per project* instead of the 3 newest overall, so a busy project cannot crowd out the one you came back for.
 
 ### Architectural principle: append-only, never overwrite
 
@@ -51,13 +53,15 @@ Multiple Claude Code chats can work in parallel in the same project. If all chat
 
 ```
 .claude/handoffs/
-├── 2026-04-09_14-32_373d1618.md     ← chat 1
-├── 2026-04-09_15-01_b858f500.md     ← chat 2
-├── 2026-04-09_16-47_ab154a15.md     ← chat 3
-└── INDEX.md                          ← append-only index of all handoffs
+├── project-alpha/
+│   ├── 2026-04-09_14-32_373d1618.md  ← chat 1
+│   └── 2026-04-09_16-47_ab154a15.md  ← chat 3
+├── project-beta/
+│   └── 2026-04-09_15-01_b858f500.md  ← chat 2
+└── INDEX.md                           ← append-only index of all handoffs
 ```
 
-**Invariant:** no chat ever overwrites another chat's handoff. Each handoff has a unique filename following `YYYY-MM-DD_HH-MM_<session-short-id>.md`.
+**Invariant:** no chat ever overwrites another chat's handoff. Each handoff has a unique filename following `YYYY-MM-DD_HH-MM_<session-short-id>.md` inside its project subdirectory. The timestamp in the **filename** is authoritative (mtime drifts when a handoff gets a later status update).
 
 This is a direct application of [principle 18 - multi-session coordination](../principles/18-multi-session-coordination.md): handoffs are the **append-only** variant of shared state (conflict-free by construction).
 
@@ -78,21 +82,21 @@ When the user sends one of these phrases (or equivalent), immediately write a ha
 - Session ID: from session context if available, else generate short UUID (8 hex chars)
 - Timestamp: current local time
 
-**Step 2.** Ensure directory exists:
+**Step 2.** Ensure the project subdirectory exists (reuse an existing slug if one fits):
 ```bash
-mkdir -p .claude/handoffs
+mkdir -p .claude/handoffs/<project-slug>
 ```
 
 **Step 3.** Write the handoff file with a unique name (atomic via Write tool, not append-in-pieces):
 ```
-.claude/handoffs/YYYY-MM-DD_HH-MM_<session-short-id>.md
+.claude/handoffs/<project-slug>/YYYY-MM-DD_HH-MM_<session-short-id>.md
 ```
 
 Where `<session-short-id>` is the first 8 chars of the session ID, or 8 random hex chars if the ID is unavailable.
 
 **Step 4.** Append one line to `.claude/handoffs/INDEX.md` (append, never overwrite):
 ```markdown
-- 2026-04-09 14:32 | 373d1618 | Cleanup: drift validator + security case study | ACTIVE
+- 2026-04-09 14:32 | 373d1618 | project-alpha | Cleanup: drift validator + security case study | ACTIVE
 ```
 
 If INDEX.md does not exist, create it with a header.

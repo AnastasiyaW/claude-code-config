@@ -72,10 +72,10 @@ def main() -> int:
     if handoff_old.exists():
         if (time.time() - handoff_old.stat().st_mtime) / 60 < HANDOFF_STALE_MINUTES:
             fresh = True
-    # New format: any .md in handoffs/ (except INDEX.md)
+    # New format: any .md in handoffs/ incl. per-project subdirs (except INDEX.md)
     if not fresh and handoffs_dir.exists():
-        for p in handoffs_dir.glob("*.md"):
-            if p.name == "INDEX.md":
+        for p in handoffs_dir.rglob("*.md"):
+            if p.name.startswith("INDEX"):
                 continue
             if (time.time() - p.stat().st_mtime) / 60 < HANDOFF_STALE_MINUTES:
                 fresh = True
@@ -92,11 +92,15 @@ def main() -> int:
         "reason": (
             f"This session has been active for ~{int(age)} minutes and no fresh "
             f"handoff exists. Before ending, please write a handoff file in "
-            f".claude/handoffs/ following the format in .claude/rules/session-handoff.md. "
-            f"File name: YYYY-MM-DD_HH-MM_<session-short-id>.md. "
+            f".claude/handoffs/<project-slug>/ following the format in "
+            f".claude/rules/session-handoff.md. <project-slug> = kebab-case name "
+            f"of the project worked on (reuse an existing subdirectory name if "
+            f"one fits; create it if not). File name: "
+            f"YYYY-MM-DD_HH-MM_<session-short-id>.md. "
             f"Keep it under 1500 tokens. Must include: goal, what was done, "
             f"what did NOT work (with reasons), current state, key decisions, "
-            f"single next step. Update .claude/handoffs/INDEX.md (append). "
+            f"single next step. Append one line to .claude/handoffs/INDEX.md "
+            f"(format: date time | session-id | project | summary | status). "
             f"After writing, you may end the session normally."
         ),
     }

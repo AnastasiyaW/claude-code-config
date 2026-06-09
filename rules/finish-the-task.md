@@ -19,8 +19,12 @@
 ## Единственное исключение — реальное переполнение контекста
 - Если контекст реально близко к пределу (≈>85%): **создать handoff** для передачи контекста,
   а не просто остановиться.
-- Handoff: `~/.claude/handoffs/ГГГГ-ММ-ДД_ЧЧ-ММ_<slug>.md` + дописать строку в `handoffs/INDEX.md`
-  (что сделано / статус ACTIVE|CLOSED / что дальше / фоновые задачи / next steps).
+- Handoff: `<cwd>/.claude/handoffs/<project-slug>/ГГГГ-ММ-ДД_ЧЧ-ММ_<session-id>.md` + дописать
+  строку в `.claude/handoffs/INDEX.md` (формат: `date time | session | project | summary | status`).
+  `<project-slug>` = kebab-case имя проекта, над которым шла работа (переиспользовать существующую
+  подпапку, если подходит). `~/.claude/handoffs/` — ТОЛЬКО fallback, когда у сессии нет проектного
+  cwd (иначе SessionStart-хук следующей сессии хендоф не покажет). Полная конвенция —
+  `session-handoff.md`.
 
 ## Механически (на хуках, активно)
 - `stop-phrase-guard.py` (Stop) — блокирует завершение при фразах-отговорках: deferral / ownership
