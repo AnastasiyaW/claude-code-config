@@ -54,11 +54,18 @@ PATH_PATTERN = re.compile(
 # Skip patterns (template placeholders, URLs, etc.)
 SKIP_PATTERNS = [
     r'\{\{',           # Template: {{path}}
-    r'https?://',      # URLs
+    r'://',            # URLs (also partial matches like s://github.com/...)
     r'example\.com',   # Example domains
     r'<[^>]+>',        # Angle-bracket placeholders
     r'\$\{',           # Variable expansion
 ]
+
+# Bare multi-segment matches ("foo/bar/baz") are the noisiest alternative:
+# prose word-lists ("GPU/port/container"), domains without scheme
+# ("code.claude.com/docs/..."). Only treat them as paths when the last
+# segment has a file extension and the first segment is not domain-like.
+EXT_RE = re.compile(r'\.[A-Za-z0-9]{1,5}$')
+DOMAIN_RE = re.compile(r'^[\w-]+(\.[\w-]+)*\.(com|org|net|io|dev|app|ai|ru|club|space|work|md)$', re.I)
 
 
 def extract_paths(text: str) -> list[str]:
@@ -68,6 +75,17 @@ def extract_paths(text: str) -> list[str]:
         path = match.group(0).rstrip('.,;:)')
         if any(re.search(skip, path) for skip in SKIP_PATTERNS):
             continue
+        # Cyrillic/other non-ASCII "paths" are prose word-lists, not files
+        # ("\w" matches Unicode, so "код/probe/доки" slips through otherwise)
+        if not path.isascii():
+            continue
+        anchored = path.startswith(('./', '../', '~')) or re.match(r'^[A-Za-z]:[/\\]', path)
+        if not anchored:
+            first_seg = path.split('/')[0]
+            if DOMAIN_RE.match(first_seg):
+                continue
+            if not EXT_RE.search(path):
+                continue
         paths.append(path)
     return paths
 

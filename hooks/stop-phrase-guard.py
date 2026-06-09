@@ -106,6 +106,20 @@ PHRASE_CATEGORIES: list[tuple[str, list[str]]] = [
             r"pick (one|an option|which)\b",
         ],
     ),
+    (
+        "offer_and_defer",
+        [
+            # Offering to do remaining work "later / if you say so" instead of doing it NOW.
+            # User directive 2026-06-09: "доделывай нормально ... всегда всё доделываем до конца".
+            r"осталось( бы)? (доделать|сделать|починить|доводить|закрыть)",
+            r"по[- ]хорошему[^.?!\n]{0,80}(скаж|если|можно|надо|стоит|сделать|доделать)",
+            r"не срочно[^.?!\n]{0,40}(скаж|сделаю|если|можно|потом)",
+            r"могу[^.?!\n]{0,50}если[^.?!\n]{0,30}(скаж|захочешь|нужно|надо)",
+            r"если (захочешь|нужно|надо|пожелаешь)[^.?!\n]{0,40}(сделаю|починю|подниму|заведу|могу)",
+            r"оставля[ею] (на потом|на будущее|как есть)",
+            r"\(не срочно",
+        ],
+    ),
 ]
 
 # Suppress false positives: if the agent is explicitly ACKNOWLEDGING the phrase
@@ -124,6 +138,18 @@ META_DISCUSSION_MARKERS = [
     "next-step-guard",
     "deferral_via_next_step",
     "не откладыва",
+]
+
+# Strong meta markers: naming THIS guard or its categories means the message is ABOUT the
+# hook (documenting it / quoting example trigger phrases), not an actual deferral. Their
+# presence ANYWHERE suppresses the whole message — avoids the guard tripping on its own docs.
+STRONG_META_MARKERS = [
+    "stop-phrase-guard",
+    "offer_and_defer",
+    "deferral_via_next_step",
+    "regression phrase guard",
+    "phrase guard",
+    "regression phrase",
 ]
 
 
@@ -175,6 +201,10 @@ def get_final_assistant_message(transcript_path: str | None) -> str:
 def scan_phrases(message: str) -> list[tuple[str, str]]:
     """Return list of (category, matched_text) hits in the message."""
     lower = message.lower()
+    # Whole-message meta suppression: a message that names the guard/its categories is
+    # documenting it, not deferring. (Fixes the guard firing on its own description.)
+    if any(sm in lower for sm in STRONG_META_MARKERS):
+        return []
     hits: list[tuple[str, str]] = []
     for category, patterns in PHRASE_CATEGORIES:
         for pat in patterns:
@@ -206,10 +236,19 @@ def main() -> int:
         or os.environ.get("CLAUDE_CODE_TRANSCRIPT_PATH")
     )
 
-    # Marker file to avoid blocking twice in same session
+    # Counter marker: keep enforcing repeated deferrals (up to MAX_FIRES) instead of
+    # giving up after the first block — but cap it so a truly unavoidable phrase can't
+    # hard-deadlock the session. (User 2026-06-09: "всегда всё доделываем до конца".)
+    MAX_FIRES = 3
     cwd = Path.cwd()
     marker = cwd / ".claude" / ".stop-phrase-guard-fired"
+    fires = 0
     if marker.exists():
+        try:
+            fires = int((marker.read_text(encoding="utf-8").strip() or "0"))
+        except (ValueError, OSError):
+            fires = 0
+    if fires >= MAX_FIRES:
         return 0
 
     message = get_final_assistant_message(transcript_path)
@@ -231,9 +270,9 @@ def main() -> int:
         for cat in by_cat
     )
 
-    # Touch marker so we don't block again this session
+    # Increment the fire counter (block now; allow up to MAX_FIRES blocks per session)
     marker.parent.mkdir(parents=True, exist_ok=True)
-    marker.touch()
+    marker.write_text(str(fires + 1), encoding="utf-8")
 
     response = {
         "decision": "block",
