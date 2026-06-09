@@ -56,8 +56,10 @@ BASH_PATTERNS = [
     r">\s*/etc/ssh/sshd_config",
     r">>\s*/etc/ssh/authorized_keys",  # append alone is not always bad but worth flagging
 
-    # Reboot without handoff
-    r"\b(shutdown|reboot|halt|poweroff)\s+(-[a-z]*|now)?",
+    # Reboot without handoff. Anchored to command position (line start /
+    # after ; & | / sudo) so bare "reboot" and "sudo reboot" are caught
+    # while mentions like "grep reboot /var/log/syslog" stay allowed.
+    r"(?:^|[;&|]\s*|\bsudo\s+)(shutdown|reboot|halt|poweroff)\b",
 ]
 
 
