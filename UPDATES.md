@@ -203,7 +203,7 @@ UPDATED rules/no-guessing.md, rules/verify-at-consumer.md
 - Replaced "Илюхина's Claude" attribution with "a collaborator's parallel Claude session" (idea attribution preserved, person name removed)
 
 UPDATED rules/long-run-harness.md
-- Replaced 3 broken `CODE_Claude/.claude/rules/...` cross-refs with `project-level .claude/rules/...` (these were paths from the original author's workspace; in public repo they read as broken pointers)
+- Replaced 3 broken author-workspace `.claude/rules/...` cross-refs with `project-level .claude/rules/...` (in the public repo they read as broken pointers)
 
 UPDATED UPDATES.md (historic entries)
 - v3.7.1 entry: replaced 3 specific project mentions with generic descriptors
