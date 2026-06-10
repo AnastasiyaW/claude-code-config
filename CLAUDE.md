@@ -452,7 +452,7 @@ Source: ULTRAPACK (github.com/btseytlin/ultrapack) task.md pattern + this repo's
 **Tooling:**
 - `/layer-new <name>` -- scaffold a layer from template (`templates/kb-skeleton/docs/layers/_LAYER-TEMPLATE/`)
 - `/feature-new <layer> <slug>` -- scaffold a feature with auto-allocated F-NNN
-- `scripts/build_kb_graph.py` -- generate `docs/_graph/tree.md` (Mermaid), `backlinks.json`, `health.md`
+- [`templates/kb-skeleton/scripts/build_kb_graph.py`](templates/kb-skeleton/scripts/build_kb_graph.py) -- generate the project KB graph (Mermaid tree, backlinks index, health report) in the project's `docs/_graph` directory
 - SessionStart hook `validate_kb_links.py` -- lightweight scan on session start, surfaces drift
 
 **Promotion gate:** patterns earn their place by usage. Feature-local PC-N -> layer pattern (after 2+ features) -> global principle (after 2+ projects). Most layer-local patterns never promote; that is correct.
