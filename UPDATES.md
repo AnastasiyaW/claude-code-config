@@ -4,6 +4,19 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-10 (v3.29.1 — user-facing docs actualized to match actual contents)
+
+Every "textual information" surface refreshed against the real file tree (counts were 1-2 versions stale):
+
+- **README.md**: intro counts corrected (29 principles / 25 hooks / 28 skills / 43 rules); principles list completed (12 Low-Signal Residual Training, 13 Research Pipeline, 29 MVP Agent Blueprint were missing); hooks table expanded 15 -> 25 rows with verified events/matchers (taken from a live `settings.json` wiring, not guessed); Structure section now documents `rules/` and `workflows/`; install table gains a "more than one CLI agent" row; CN/RU intro sections rewritten with current counts and the cross-harness pointer.
+- **[`scripts/install_hooks.py`](scripts/install_hooks.py)**: 9 shipped-but-uninstallable hooks added to `--extras` (claude-attribution-guard, human-confirmation-guard, db-snapshot-guard, verify-deleted-guard, file-cohesion-guard, precompact-handoff-guard, test-gate-stop-hook, problems-md-validator, plan-gate) — previously the repo shipped 25 hooks but the installer knew only 15.
+- **[`CLAUDE.md`](CLAUDE.md)**: Core Working Rules section extended with the rules published in v3.29.0 (autonomy-risk-tiers, no-guessing, git-source-of-truth, file-organization-cohesion, cross-harness-agents-md) — previously listed only 5 of the always-on set.
+- **[`AGENTS.md`](AGENTS.md)**: counts + `workflows/` entry.
+- **[`HOW-IT-WORKS.md`](HOW-IT-WORKS.md)**: new "Cross-Harness Context" section (one AGENTS.md, many CLIs — the no-symlinks mechanism table); scripts table completed (12 scripts, was 5).
+- **[`MAINTENANCE.md`](MAINTENANCE.md)**: section 3 (bi-weekly sync) rewritten around the mechanized `sync_public_config.py` four-bucket workflow.
+
+---
+
 ## 2026-06-10 (v3.29.0 — cross-harness AGENTS.md, gemini-delegate, workflows/, mechanical public-repo sync)
 
 **Cross-harness context sharing (the "CLAUDE.md vs GEMINI.md vs AGENTS.md" question):**

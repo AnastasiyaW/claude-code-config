@@ -1,4 +1,4 @@
-# Proof Verify
+﻿# Proof Verify
 
 Plan-based verification: freeze acceptance criteria BEFORE building, verify AFTER with independent agents.
 
@@ -230,7 +230,7 @@ Typical: 1-2 fix rounds. If 3+ rounds on same AC → the AC itself might be wron
 
 ## Sources
 
-- [Proof Loop (Principle 02)](../../principles/02-proof-loop.md) - the theoretical foundation
+- [Proof Loop (Principle 02)](../../../principles/02-proof-loop.md) - the theoretical foundation
 - [OpenClaw-RL](https://arxiv.org/abs/2603.10165) - spec freeze → build → fresh verify
 - [Agent-R](https://arxiv.org/abs/2501.11425) - failed-then-fixed trajectories
 - oh-my-claudecode Ralph - PRD-driven persistence (practical inspiration)

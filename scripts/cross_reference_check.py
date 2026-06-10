@@ -33,6 +33,16 @@ ROOT = Path(__file__).resolve().parent.parent
 # Match markdown links: [text](relative/path.md) or [text](path.md#anchor)
 # Skip URLs (http://, https://, mailto:)
 LINK_RE = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+FENCED_CODE_RE = re.compile(r"```.*?```", re.DOTALL)
+INLINE_CODE_RE = re.compile(r"`[^`\n]*`")
+PLACEHOLDER_RE = re.compile(r"[<>]|\bNNN\b|\{\{|-slug\b")
+
+
+def strip_code(text: str) -> str:
+    """Remove fenced blocks and inline code spans - links inside them are
+    illustrative examples (template substitution tables, sample file trees),
+    not real references."""
+    return INLINE_CODE_RE.sub("", FENCED_CODE_RE.sub("", text))
 
 # What dirs contain markdown we scan
 SCAN_DIRS = ["principles", "rules", "alternatives", "skills", "templates"]
@@ -321,15 +331,18 @@ def main(argv: list[str]) -> int:
     errors: list[str] = []
     warnings: list[str] = []
 
-    # 1. Resolve all markdown links
+    # 1. Resolve all markdown links (outside code blocks/spans)
     for f in collect_files():
-        text = f.read_text(encoding="utf-8", errors="replace")
+        text = strip_code(f.read_text(encoding="utf-8", errors="replace"))
         for m in LINK_RE.finditer(text):
             url = m.group(2).strip()
             if is_external(url):
                 continue
             if not url.endswith(".md") and not url.endswith(".py"):
                 # Links to other extensions or dirs, skip
+                continue
+            if PLACEHOLDER_RE.search(url):
+                # Template placeholder (feat-<NNN>-<slug>.md etc), not a real path
                 continue
             err = check_link(f, url)
             if err:

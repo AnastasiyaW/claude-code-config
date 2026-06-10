@@ -62,11 +62,11 @@ If you have enough information, proceed. If anything is ambiguous, ask one focus
 ## Связанное
 
 - **Rule**: [~/.claude/rules/no-pre-existing-evasion.md](../rules/no-pre-existing-evasion.md)
-- **Stop hook**: [~/.claude/scripts/stop-test-gate.py](../scripts/stop-test-gate.py) - блокирует "готово" если красный
-- **PROBLEMS.md hook**: [~/.claude/scripts/check-problems-md.py](../scripts/check-problems-md.py) - блокирует если OPEN без 5-exception
+- **Stop hook**: `hooks/test-gate-stop-hook.py` - блокирует "готово" если красный
+- **PROBLEMS.md hook**: `hooks/problems-md-validator.py` - блокирует если OPEN без 5-exception
 
 ## Источники
 
 - [Anthropic - Best Practices Opus 4.7](https://claude.com/blog/best-practices-for-using-claude-opus-4-7-with-claude-code) - literal interpretation
 - [bradfeld - Fix or ticket policy](https://gist.github.com/bradfeld/1deb0c385d12289947ff83f145b7e4d2) - 5-exception list
-- Research: [research/agentic/2026-05-04-claude-pre-existing-bug-evasion-pattern.md](../../Desktop/CODE_Claude/research/agentic/2026-05-04-claude-pre-existing-bug-evasion-pattern.md)
+- Полный разбор паттерна: [principles/26-no-pre-existing-evasion.md](../principles/26-no-pre-existing-evasion.md) + [rules/no-pre-existing-evasion.md](../rules/no-pre-existing-evasion.md)

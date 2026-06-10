@@ -82,20 +82,29 @@ Whenever you notice a class of drift the script missed, **add it as a new automa
 
 ---
 
-## 3. Bi-weekly sync checkpoint with local workflow
+## 3. Sync checkpoint with local workflow (mechanized)
 
 **Trigger:** every ~2 weeks, or when onboarding a new significant pattern.
 
-**Workflow:**
-1. Diff `.claude/rules/` from your active project against `rules/` in this repo
-2. For each file in local that doesn't exist in public, classify:
-   - **Generalizable** - pattern applies broadly, not tied to personal paths/infra → port
-   - **Local-only** - personal workflow (specific research hub, project names, server hostnames, custom triggers) → stay local
-   - **Already ported** - covered by an existing principle/rule → verify alignment, no action
-3. For each file in public that exists in local, diff the content:
-   - Is the public version lagging behind local evolution? → update public
-   - Is the public version correctly generic while local is project-specific? → no action
-4. Update UPDATES.md with any ports or fixes
+**Mechanized since v3.29.0:** `scripts/sync_public_config.py` + `sync-manifest.json` do the diffing for you:
+
+```bash
+python scripts/sync_public_config.py                    # dry-run report
+python scripts/sync_public_config.py --apply            # copy in-sync updates
+python scripts/sync_public_config.py --scan-repo --strict   # privacy gate (run before EVERY push)
+```
+
+The report has four buckets:
+1. **updated** - file exists on both sides, active is newer, no privacy markers → copied on `--apply`
+2. **active-only candidates** - exists only in the live config. NEVER auto-copied. Classify manually:
+   - **Generalizable** → strip personal details (section 4), copy, add to manifest as synced
+   - **Local-only** (server names, personal projects, machine paths) → add to the mapping's `deny` list
+3. **repo-only** - genericized forks living here (e.g. `safety-hooks.md`); also listed in `deny` so a sync never overwrites the generic version with the private one
+4. **SKIPPED privacy markers** - the scanner caught something private; fix the file or deny it
+
+Comparison is EOL-normalized - a CRLF clone on Windows does not read as "everything differs" (a raw hash diff once reported 100+ false positives here).
+
+After applying: update UPDATES.md with any ports or fixes.
 
 **Classification helper questions:**
 - Does it mention specific server names, IPs, or paths like `C:\Users\...`? → local-only, do not port

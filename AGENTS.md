@@ -4,20 +4,21 @@ This is a configuration system repository for AI coding agents, not an applicati
 
 ## Purpose
 
-- `principles/` - 28 architectural principles, each preventing a specific failure mode
+- `principles/` - 29 architectural principles, each preventing a specific failure mode
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem
-- `hooks/` - ready-to-use Python hook scripts (session management, safety guards)
+- `hooks/` - 25 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types
 - `skills/` - domain-specific knowledge bundles (loaded on demand)
-- `rules/` - drop-in `.claude/rules/` files
-- `scripts/` - diagnostic utilities (config drift validator, KV-cache stats)
+- `rules/` - 43 drop-in `.claude/rules/` files
+- `workflows/` - dynamic-workflow commands + cost lessons
+- `scripts/` - utilities (hook installer, config drift validator, KV-cache stats, public-repo sync)
 - `CLAUDE.md` - Claude Code-specific overlay (extends this file)
 
 ## How agents should use this repo
 
 When the user asks you to "set up this project" or "apply these principles":
 
-1. Read `README.md` first - it lists the 28 principles by problem they solve
+1. Read `README.md` first - it lists the 29 principles by problem they solve
 2. Read `principles/README.md` for the maturity-level map (L1 -> L2 -> L3)
 3. Do NOT bulk-copy everything. Pick what matches the user's actual project:
    - Any project: Principle 09 (Supply Chain Defense), Principle 10 (Agent Security), Principle 11 (Documentation Integrity)

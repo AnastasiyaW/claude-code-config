@@ -25,6 +25,15 @@ Opt-in extras (use --extras):
   - session-handoff-check        SessionStart  surfaces recent handoffs
   - keyword-skill-router         UserPromptSubmit  suggests matching skills
   - task-inbox-show              SessionStart  surfaces .claude/task-inbox/ pending tasks
+  - claude-attribution-guard     PreToolUse    blocks Co-Authored-By: Claude footers
+  - human-confirmation-guard     PreToolUse    requires explicit user OK for deletions
+  - db-snapshot-guard            PreToolUse    auto-snapshot before destructive SQL
+  - verify-deleted-guard         PostToolUse   verifies destructive ops actually completed
+  - file-cohesion-guard          PreToolUse    advisory: durable files belong in project structure
+  - precompact-handoff-guard     PreCompact    demands a fresh handoff before context compaction
+  - test-gate-stop-hook          Stop          blocks closing a session with red tests
+  - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
+  - plan-gate                    UserPromptSubmit  plan-artifact discipline for risky asks
 
 Usage
 -----
@@ -77,6 +86,15 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("session-handoff-check.py",     "SessionStart", None),
     ("keyword-skill-router.py",      "UserPromptSubmit", None),
     ("task-inbox-show.py",           "SessionStart", None),
+    ("claude-attribution-guard.py",  "PreToolUse", "Bash"),
+    ("human-confirmation-guard.py",  "PreToolUse", "Bash"),
+    ("db-snapshot-guard.py",         "PreToolUse", "Bash"),
+    ("verify-deleted-guard.py",      "PostToolUse", "Bash"),
+    ("file-cohesion-guard.py",       "PreToolUse", "Write|Edit"),
+    ("precompact-handoff-guard.py",  "PreCompact", None),
+    ("test-gate-stop-hook.py",       "Stop", None),
+    ("problems-md-validator.py",     "Stop", None),
+    ("plan-gate.py",                 "UserPromptSubmit", None),
 ]
 
 # Shared utility (not a hook itself - but needed by hooks)

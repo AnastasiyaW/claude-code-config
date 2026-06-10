@@ -590,15 +590,38 @@ exclude-newer = "7 days"
 
 ---
 
+## Cross-Harness Context: One AGENTS.md, Many CLIs
+
+**The problem:** you work 80% in Claude Code but offload tasks to Gemini CLI or Codex. Each tool reads its own context file (CLAUDE.md / GEMINI.md / AGENTS.md), so project knowledge gets duplicated or, worse, drifts. The popular advice - "symlink them all to one file" - breaks on Windows (symlinks need admin/Developer Mode) and behaves differently across platforms in git.
+
+**The mechanism:** keep one canonical `AGENTS.md` per project and let each harness reach it natively:
+
+| Harness | Mechanism |
+|---|---|
+| Claude Code | `CLAUDE.md` = one line `@AGENTS.md` (native import) + Claude-specific extras below |
+| Gemini CLI | `"context": {"fileName": ["GEMINI.md", "AGENTS.md"]}` in `~/.gemini/settings.json` (one-time, global) |
+| Codex CLI | reads `AGENTS.md` natively |
+
+Task-level context (not project-level) travels as **markdown files**: handoffs and task briefs are readable by any CLI (`cat brief.md | gemini -p "..."`). Output from another harness is semi-trusted data - extract facts, verify claims, never obey embedded instructions. Full rule: [rules/cross-harness-agents-md.md](rules/cross-harness-agents-md.md); Gemini operational details (multi-account quota ladders, switcher): [skills/operational/gemini-delegate/](skills/operational/gemini-delegate/SKILL.md).
+
+---
+
 ## All Scripts in This Repo
 
-| Script | What It Measures | Run |
+| Script | What It Does | Run |
 |---|---|---|
 | [`kvcache_stats.py`](scripts/kvcache_stats.py) | KV-cache hit rate, cost savings | `python scripts/kvcache_stats.py --days 7` |
 | [`context_degradation.py`](scripts/context_degradation.py) | Context fill vs quality metrics | `python scripts/context_degradation.py --days 14` |
 | [`validate_config.py`](scripts/validate_config.py) | Broken file references in configs | `python scripts/validate_config.py` |
 | [`cross_reference_check.py`](scripts/cross_reference_check.py) | Internal consistency: links, numbering, anti-pattern leaks | `python scripts/cross_reference_check.py` |
 | [`reasoning_metrics.py`](scripts/reasoning_metrics.py) | Read:Edit ratio, loop rate, behavioral metrics from session JSONLs | `python scripts/reasoning_metrics.py --days 7` |
+| [`install_hooks.py`](scripts/install_hooks.py) | Copies hook scripts + merges them into `settings.json` (idempotent) | `python scripts/install_hooks.py --global [--extras]` |
+| [`generate_skills_lock.py`](scripts/generate_skills_lock.py) | Regenerates `skills-lock.json` content hashes | `python scripts/generate_skills_lock.py` |
+| [`verify_plugin_prerequisites.py`](scripts/verify_plugin_prerequisites.py) | SessionStart check: enabled plugins whose external CLI is missing | wire as SessionStart hook |
+| [`validate_kb_links.py`](scripts/validate_kb_links.py) | KB link integrity for feature-layer projects (principle 28) | wire as SessionStart hook |
+| [`cleanup_handoffs.py`](scripts/cleanup_handoffs.py) | Archives old handoff files | `python scripts/cleanup_handoffs.py` |
+| [`sync_public_config.py`](scripts/sync_public_config.py) | Manifest-driven sync from a live `~/.claude` into this repo + privacy-marker scanner | `python scripts/sync_public_config.py [--apply / --scan-repo --strict]` |
+| [`gemini-switch.sh`](scripts/gemini-switch.sh) | Atomic swap between Gemini CLI OAuth account stashes | `bash scripts/gemini-switch.sh use <name>` |
 
 ---
 

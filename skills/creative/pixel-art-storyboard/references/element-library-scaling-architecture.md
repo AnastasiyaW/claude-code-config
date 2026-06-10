@@ -1,4 +1,4 @@
-# Element Library Scaling Architecture (10,000+ elements)
+﻿# Element Library Scaling Architecture (10,000+ elements)
 
 How to store, organize, search, and compose pixel-art elements at scale where a small agent can build beautiful animated scenes from text prompts. This goes beyond the v3.15 single-file approach (`elements.js`, 9 elements) to a tier-based growth path: 10 → 100 → 1,000 → 10,000+.
 
@@ -551,6 +551,6 @@ At 10K elements, manual review impossible. Solution:
 - pgvector: [pgvector docs](https://github.com/pgvector/pgvector)
 - Pinecone: [pinecone.io](https://www.pinecone.io/)
 - Weaviate: [weaviate.io](https://weaviate.io/)
-- DBS framework: [our principles/17-dbs-skill-creation.md](../../../principles/17-dbs-skill-creation.md)
+- DBS framework: [our principles/17-dbs-skill-creation.md](../../../../principles/17-dbs-skill-creation.md)
 
 See also `image-collection-learning-2026.md` for how to build the initial 10K library by decomposing public pixel-art collections (Pinterest, Lospec gallery, OpenGameArt, Reddit r/PixelArt).
