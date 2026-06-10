@@ -1,0 +1,69 @@
+{
+  "_doc": "Config for scripts/sync_public_config.py. One-way sync ACTIVE ~/.claude -> this repo. 'deny' = never sync (machine-specific in active, OR genericized fork lives in this repo and must not be overwritten). Files present in active but not in repo are only REPORTED as candidates; promote by adding to 'add' once reviewed. 'privacy_markers' are regexes; any match skips the file (and fails --strict).",
+  "active_root": "~/.claude",
+  "mappings": [
+    {
+      "from": "rules",
+      "to": "rules",
+      "deny": [
+        "mashinki-server-journal.md",
+        "ssh-connection-discipline.md",
+        "frontend-design-catalog.md",
+        "frontend-skill-routing.md",
+        "billing-safety.md",
+        "secrets-as-data.md",
+        "safety-hooks.md",
+        "post-ui-change-review.md",
+        "cross-harness-agents-md.md",
+        "file-organization-cohesion.md"
+      ],
+      "add": []
+    },
+    { "from": "principles", "to": "principles", "deny": [], "add": [] },
+    { "from": "templates", "to": "templates", "deny": [], "add": [] },
+    { "from": "agents", "to": "agents", "deny": [], "add": [] },
+    { "from": "alternatives", "to": "alternatives", "deny": [], "add": [] },
+    {
+      "from": "claude-code-config/hooks",
+      "to": "hooks",
+      "deny": ["mashinki-journal-reminder.py", "ssh-connection-guard.py"],
+      "add": []
+    },
+    {
+      "from": "workflows",
+      "to": "workflows",
+      "deny": ["scrape-batch.js", "dataset-validate.js", "README.md"],
+      "add": []
+    },
+    {
+      "from": "skills/workflow-orchestration",
+      "to": "skills/development/workflow-orchestration",
+      "deny": [],
+      "add": []
+    }
+  ],
+  "privacy_markers": [
+    "mashinki",
+    "workshop-vm",
+    "188\\.65\\.105",
+    "100\\.96\\.20\\.",
+    "100\\.99\\.128\\.",
+    "100\\.105\\.96\\.",
+    "100\\.111\\.38\\.",
+    "100\\.82\\.159\\.",
+    "100\\.106\\.168\\.",
+    "100\\.112\\.80\\.",
+    "tail4352f9",
+    "Users[/\\\\]+AiD",
+    "Users[/\\\\]+black",
+    "home[/\\\\]+happyin",
+    "ois\\.gold",
+    "anastasia\\.workflow",
+    "ri-advance",
+    "rpmx\\.ru",
+    "diamant",
+    "happyin\\.app",
+    "margins\\.club",
+    "voice-learning-system"
+  ]
+}

@@ -48,6 +48,7 @@ Add any hook to your `~/.claude/settings.json`:
 
 | Script | Event | What It Does |
 |---|---|---|
+| [file-cohesion-guard.py](file-cohesion-guard.py) | `PreToolUse` | Advisory (never blocks): warns when a durable file (code, doc, config, data) is written to a scratch location — home root, Desktop, Downloads, /tmp — instead of the project structure. Policy: [rules/file-organization-cohesion.md](../rules/file-organization-cohesion.md). |
 | [kvcache-stats.py](../scripts/kvcache_stats.py) | Manual | Analyzes KV-cache hit rate across sessions. Not a hook but a diagnostic script. |
 
 ## Hook Events Reference (Claude Code v2.1.89+)

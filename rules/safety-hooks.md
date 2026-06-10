@@ -1,0 +1,69 @@
+# Safety Hooks — свод (mechanical enforcement)
+
+Реальную защиту дают **hooks** — они срабатывают механически на каждый tool call. Это правило -
+объяснение ПОЧЕМУ и safe-альтернативы. Hook = закон, правило = объяснение.
+
+> Активная директория хуков в этом наборе: `hooks/*.py` (wire через
+> `scripts/install_hooks.py`). Git-хуки (pre-push): `git config --global core.hooksPath
+> ~/.claude/scripts/git-hooks`.
+
+## Bypass-формат
+
+Комментарий в начале команды:
+
+```
+# claude-bypass: <key1>, <key2>
+# Reason: <зачем bypass и какое разрешение user>
+<команда>
+```
+
+Всегда писать `Reason:`. `all` - пропускает все hooks (только по explicit запросу user).
+Env vars через inline `FOO=1 cmd` НЕ видны хуку — нужен marker либо `export` заранее.
+
+## PreToolUse блокировки
+
+| Hook (script) | Блокирует | Bypass key | Safe-альтернатива |
+|---|---|---|---|
+| `destructive-command-guard.py` | rm -rf корней, DROP/TRUNCATE, docker system prune, mkfs, dd | destructive | targeted rm; DELETE с узким WHERE; явный список контейнеров |
+| `git-destructive-guard.py` | reset --hard, push --force, branch -D, clean -fdx, checkout -- . | git-destructive | stash + reset --keep; push --force-with-lease; branch -d |
+| `self-harm-guard.py` | restart sshd (единств. сессия), kill node/bun/python, iptables/ufw DROP, reboot | self-harm | только при наличии второго канала на хост |
+| `test-muting-guard.py` | @pytest.mark.skip/xfail, it.skip, @Disabled, t.Skip | test-muting | чинить тест; skip только с reason + issue-link |
+| `command-injection-guard.py` | `$(...)` / backticks с non-trivial body (Bash) | injection | одинарные кавычки; heredoc `'EOF'`; `--body-file`/stdin |
+| `human-confirmation-guard.py` | любой destructive intent без явного подтверждения user | (подтвердить) | спросить user с конкретным списком, что удаляем (см. `deletion-confirm-and-verify.md`) |
+| `db-snapshot-guard.py` | bypass'нутый destructive SQL без снапшота | — | авто-снапшот БД перед операцией |
+| `file-cohesion-guard.py` | (advisory, не блок) durable-файл в scratch-локации | — | положить в правильное место структуры (см. `file-organization-cohesion.md`) |
+
+## PostToolUse / Stop / SessionStart / PreCompact
+
+- `verify-deleted-guard.py` (PostToolUse) — проверяет, что destructive-операция РЕАЛЬНО завершилась (объект исчез).
+- `api-key-leak-detector.py` (PostToolUse) — detective: сканирует output на API-key паттерны, warning (не блок).
+- `git-auto-backup.py` (PreToolUse) — перед bypass'нутой destructive git-операцией создаёт ветку `claude-backup-<ts>` / stash.
+- `stop-phrase-guard.py` (Stop) — блок завершения при фразах-отговорках («на следующую сессию» и т.п.) → `finish-the-task.md`.
+- `test-gate-stop-hook.py` (Stop) — не даёт закрыть с красными тестами.
+- `problems-md-validator.py` (Stop) — блок при OPEN-пунктах в PROBLEMS.md без 5-exception тикета.
+- `session-handoff-reminder.py` (Stop) — напоминает написать handoff в конце длинной сессии.
+- `backup-retention-cleanup.py` (Stop) — удаляет backup-ветки/stash старше 14 дней.
+- `precompact-handoff-guard.py` (PreCompact) — на авто/ручной компакт (= переполнение контекста): если свежего handoff (<25 мин) нет, ставит маркер `.claude/.precompact-handoff-needed` + требует дописать handoff (near-overflow exception из `finish-the-task.md`). Не блокирует компакт.
+- `session-handoff-check.py` (SessionStart) — показывает свежие handoff'ы: последний **на проект** (подпапки `.claude/handoffs/<slug>/` + legacy flat + глобальный `~/.claude/handoffs/`), сортировка по времени из ИМЕНИ файла; поднимает маркер от `precompact-handoff-guard` после компакта, затем чистит его.
+- `session-drift-validator.py` (SessionStart) — валидирует ссылки в CLAUDE.md/rules, ловит мёртвые пути.
+- `keyword-skill-router.py` (UserPromptSubmit) — подсказывает релевантный skill по ключевым словам.
+
+## Секреты → единый источник: [`secrets-as-data.md`](secrets-as-data.md)
+
+Коротко (механика): чтение/использование секретов локально — свободно; `secret-leak-guard.py`
+поставляется, но wire его — осознанное решение каждого пользователя. Единственная жёсткая
+граница — выходная: `pre-push-claude-attribution.py` + публичный pre-push скан (ничего
+секретного не уходит в ПУБЛИЧНЫЙ репозиторий). Полная политика — `secrets-as-data.md`.
+
+## Recovery
+
+- После `reset --hard` с auto-backup: `git log claude-backup-<ts>` → checkout/cherry-pick.
+- После `clean -fdx` с auto-backup: `git stash list` → `git stash pop stash@{N}`.
+- API key leak (`api-key-leak-detector` сработал): оценить, утёк ли ключ реально наружу
+  (публичный репо / внешний сервис) — тогда ротация; локальный output сам по себе не утечка.
+
+## Источник
+
+Детальная история каждого hook — в [hooks/README.md](../hooks/README.md). Имена скриптов
+сверять с вашим `settings.json` (источник истины — wiring), не с этим списком, если
+возникнут расхождения.

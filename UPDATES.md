@@ -4,6 +4,31 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-10 (v3.29.0 — cross-harness AGENTS.md, gemini-delegate, workflows/, mechanical public-repo sync)
+
+**Cross-harness context sharing (the "CLAUDE.md vs GEMINI.md vs AGENTS.md" question):**
+- NEW [`rules/cross-harness-agents-md.md`](rules/cross-harness-agents-md.md) — one canonical `AGENTS.md` per project shared by Claude Code (`@AGENTS.md` import), Gemini CLI (`context.fileName` setting), and Codex (native). No symlinks — they break on Windows and behave differently across platforms in git. Includes task-level context passing (handoff/brief markdown files as the universal currency) and trust labels for cross-vendor output.
+- NEW skill [`skills/operational/gemini-delegate/`](skills/operational/gemini-delegate/SKILL.md) — delegating bulk / long-context / second-opinion work to Gemini CLI: multi-account OAuth stash switcher ([`scripts/gemini-switch.sh`](scripts/gemini-switch.sh)), live-measured quota caps (~16-18 Pro-tier agentic tasks/account/day) with a recovery ladder (switch account → Flash model → split across days), non-interactive invocation patterns, hard boundaries (no secrets to external LLMs, semi_trusted output).
+
+**Dynamic workflows go public:**
+- NEW [`workflows/`](workflows/) — drop-in workflow commands `/deep-review-flow` (competency review with adversarial verify) and `/research-cn-ru` (research with mandatory CN/RU sources), plus [`workflows/EFFECTIVE-AGENTS.md`](workflows/EFFECTIVE-AGENTS.md) — measured lessons from production runs (one `agent()` ≈ 95-150k tokens; resume is the main economy lever).
+- NEW skill [`skills/development/workflow-orchestration/`](skills/development/workflow-orchestration/SKILL.md) — writing dynamic workflow scripts: pipeline vs parallel, schemas, budgets, resume, quality patterns, billing discipline.
+- [`rules/safety-billing.md`](rules/safety-billing.md) gains Risk 4: dynamic workflows as a token-burn multiplier — opt-in requirement, scale estimation before launch, `budget`-guard in loops.
+
+**Broken references fixed + missing rules published.** Several rules already in this repo (`silent-failure-detection`, `deletion-confirm-and-verify`, `quality-no-monkey-patch`, `quality-over-tokens-independent-verify`) linked to files that were not here. Now published:
+- [`rules/system-verification-independent.md`](rules/system-verification-independent.md) — control systems / kill switches / functions verify behavior independently ("function name ≠ behavior"), with the real watchdog-that-didn't-kill case
+- [`rules/safety-hooks.md`](rules/safety-hooks.md) — one-page map of every hook + the `# claude-bypass: <key>` comment format
+- [`rules/autonomy-risk-tiers.md`](rules/autonomy-risk-tiers.md) — act without asking on reversible actions; backup→verify→act (or wait) only on the irreversible tier
+- [`rules/git-source-of-truth.md`](rules/git-source-of-truth.md) — git as the single source of truth; deploy → commit+push always together; the 4 classes of things that stay out
+- [`rules/file-organization-cohesion.md`](rules/file-organization-cohesion.md) + enforcing hook [`hooks/file-cohesion-guard.py`](hooks/file-cohesion-guard.py) — durable artifacts go into the existing structure, related files stay together
+- [`rules/post-ui-change-review.md`](rules/post-ui-change-review.md) — isolated design-review subagent after every CSS/HTML/DOM change (path-scoped)
+- [`templates/bug-fix-prompt.md`](templates/bug-fix-prompt.md) — bug-fix task prompt with anti-"pre-existing" constraints baked in
+
+**Repo freshness is now mechanical:**
+- NEW [`scripts/sync_public_config.py`](scripts/sync_public_config.py) + [`sync-manifest.json`](sync-manifest.json) — manifest-driven one-way sync from a live `~/.claude` into this repo: EOL-normalized diffing (a CRLF clone no longer reads as "everything differs"), deny-list for machine-specific files, active-only files surface as candidates instead of being auto-copied, and a privacy-marker scanner (`--scan-repo --strict`) gates every push. Reusable for any private-config/public-fork split.
+
+---
+
 ## 2026-05-28 (v3.28.0 — silent-failure-detection: plugin CLI prerequisite verifier)
 
 NEW [`rules/silent-failure-detection.md`](rules/silent-failure-detection.md)

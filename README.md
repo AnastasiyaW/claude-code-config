@@ -110,8 +110,13 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [self-harm-guard](hooks/self-harm-guard.py) | `PreToolUse` | Prevents agent from killing its own process, locking SSH |
 | [test-muting-guard](hooks/test-muting-guard.py) | `PreToolUse` | Blocks adding `@skip`, `.only()`, `@Ignore` to existing tests |
 | [backup-retention-cleanup](hooks/backup-retention-cleanup.py) | `Stop` | Cleans up old backup branches (14-day retention) |
+| [file-cohesion-guard](hooks/file-cohesion-guard.py) | `PreToolUse` | Advisory: warns when a durable file is written to a scratch location (home root, Desktop, Downloads, /tmp) instead of the project structure |
 
-**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md), [long-run project harness pack](templates/long-run-project/) (drop-in `feature_list.schema.json` + `feature_list.template.json` + `init.sh.template` for any project crossing 5+ features and 5+ sessions).
+**Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md), [bug-fix prompt](templates/bug-fix-prompt.md) (anti-"pre-existing" constraints baked in), [long-run project harness pack](templates/long-run-project/) (drop-in `feature_list.schema.json` + `feature_list.template.json` + `init.sh.template` for any project crossing 5+ features and 5+ sessions).
+
+**Dynamic workflow commands** ([workflows/](workflows/)) - ready-to-drop `.js` orchestration scripts for Claude Code dynamic workflows (`/deep-review-flow`, `/research-cn-ru`) plus [EFFECTIVE-AGENTS.md](workflows/EFFECTIVE-AGENTS.md) - measured cost lessons (one `agent()` ≈ 95-150k tokens; resume as the main economy lever).
+
+**Cross-harness setup** ([rules/cross-harness-agents-md.md](rules/cross-harness-agents-md.md)) - share one `AGENTS.md` per project between Claude Code, Gemini CLI, and Codex without symlinks: Claude imports it via `@AGENTS.md`, Gemini reads it via `context.fileName`, Codex natively. Companion skill [gemini-delegate](skills/operational/gemini-delegate/SKILL.md) covers multi-account Gemini CLI delegation (quota ladders, account switcher [scripts/gemini-switch.sh](scripts/gemini-switch.sh), trust boundaries).
 
 **Your agent picks the approach that fits.** The [alternatives/](alternatives/) directory compares 2-5 approaches for each problem, with pros, cons, and "when to choose" guidance:
 
@@ -283,6 +288,8 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Writing | `article-structure-review` | Audit article structure: hook strength, narrative arc, conclusion clarity |
 | Operational | `desktop-sessions-discovery` | Find/restore Claude desktop app sessions hidden after account switch (issue #48511) — 4 scripts (inventory/find/restore/HTML registry) for Mac/Win/Linux |
 | Operational | `harness-audit` | Score a project's agent harness across 5 subsystems (Instructions / State / Verification / Scope / Lifecycle), identify the bottleneck, produce a prioritized 3-step improvement plan with effort estimates. Read-only query skill — no changes applied without explicit user approval. |
+| Operational | `gemini-delegate` | Delegate bulk/long-context/second-opinion tasks to Gemini CLI: multi-account OAuth switcher, daily quota recovery ladder, non-interactive invocation, trust boundaries for cross-vendor output |
+| Development | `workflow-orchestration` | Write and run Claude Code dynamic workflows (deterministic JS orchestrator): pipeline vs parallel, schemas, budgets, resume, adversarial-verify patterns, billing discipline |
 
 ---
 
@@ -300,6 +307,8 @@ These work well alongside the principles:
 ## This Repo Is Updated Regularly
 
 Principles are updated with new research findings, real-world incidents, and community patterns. Security sections track actual CVEs and attack chains. See [UPDATES.md](UPDATES.md) for the full changelog.
+
+Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scripts/sync_public_config.py) + [sync-manifest.json](sync-manifest.json) run a manifest-driven one-way sync from the author's live `~/.claude` into this repo - EOL-normalized diffing, an explicit deny-list for machine-specific files, and a privacy-marker scanner that blocks anything private from reaching the public tree (`--scan-repo --strict` runs before every push). If you maintain your own private-config/public-fork split, the same script works for you - edit the manifest.
 
 ---
 
