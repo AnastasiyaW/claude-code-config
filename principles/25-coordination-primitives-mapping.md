@@ -31,6 +31,14 @@ design review.
 | Hierarchical knowledge graph (Wings/Rooms) | Wiki / hierarchical KB | Engelbart 1968+ |
 | Atomic file write (tmp + fsync + rename) | Crash-safe replacement | POSIX rename(2) |
 | Pre-commit guard for lock leaks | Advisory lock leak detection | git hook conventions |
+| Current-state registry ("running now" snapshot) | Materialized view / status table | Database systems 1970s+ |
+| Pre-exec guard forcing a journal write on mutate | Write-ahead-before-mutate / audit gate | WAL discipline + git hook conventions |
+
+The last two rows are operationalized in [rules/activity-journal-and-state-registry.md](../rules/activity-journal-and-state-registry.md):
+the journal (WAL) records *what happened*, the registry (materialized view) answers *what is
+running now*, and the pre-exec guard ([hooks/activity-journal-guard.py](../hooks/activity-journal-guard.py))
+keeps the journal complete by **blocking** a mutation that does not log — discipline decays,
+the guard does not. Same scope caveats as the lock primitive: single shared FS / SSH reach.
 
 ## Why this matters for agent systems
 
