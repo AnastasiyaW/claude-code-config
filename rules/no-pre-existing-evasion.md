@@ -1,5 +1,8 @@
 # Rule - No "pre-existing" evasion (Anti-Laziness)
 
+> **Depth (pillars P1/P2/P4)** of the single work-discipline canon → [`finish-the-task.md`](finish-the-task.md).
+> That file states the whole principle in one place; this one carries the 5-exception taxonomy + hooks.
+
 Companion document to principle 26. Drop this into a project's
 `.claude/rules/` directory or merge into `CLAUDE.md`.
 
