@@ -17,7 +17,7 @@
         "cross-harness-agents-md.md",
         "file-organization-cohesion.md"
       ],
-      "add": ["quality-no-over-engineering.md"]
+      "add": ["rlm-context-as-program.md"]
     },
     { "from": "principles", "to": "principles", "deny": [], "add": [] },
     { "from": "templates", "to": "templates", "deny": [], "add": [] },
@@ -27,13 +27,13 @@
       "from": "claude-code-config/hooks",
       "to": "hooks",
       "deny": ["mashinki-journal-reminder.py", "ssh-connection-guard.py"],
-      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py"]
+      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py", "cyrillic-bash-guard.py", "handoff-resume-gate.py"]
     },
     {
       "from": "workflows",
       "to": "workflows",
       "deny": ["scrape-batch.js", "dataset-validate.js", "README.md"],
-      "add": []
+      "add": ["rlm-explore.js"]
     },
     {
       "from": "skills/workflow-orchestration",
