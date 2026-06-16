@@ -31,6 +31,7 @@ Opt-in extras (use --extras):
   - verify-deleted-guard         PostToolUse   verifies destructive ops actually completed
   - file-cohesion-guard          PreToolUse    advisory: durable files belong in project structure
   - ask-question-guard           PreToolUse    blocks deferral/menu AskUserQuestion on reversible work
+  - over-engineering-advisor     PostToolUse   advisory nudge on large/dependency-adding code changes
   - precompact-handoff-guard     PreCompact    demands a fresh handoff before context compaction
   - test-gate-stop-hook          Stop          blocks closing a session with red tests
   - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
@@ -93,6 +94,7 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("verify-deleted-guard.py",      "PostToolUse", "Bash"),
     ("file-cohesion-guard.py",       "PreToolUse", "Write|Edit"),
     ("ask-question-guard.py",        "PreToolUse", "AskUserQuestion"),
+    ("over-engineering-advisor.py",   "PostToolUse", "Write|Edit|MultiEdit"),
     ("precompact-handoff-guard.py",  "PreCompact", None),
     ("test-gate-stop-hook.py",       "Stop", None),
     ("problems-md-validator.py",     "Stop", None),

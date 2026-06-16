@@ -38,6 +38,7 @@ Env vars через inline `FOO=1 cmd` НЕ видны хуку — нужен m
 
 - `verify-deleted-guard.py` (PostToolUse) — проверяет, что destructive-операция РЕАЛЬНО завершилась (объект исчез).
 - `api-key-leak-detector.py` (PostToolUse) — detective: сканирует output на API-key паттерны, warning (не блок).
+- `over-engineering-advisor.py` (PostToolUse Write|Edit|MultiEdit) — advisory: большое добавление в код / новая зависимость → нудж «это минимум?» (`quality-code.md`), НЕ блок; bypass `CLAUDE_ALLOW_BLOAT=1`.
 - `git-auto-backup.py` (PreToolUse) — перед bypass'нутой destructive git-операцией создаёт ветку `claude-backup-<ts>` / stash.
 - `stop-phrase-guard.py` (Stop) — блок завершения при фразах-отговорках («на следующую сессию» и т.п.) → `finish-the-task.md`.
 - `test-gate-stop-hook.py` (Stop) — не даёт закрыть с красными тестами.
