@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """PostToolUse(Write|Edit|MultiEdit): advisory nudge on large / dependency-adding code changes.
 
 Makes the quality-code / anti-over-engineering (YAGNI) principle a PERMANENT
@@ -12,7 +12,7 @@ Design (research-backed 2026-06-16):
   * Checks ONLY reliable mechanical signals: a large net addition to a code file,
     or a new dependency in a manifest. Fuzzy "abstraction smells" (factory-for-one,
     interface-with-one-impl, speculative config) are deliberately NOT auto-classified
-    here — they need semantic judgment; left to the model + the /ponytail-review skill.
+    here — they need semantic judgment; left to the model + the /lean-code (or /simplify) review skill.
   * Scoped to code files + dependency manifests. Docs/markdown/data are skipped
     (consolidating a big doc is not over-engineering).
 

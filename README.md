@@ -2,7 +2,7 @@
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code agents. 29 architectural principles, 27 enforcement hooks, 29 skills, 24 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code agents. 29 architectural principles, 27 enforcement hooks, 30 skills, 24 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -190,7 +190,7 @@ See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the
 - `hooks/` - 27 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
 - `workflows/` - drop-in dynamic-workflow commands (`/deep-review-flow`, `/research-cn-ru`) + measured cost lessons.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types, plus the kb-skeleton and long-run-project scaffolding packs.
-- `skills/` - 29 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
+- `skills/` - 30 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
 - `scripts/` - utilities: hook installer, config validator, cross-reference checker, KV-cache stats, skills-lock generator, public-repo sync with privacy scanner, Gemini account switcher.
 - `skills-lock.json` - reproducible lockfile with content hashes of every skill (regenerate via `scripts/generate_skills_lock.py`).
 - `CLAUDE.md` - compact summary of all principles for global config.
@@ -294,6 +294,7 @@ Skills are practical tools for specific domains. They are secondary to the princ
 | Frontend | `frontend-design` | Production-grade interfaces, not template defaults |
 | Architecture | `harness-design` | Multi-agent patterns: Generator-Evaluator, Sprint Contracts |
 | Architecture | `agent-harness-design` | Ten on-demand reference sheets for building a safe agent harness: tool risk taxonomy, permissions, budgets, evals, observability, plan/approval artifacts, context trust labels, 3rd-party-skill checklist |
+| Architecture | `lean-code` | On-demand minimalism intensifier (YAGNI ladder) — write the leanest correct code, kill over-engineering before it starts; lite/full/ultra. Pairs with the quality-code rule + over-engineering-advisor hook |
 | Architecture | `layer-new` | Scaffold a project layer (security, data, ui, etc.) under `docs/layers/` per Principle 28. Idempotent, falls back to GitHub fetch if template missing. |
 | Architecture | `feature-new` | Scaffold an ULTRAPACK-style feature narrative inside a layer with auto-allocated F-NNN ID, layer README updates, feature_list.json sync. |
 | iOS | `ios-development` | Swift, SwiftUI, UIKit, MVVM/TCA, Metal/GPU |
@@ -346,7 +347,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、29 个技能、27 个即用型 Hook 脚本、24 条 drop-in 规则和项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、30 个技能、27 个即用型 Hook 脚本、24 条 drop-in 规则和项目模板。
 
 **核心功能:**
 - `principles/` - 29 个独立架构原则，每个解决一个具体失败模式
@@ -366,7 +367,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 29 навыков, 27 hook-скриптов, 24 drop-in правила и шаблоны проектов.
+Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 30 навыков, 27 hook-скриптов, 24 drop-in правила и шаблоны проектов.
 
 **Что внутри:**
 - `principles/` - 29 принципов, каждый предотвращает конкретный тип отказа
