@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """install_hooks.py - register the always-on safety hooks into Claude Code settings.
 
 Copies hook scripts from this repo's `hooks/` directory into the target
@@ -30,6 +30,7 @@ Opt-in extras (use --extras):
   - db-snapshot-guard            PreToolUse    auto-snapshot before destructive SQL
   - verify-deleted-guard         PostToolUse   verifies destructive ops actually completed
   - file-cohesion-guard          PreToolUse    advisory: durable files belong in project structure
+  - ask-question-guard           PreToolUse    blocks deferral/menu AskUserQuestion on reversible work
   - precompact-handoff-guard     PreCompact    demands a fresh handoff before context compaction
   - test-gate-stop-hook          Stop          blocks closing a session with red tests
   - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
@@ -91,6 +92,7 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("db-snapshot-guard.py",         "PreToolUse", "Bash"),
     ("verify-deleted-guard.py",      "PostToolUse", "Bash"),
     ("file-cohesion-guard.py",       "PreToolUse", "Write|Edit"),
+    ("ask-question-guard.py",        "PreToolUse", "AskUserQuestion"),
     ("precompact-handoff-guard.py",  "PreCompact", None),
     ("test-gate-stop-hook.py",       "Stop", None),
     ("problems-md-validator.py",     "Stop", None),

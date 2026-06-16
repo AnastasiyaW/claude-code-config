@@ -32,7 +32,7 @@
 - Выбор между вариантами, которые все обратимы → выбираю лучший сам и делаю; в отчёте называю выбор.
 
 ## Механически / связано
-- Хук `stop-phrase-guard` ловит deferral-эндинги и «что дальше?»-меню (категория deferral_via_next_step_question).
+- Хуки `stop-phrase-guard` (Stop — ловит deferral-ФРАЗЫ в финальном тексте) + `ask-question-guard` (PreToolUse на `AskUserQuestion` — ловит deferral/меню-ВОПРОСЫ через сам инструмент). 2026-06-16 закрыта дыра: stop-guard видит только текст ассистента, а `AskUserQuestion` — tool-call (текст меню в tool_input), поэтому «куда продолжаем?»-меню проходило мимо; ask-question-guard блокирует его до показа (genuine-fork/необратимое — пропускает).
 - Связано: `finish-the-task.md` (доводим до конца), `no-pre-existing-evasion.md` (5 исключений отложки),
   `quality-over-tokens-independent-verify.md` (сложное/необратимое → independent verify),
   `deletion-confirm-and-verify.md` (удаление = подтверждение). Память: [[autonomy-risk-tiers]].

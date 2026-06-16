@@ -2,7 +2,7 @@
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code agents. 29 architectural principles, 25 enforcement hooks, 29 skills, 24 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code agents. 29 architectural principles, 26 enforcement hooks, 29 skills, 24 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -118,6 +118,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [backup-retention-cleanup](hooks/backup-retention-cleanup.py) | `Stop` | Cleans up old backup branches (14-day retention) |
 | [file-cohesion-guard](hooks/file-cohesion-guard.py) | `PreToolUse` | Advisory: warns when a durable file is written to a scratch location (home root, Desktop, Downloads, /tmp) instead of the project structure |
 | [human-confirmation-guard](hooks/human-confirmation-guard.py) | `PreToolUse` | Requires explicit user confirmation before any deletion-intent command |
+| [ask-question-guard](hooks/ask-question-guard.py) | `PreToolUse` | Blocks deferral/menu `AskUserQuestion` ("what next?", "which of these?") on reversible work — decide and proceed instead |
 | [verify-deleted-guard](hooks/verify-deleted-guard.py) | `PostToolUse` | Verifies a destructive operation actually completed (object really gone) |
 | [db-snapshot-guard](hooks/db-snapshot-guard.py) | `PreToolUse` | Auto-snapshots the database before bypassed destructive SQL |
 | [claude-attribution-guard](hooks/claude-attribution-guard.py) | `PreToolUse` | Blocks commits/PRs carrying `Co-Authored-By: Claude` footers (see [rules/no-claude-attribution.md](rules/no-claude-attribution.md)) |
@@ -185,7 +186,7 @@ See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the
 - `principles/` - 29 standalone architectural principles. Read the one that matches your current problem.
 - `rules/` - 24 drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
-- `hooks/` - 25 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
+- `hooks/` - 26 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
 - `workflows/` - drop-in dynamic-workflow commands (`/deep-review-flow`, `/research-cn-ru`) + measured cost lessons.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types, plus the kb-skeleton and long-run-project scaffolding packs.
 - `skills/` - 29 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
@@ -344,7 +345,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、29 个技能、25 个即用型 Hook 脚本、24 条 drop-in 规则和项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、29 个技能、26 个即用型 Hook 脚本、24 条 drop-in 规则和项目模板。
 
 **核心功能:**
 - `principles/` - 29 个独立架构原则，每个解决一个具体失败模式
@@ -364,7 +365,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 29 навыков, 25 hook-скриптов, 24 drop-in правила и шаблоны проектов.
+Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 29 навыков, 26 hook-скриптов, 24 drop-in правила и шаблоны проектов.
 
 **Что внутри:**
 - `principles/` - 29 принципов, каждый предотвращает конкретный тип отказа
