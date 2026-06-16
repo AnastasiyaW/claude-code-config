@@ -16,6 +16,7 @@ Bypass: env CLAUDE_COORD_BYPASS=1 (handled inside guard.evaluate).
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -56,7 +57,6 @@ def main() -> None:
 
     ti = event.get("tool_input", {})
     if isinstance(ti, str):
-        import json
         try:
             ti = json.loads(ti)
         except json.JSONDecodeError:
@@ -78,7 +78,6 @@ def main() -> None:
 
     if decision == "block":
         # use the guard's own block channel via safety_common
-        import json
         try:
             sys.stdout.reconfigure(encoding="utf-8")
         except (AttributeError, OSError):

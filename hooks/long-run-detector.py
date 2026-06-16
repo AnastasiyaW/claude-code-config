@@ -46,26 +46,17 @@ MIN_COMMITS = 40          # medium signal
 MIN_TRACKED = 200         # medium signal
 
 
-def _git_int(cwd: Path, *args: str) -> int:
+def _git(cwd: Path, *args: str, count_lines: bool = False) -> int:
+    """Run a git command; return its int value (or line count), -1 on any failure."""
     try:
         out = subprocess.run(
             ["git", *args], cwd=str(cwd), capture_output=True, text=True, timeout=3
         )
         if out.returncode != 0:
             return -1
+        if count_lines:
+            return sum(1 for ln in out.stdout.splitlines() if ln.strip())
         return int(out.stdout.strip() or 0)
-    except Exception:
-        return -1
-
-
-def _count_lines(cwd: Path, *args: str) -> int:
-    try:
-        out = subprocess.run(
-            ["git", *args], cwd=str(cwd), capture_output=True, text=True, timeout=3
-        )
-        if out.returncode != 0:
-            return -1
-        return sum(1 for ln in out.stdout.splitlines() if ln.strip())
     except Exception:
         return -1
 
@@ -87,10 +78,10 @@ def detect(cwd: Path) -> list[str] | None:
 
     hdir = claude_dir / "handoffs"
     if hdir.exists():
-        subdirs = [
-            d for d in hdir.iterdir() if d.is_dir() and d.name != "archive"
-        ]
-        if len(subdirs) > HUB_SUBDIR_LIMIT:
+        subdir_count = sum(
+            1 for d in hdir.iterdir() if d.is_dir() and d.name != "archive"
+        )
+        if subdir_count > HUB_SUBDIR_LIMIT:
             return None  # multi-project aggregation hub, not one project
         handoffs = 0
         for p in hdir.rglob("*.md"):
@@ -102,10 +93,10 @@ def detect(cwd: Path) -> list[str] | None:
             strong = True
             signals.append(f"{handoffs} session handoffs (multi-session work)")
 
-    commits = _git_int(cwd, "rev-list", "--count", "HEAD")
+    commits = _git(cwd, "rev-list", "--count", "HEAD")
     if commits >= MIN_COMMITS:
         signals.append(f"{commits} git commits")
-    tracked = _count_lines(cwd, "ls-files")
+    tracked = _git(cwd, "ls-files", count_lines=True)
     if tracked >= MIN_TRACKED:
         signals.append(f"{tracked} tracked files (large codebase)")
     if (cwd / "PROBLEMS.md").exists():
