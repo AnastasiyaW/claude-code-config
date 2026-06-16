@@ -1,4 +1,4 @@
-# Safety: Billing — Silent Subscription Overrides in Claude Code
+﻿# Safety: Billing — Silent Subscription Overrides in Claude Code
 
 ## Правило (advice layer)
 
@@ -158,5 +158,5 @@ $500+ чеками такие системы умножают, особенно 
 ## Связанное
 
 - [`rules/no-claude-attribution.md`](no-claude-attribution.md) — запрет `Co-Authored-By: Claude` в commits/PR (защищает от harness-detection regex'ов в будущих updates)
-- [`rules/safety-secrets.md`](safety-secrets.md) — общая защита `.env` файлов
-- [`rules/safety-api-key-leak.md`](safety-api-key-leak.md) — detection hook для leaked keys в output
+- [`secrets-as-data.md`](secrets-as-data.md) — политика секретов + защита `.env`
+- [`safety-hooks.md`](safety-hooks.md) — api-key-leak detector + все safety-хуки

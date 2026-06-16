@@ -1,4 +1,4 @@
-# Git - единственный источник истины
+﻿# Git - единственный источник истины
 
 ## Принцип (2026-05-14, user explicit)
 
@@ -123,7 +123,7 @@ Thumbs.db
 
 - **no-claude-attribution.md** - коммиты без `Co-Authored-By: Claude` и `Generated with Claude Code`
 - **safety-billing.md** - hermes.md pre-check перед работой в существующем репо
-- **safety-secrets.md** + `pre_push_public_repo_scan.py` - защита на выходной границе; приватные репо проходят push без скана, публичные - с 2-агентным сканом
+- **secrets-as-data.md** + `pre_push_public_repo_scan.py` - защита на выходной границе; приватные репо проходят push без скана, публичные - с 2-агентным сканом
 - **session-handoff.md** (project-level) - handoff = "что делать дальше", git = "что существует"; дополняют друг друга
 - **CLAUDE.md** "After making any change" пункт 3 (push to GitHub) - частный случай этого правила
 - **CLAUDE.md** "Public Skills Repository" - claude-code-config repo обновляется по этому же принципу

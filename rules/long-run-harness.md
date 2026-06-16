@@ -1,4 +1,4 @@
-# Long-Run Project Harness — feature_list.json + init.sh convention
+﻿# Long-Run Project Harness — feature_list.json + init.sh convention
 
 ## Принцип (2026-05-12)
 
@@ -135,9 +135,9 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 ### Process-level
 
 - [ ] **Autonomy level explicit** — answer-only / draft-only / approval-gated / autonomous-within-policy. Документировано в CLAUDE.md
-- [ ] **High-risk actions draft-only OR approval-gated** — список risk-classes в CLAUDE.md (см. `rules/agent-tool-design.md`)
-- [ ] **Step/cost/time budgets declared** для всех agents которые проект запускает (см. `rules/agent-budgets.md`)
-- [ ] **Trust labels applied** для external content (см. `rules/context-trust-labels.md`)
+- [ ] **High-risk actions draft-only OR approval-gated** — список risk-classes в CLAUDE.md (см. skill `agent-harness-design`)
+- [ ] **Step/cost/time budgets declared** для всех agents которые проект запускает (см. skill `agent-harness-design`)
+- [ ] **Trust labels applied** для external content (см. skill `agent-harness-design`)
 
 ### Knowledge-level
 
@@ -148,7 +148,7 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 
 ### Safety-level
 
-- [ ] **Secrets не в git, не в CLAUDE.md, не в скриптах** — pre-push scan настроен (см. `rules/safety-secrets.md`)
+- [ ] **Secrets не в git, не в CLAUDE.md, не в скриптах** — pre-push scan настроен (см. `secrets-as-data.md`)
 
 Если checklist не пройден полностью — проект остаётся в обычном режиме (не помечается `[LONG-RUN]`). Можно переходить итеративно — закрыл item, отметил, повторил.
 

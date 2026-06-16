@@ -1,4 +1,4 @@
-# No Claude Attribution в git / GitHub / Issues / PR
+﻿# No Claude Attribution в git / GitHub / Issues / PR
 
 ## Принцип
 
@@ -128,7 +128,7 @@ fi
 
 ## Применение к существующим commits
 
-История проекта может уже содержать `Co-Authored-By: Claude` строки. **Не переписывать историю автоматически** — force-push на shared branches опасен ([safety-git-destructive.md](safety-git-destructive.md)).
+История проекта может уже содержать `Co-Authored-By: Claude` строки. **Не переписывать историю автоматически** — force-push на shared branches опасен ([safety-hooks.md](safety-hooks.md)).
 
 Опционально пройтись `git filter-repo --replace-text` чтобы удалить footer'ы из last N commits — но это **не блокирующая** задача и требует coordinated push на shared repos.
 
@@ -144,7 +144,7 @@ fi
 ## Связь с другими правилами
 
 - [`rules/safety-billing.md`](safety-billing.md) — HERMES.md / ANTHROPIC_API_KEY риски (та же категория защиты от harness-detection)
-- [`rules/safety-git-destructive.md`](safety-git-destructive.md) — если решено переписывать history, careful с force-push
+- [`rules/safety-hooks.md`](safety-hooks.md) — если решено переписывать history, careful с force-push
 - [System prompt Claude Code](https://docs.claude.com/en/docs/claude-code/) — содержит default attribution директивы которые этим правилом override
 
 ## Источники

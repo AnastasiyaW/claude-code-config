@@ -55,6 +55,19 @@ Env vars через inline `FOO=1 cmd` НЕ видны хуку — нужен m
 граница — выходная: `pre-push-claude-attribution.py` + публичный pre-push скан (ничего
 секретного не уходит в ПУБЛИЧНЫЙ репозиторий). Полная политика — `secrets-as-data.md`.
 
+## Per-hook: safe-use, gaps, tuning (свод бывших safety-*.md)
+
+Каждый hook = закон; здесь — что он НЕ покрывает (важно знать предел) + tuning.
+
+- **destructive-command-guard** — `rm -rf /tmp/*` проходит, корни/`$HOME`/`/etc/*` блок (паттерны в `PATTERNS`). НЕ покрывает: деструктив внутри запускаемого скрипта (`./drop.sh`), shell-aliases, `psql -f drop.sql` (файл не виден), Python/Node DB-client API. Сужать regex при false-positive, не отключать категорию.
+- **git-destructive-guard** — safe-альт: `--force-with-lease` (а не `--force`), `branch -d`, `stash`+`reset --keep`. НЕ покрывает: force-push через GitHub Desktop/IDE/lazygit (не через Bash tool), `reflog expire`, interactive-rebase drop. Personal feature-branch → `CLAUDE_ALLOW_GIT_DESTRUCTIVE=1`.
+- **self-harm-guard** — тест перед действием: «сломает → есть второй способ зайти на хост?» нет → НЕ делать. НЕ покрывает: `/etc/hosts.deny`, systemd mask через конфиг, NetworkManager/systemd-networkd firewall, BMC/IPMI. Нестандартный SSH-порт = долгое восстановление через rescue.
+- **command-injection-guard** — safe: одинарные кавычки, heredoc `'EOF'`, `--body-file`/stdin. НЕ покрывает: `$(var)` где `$var` malicious, `eval`/`bash -c`/`sh -c`, Python/Node subprocess, SQL-инъекции (нужны prepared statements). Whitelist в `TRIVIAL_CMDS` — НЕ добавлять curl/ssh/docker/kubectl.
+- **test-muting-guard** — legit-skip: с `reason=…#issue`, `skipif` (OS/cond), или **удалить** тест устаревшей фичи. НЕ покрывает: закомментированный файл целиком, mute через CI-config / `.gitignore tests/`. Проект со skip как 1st-class → `CLAUDE_ALLOW_TEST_MUTING=1` + review-требование issue-link.
+- **api-key-leak-detector** (detective, warning не блок) — паттерны: `sk-ant-`, `sk-`, `gh[pousr]_`, `AKIA/ASIA`, stripe `*_live/_test_`, slack `xox*`, google `AIza`, PEM, JWT, bearer. НЕ ловит: base64/encoded, <16 символов, кастомные форматы. При срабатывании на РЕАЛЬНУЮ утечку наружу → ротация.
+- **git-auto-backup** — перед bypass'нутой git-destructive создаёт `claude-backup-<ts>`/stash. НЕ спасает от: force-push (remote уже перезаписан → `--force-with-lease`), `gc --prune=now`, `filter-repo` (ghost-branches).
+- **backup-retention-cleanup** (Stop) — чистит `claude-backup-*`/`claude-pre-clean-*` старше `RETENTION_DAYS=14`. Сохранить навсегда → переименовать вне паттерна (`git branch -m claude-backup-<ts> kept-<name>`).
+
 ## Recovery
 
 - После `reset --hard` с auto-backup: `git log claude-backup-<ts>` → checkout/cherry-pick.

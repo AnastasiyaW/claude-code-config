@@ -1,4 +1,4 @@
-# Edit Formats & Architect/Editor Tiering — токен-экономные правки + распределение по моделям
+﻿# Edit Formats & Architect/Editor Tiering — токен-экономные правки + распределение по моделям
 
 ## Принцип (2026-06-09, из разбора Aider)
 
@@ -9,7 +9,7 @@
 Это правило кодифицирует выбор формата и маппит его на наш Generator-Evaluator + `/model`-tiering.
 
 Источник: Aider edit-formats + architect/editor mode (Apache-2.0). Ложится на
-[[practice_harness_design]] и наш `agent-tool-design`.
+[[practice_harness_design]] и skill `agent-harness-design`.
 
 ## 4 формата правок — когда какой
 
@@ -63,7 +63,7 @@ Aider'овский split — это **тот же паттерн**, что у н
 - ❌ architect-план принят как «сделано» без applied+verified diff (нарушает proof-loop)
 
 ## Related
-- `agent-tool-design.md` — Edit/Write как typed tools; structured results
+- skill `agent-harness-design` (references/agent-tool-design.md) — Edit/Write как typed tools; structured results
 - `quality-over-tokens-independent-verify.md` — architect/editor = Generator-Evaluator на правках
 - [[practice_proof_loop]] — diff применён И верифицирован, не «выглядит ок»
 - [[feedback_communication_optimization]] — конститутивные задачи → явная структура полезна

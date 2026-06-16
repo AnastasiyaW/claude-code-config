@@ -4,7 +4,7 @@
 
 Hard user directives, codified as drop-in `rules/` + mirrored on hooks:
 - [`rules/secrets-as-data.md`](rules/secrets-as-data.md) -- secrets are working data, used freely; do NOT scrub tokens or nag about rotation; the only hard line is **nothing leaks into a PUBLIC repo** (pre-push scan).
-- [`rules/quality-no-monkey-patch.md`](rules/quality-no-monkey-patch.md) -- no monkey-patches without extreme need; rewrite cleanly with understanding, then verify.
+- [`rules/quality-code.md`](rules/quality-code.md) -- code quality between two poles: no monkey-patches (don't cut corners at the cost of stability) AND no over-engineering (YAGNI ladder); sweet spot = minimal correct architecture + verify. `/ponytail` = on-demand intensifier.
 - [`rules/finish-the-task.md`](rules/finish-the-task.md) -- **the single work-discipline canon (4 pillars, all in one place):** finish everything to the end (nothing "for later") · cover ALL related branches, not the minimum that works · quality over token economy · difficulty is no reason to defer. Aggregates the depth rules (`no-pre-existing-evasion`, `quality-over-tokens-independent-verify`) by reference. Enforced by `stop-phrase-guard` + `session-handoff-*`; near-overflow -> write a handoff.
 - [`rules/quality-over-tokens-independent-verify.md`](rules/quality-over-tokens-independent-verify.md) -- optimize for quality, NOT token economy; complex/irreversible work gets independent fresh-context agent verification (Generator-Evaluator).
 - [`rules/deletion-confirm-and-verify.md`](rules/deletion-confirm-and-verify.md) -- any deletion needs explicit unambiguous user confirmation; after a delete/copy, re-verify it actually happened. Enforced by `human-confirmation-guard` + `verify-deleted-guard`.
@@ -120,18 +120,7 @@ Output is a 15-section MVP blueprint: domain intake -> autonomy level (5 levels)
 
 **When to use:** new Agent SDK app, custom orchestrator, new MCP server, new Cloudflare Worker with tool calls. **Not for:** improvement of an existing harness (use principle 01 instead) or regular Claude Code sessions (harness is already given).
 
-Ten operational rules extracted for **always-on** use:
-
-- [`rules/agent-tool-design.md`](rules/agent-tool-design.md) -- 15-class risk taxonomy, 7-type permission decision object, draft/commit naming, structured tool results, deferred loading levels, hosted vs client tools, connector code-execution pattern (section 9)
-- [`rules/context-trust-labels.md`](rules/context-trust-labels.md) -- trusted/semi_trusted/untrusted labels with verbatim boundary statement, prompt injection defense
-- [`rules/agent-budgets.md`](rules/agent-budgets.md) -- 10 mandatory budget types every agent loop must declare
-- [`rules/agent-evals.md`](rules/agent-evals.md) -- 13 mandatory eval categories + 13 adversarial test cases + when to add regression evals
-- [`rules/agent-observability.md`](rules/agent-observability.md) -- 16 trace fields per model call, 7-question audit format, 6-step incident response
-- [`rules/agent-plan-artifact.md`](rules/agent-plan-artifact.md) -- planning mode (runtime, not paragraph), plan artifact format (10 fields), plan-validate-execute pattern
-- [`rules/agent-approval-records.md`](rules/agent-approval-records.md) -- approval request/result JSON schemas, scope/expiration enforcement, no self-approval
-- [`rules/agent-streaming.md`](rules/agent-streaming.md) -- buffering rules for incremental tool calls when stream=True; abort handling; output guardrail modes
-- [`rules/agent-event-model.md`](rules/agent-event-model.md) -- 13 typed events for harness state persistence (replay/audit/compaction/evals)
-- [`rules/agent-skill-install-checklist.md`](rules/agent-skill-install-checklist.md) -- pre/during/post install + audit + incident response for 3rd-party skills
+The ten operational sub-rules (tool risk taxonomy, context trust labels, agent budgets, evals, observability, plan-artifact, approval-records, streaming, event-model, 3rd-party-skill-install) now live **on-demand in the `agent-harness-design` skill** (`skills/agent-harness-design/references/`). They are situational — relevant only when building an agent harness — so they load when that skill triggers instead of bloating always-on context (consolidated 2026-06-16).
 
 These complement (do not replace) the harness design philosophy below.
 

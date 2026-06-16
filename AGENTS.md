@@ -9,7 +9,7 @@ This is a configuration system repository for AI coding agents, not an applicati
 - `hooks/` - 25 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types
 - `skills/` - domain-specific knowledge bundles (loaded on demand)
-- `rules/` - 43 drop-in `.claude/rules/` files
+- `rules/` - 24 drop-in `.claude/rules/` files (agent-harness design rules live on-demand in the `agent-harness-design` skill, not always-on)
 - `workflows/` - dynamic-workflow commands + cost lessons
 - `scripts/` - utilities (hook installer, config drift validator, KV-cache stats, public-repo sync)
 - `CLAUDE.md` - Claude Code-specific overlay (extends this file)

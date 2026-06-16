@@ -4,6 +4,19 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-16 (v3.30.0 — rules consolidation: fewer-but-focused, agent-* demoted to a skill)
+
+Research-backed consolidation of the always-on rule set (fewer files, no duplicates, one concern per file). Driven by current best practice: thin always-on context + demote situational detail to on-demand skills — bloated rule sets cause context-rot / lost-in-the-middle, which hurts quality, not just cost.
+
+- **rules/ 43 → 24.** Near-duplicates merged by synthesis (load-bearing detail kept, prose dropped):
+  - 8 per-hook safety docs (destructive, git-destructive, self-harm, command-injection, test-muting, api-key-leak, auto-backup, backup-retention) folded into the single [`rules/safety-hooks.md`](rules/safety-hooks.md) index ("Per-hook: safe-use, gaps, tuning" section). `safety-secrets` folded into [`rules/secrets-as-data.md`](rules/secrets-as-data.md).
+  - `quality-no-monkey-patch` + `quality-no-over-engineering` → one [`rules/quality-code.md`](rules/quality-code.md) (two poles: no-hack + no-over-build, sweet spot = minimal correct architecture + verify).
+  - `memory-crosslinks` + `ace-context-merge` → one [`rules/memory-maintenance.md`](rules/memory-maintenance.md) (cross-links + provenance tags + ACE delta-merge).
+- **Agent-harness design rules demoted to a skill.** The 10 `agent-*` + `context-trust-labels` rules (situational — relevant only when building an agent harness) moved into the new [`skills/agent-harness-design/`](skills/agent-harness-design/SKILL.md) (10 reference sheets), off always-on context. `CLAUDE.md` "Designing New Agents" now points to the skill.
+- All cross-references updated (CLAUDE.md, rules, README EN/中文/RU counts); no dead links; drift validator clean.
+
+---
+
 ## 2026-06-10 (v3.29.1 — user-facing docs actualized to match actual contents)
 
 Every "textual information" surface refreshed against the real file tree (counts were 1-2 versions stale):
