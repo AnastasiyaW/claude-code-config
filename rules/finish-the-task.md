@@ -67,6 +67,7 @@
 ## Связано (depth / enforcement этого канона)
 - `no-pre-existing-evasion.md` — 5-исключений + «fix B and C» (детали P1/P2/P4 + хуки-энфорсмент).
 - `quality-over-tokens-independent-verify.md` — P3 + Generator-Evaluator.
+- `quality-no-over-engineering.md` — YAGNI/анти-over-build; «минимально, но полно». P2/P3 имеют приоритет: «минимализм» = меньше кода на ветку, НЕ предлог недоделать ветку/срезать токены.
 - `autonomy-risk-tiers.md` — что делаем без спроса (обратимое) vs ждём (необратимое) — не путать с отложкой.
 - `task-thoroughness-all-branches` (memory) — исходник P2 (теперь поднят сюда как правило).
 - `session-handoff.md`, memory `claude-system-recovery-hub` — handoff (единственное legit прерывание).

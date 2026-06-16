@@ -17,7 +17,7 @@
         "cross-harness-agents-md.md",
         "file-organization-cohesion.md"
       ],
-      "add": []
+      "add": ["quality-no-over-engineering.md"]
     },
     { "from": "principles", "to": "principles", "deny": [], "add": [] },
     { "from": "templates", "to": "templates", "deny": [], "add": [] },
