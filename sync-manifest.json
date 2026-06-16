@@ -27,7 +27,7 @@
       "from": "claude-code-config/hooks",
       "to": "hooks",
       "deny": ["mashinki-journal-reminder.py", "ssh-connection-guard.py"],
-      "add": []
+      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py"]
     },
     {
       "from": "workflows",

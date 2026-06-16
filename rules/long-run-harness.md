@@ -162,14 +162,29 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 - **project-level `.claude/rules/session-handoff.md`** — handoff включает ссылку на текущую in-progress фичу
 - **project-level `.claude/rules/project-chronicles.md`** — chronicle entry при закрытии каждой фичи
 
-## Mechanical enforcement (TBD)
+## Mechanical enforcement (active)
 
-Hook idea (опционально): `Stop` hook который при detect'е `feature_list.json` в проекте:
-1. Проверяет: ровно одна фича `in-progress` (или ноль если ничего активного)? Если две — error.
-2. Проверяет: если в сессии был edit на `feature_list.json` ставящий `done` — `evidence` не пустой и содержит min 3 строки (L1, L2, L3)? Если нет — error.
-3. Soft warn (не block), потому что edge cases есть.
+Два хука (оба с `--self-test`, fail-open/opt-in — см. `no-silent-validators`):
 
-Implementation deferred. Сейчас — culture + правило.
+1. **`long-run-detector.py`** (SessionStart, informational) — **авто-ДЕТЕКТ** долгоиграющего
+   проекта. Сигналы по `cwd`: ≥3 датированных handoff'а в `.claude/handoffs/<slug>/` (strong),
+   ≥40 git-коммитов, ≥200 tracked-файлов, наличие `PROBLEMS.md`. Срабатывает при strong ИЛИ ≥2
+   medium и **нуджит**: «похоже на long-run → прогнать First Release Checklist + пометить
+   [LONG-RUN]». Молчит, если: проект уже принял харнесс (`feature_list.json`/`init.sh` есть),
+   это агрегирующий хаб (>5 проектов-подпапок в handoffs), не-проект (нет `.git` и `.claude`),
+   или уже нуджено <14 дней назад (стамп `.claude/.longrun-nudged`).
+   - 🔴 **Детект — автоматический; сама метка [LONG-RUN] — человеческое решение по дизайну.**
+     Хук НЕ пишет метку сам: преждевременная пометка = анти-паттерн (declared victory early).
+     Авто = обнаружение «пора проверить»; гейт (15-пунктовый чеклист) остаётся за человеком.
+
+2. **`feature-list-validator.py`** (Stop) — **энфорсит дисциплину** `feature_list.json` уже
+   принятого long-run проекта: WIP=1 (не больше одной `in-progress`) + `done` несёт непустой
+   `evidence`. Невалидный `status` отвергается. Opt-in: молчит, если `feature_list.json` нет.
+   Bypass: `CLAUDE_SKIP_FEATURE_CHECK=1` / `.claude/.skip-feature-check`.
+
+Оба прописаны в `~/.claude/settings.json` (SessionStart / Stop). Дополнительно дисциплину
+держат `problems-md-validator.py` (Stop) и `activity-journal-guard.py` (per-resource журнал,
+см. `activity-journal-and-state-registry.md`).
 
 ## Bootstrap существующего [LONG-RUN] проекта
 
