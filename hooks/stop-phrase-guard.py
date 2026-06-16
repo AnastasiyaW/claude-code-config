@@ -100,6 +100,11 @@ PHRASE_CATEGORIES: list[tuple[str, list[str]]] = [
             r"хочешь[^.?!\n]{0,40}(сделаю|сделать|продолжу|заведу|подниму|починю|возьмусь)",
             r"по любому из (этих|трёх|двух|них|пунктов)",
             r"\bили (всё ок|отдыхаем|ждём|двигаемся дальше)\b",
+            # binary-choice deferral: "<do X> или оставить/не трогать/потом?" — offering
+            # to skip planned work instead of doing it. (gap found 2026-06-16: a real
+            # "прогнать ... или оставить?" ending slipped past every pattern above.)
+            r"\bили (оставить|оставля|не трога|потом|как есть|подожд|скип)",
+            r"\bor (leave it|leave as|should i leave|skip it|skip this)\b",
             r"what (would you like|next|should i (do|tackle))\b",
             r"\bsay the word\b",
             r"let me know (which|if you|what you)\b",

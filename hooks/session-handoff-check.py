@@ -87,7 +87,7 @@ def main() -> int:
 
     # Reset per-session markers (so Stop hook can remind again this session)
     if claude_dir.exists():
-        for marker in (".handoff-reminded", ".session-start"):
+        for marker in (".handoff-reminded", ".session-start", ".stop-phrase-guard-fired"):
             m = claude_dir / marker
             if m.exists():
                 m.unlink()
