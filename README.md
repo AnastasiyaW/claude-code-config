@@ -2,7 +2,7 @@
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code agents. 29 architectural principles, 27 enforcement hooks, 30 skills, 24 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code agents. 29 architectural principles, 33 enforcement hooks, 30 skills, 25 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -120,6 +120,12 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [human-confirmation-guard](hooks/human-confirmation-guard.py) | `PreToolUse` | Requires explicit user confirmation before any deletion-intent command |
 | [ask-question-guard](hooks/ask-question-guard.py) | `PreToolUse` | Blocks deferral/menu `AskUserQuestion` ("what next?", "which of these?") on reversible work — decide and proceed instead |
 | [over-engineering-advisor](hooks/over-engineering-advisor.py) | `PostToolUse` | Advisory nudge when an edit adds a large code block or a new dependency — "is this the minimal solution?" (never blocks) |
+| [activity-journal-guard](hooks/activity-journal-guard.py) | `PreToolUse` | Enforces the shared activity journal — blocks a mutating command on a tracked shared resource that does not log to its journal |
+| [coord-claim-guard](hooks/coord-claim-guard.py) | `PreToolUse` | Claim-before-edit gate for multi-session / coord-enabled repos (blocks editing a file without an active claim) |
+| [cyrillic-bash-guard](hooks/cyrillic-bash-guard.py) | `PreToolUse` | Blocks raw non-ASCII (Cyrillic/CJK) in Windows Bash commands — encoding-corruption guard |
+| [feature-list-validator](hooks/feature-list-validator.py) | `Stop` | Validates feature_list.json discipline (WIP=1; `done` needs evidence) — companion to problems-md-validator |
+| [handoff-resume-gate](hooks/handoff-resume-gate.py) | `SessionStart` | Resume freshness-gate — complements session-handoff-check by gating on stale/unacknowledged handoffs |
+| [long-run-detector](hooks/long-run-detector.py) | `SessionStart` | Auto-detects a long-running project and nudges adopting the [LONG-RUN] harness (feature_list.json / init.sh) |
 | [verify-deleted-guard](hooks/verify-deleted-guard.py) | `PostToolUse` | Verifies a destructive operation actually completed (object really gone) |
 | [db-snapshot-guard](hooks/db-snapshot-guard.py) | `PreToolUse` | Auto-snapshots the database before bypassed destructive SQL |
 | [claude-attribution-guard](hooks/claude-attribution-guard.py) | `PreToolUse` | Blocks commits/PRs carrying `Co-Authored-By: Claude` footers (see [rules/no-claude-attribution.md](rules/no-claude-attribution.md)) |
@@ -185,9 +191,9 @@ See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the
 
 **Structure:**
 - `principles/` - 29 standalone architectural principles. Read the one that matches your current problem.
-- `rules/` - 24 drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
+- `rules/` - 25 drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
-- `hooks/` - 27 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
+- `hooks/` - 33 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
 - `workflows/` - drop-in dynamic-workflow commands (`/deep-review-flow`, `/research-cn-ru`) + measured cost lessons.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types, plus the kb-skeleton and long-run-project scaffolding packs.
 - `skills/` - 30 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
@@ -347,13 +353,13 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、30 个技能、27 个即用型 Hook 脚本、24 条 drop-in 规则和项目模板。
+面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、30 个技能、33 个即用型 Hook 脚本、25 条 drop-in 规则和项目模板。
 
 **核心功能:**
 - `principles/` - 29 个独立架构原则，每个解决一个具体失败模式
-- `rules/` - 24 条 drop-in 规则（工作纪律、安全 Hook 配套文档；Agent 设计规则已移至 `agent-harness-design` 技能）
+- `rules/` - 25 条 drop-in 规则（工作纪律、安全 Hook 配套文档；Agent 设计规则已移至 `agent-harness-design` 技能）
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 25 个即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
+- `hooks/` - 33 个即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
 - `workflows/` - 动态工作流命令（`/deep-review-flow`、`/research-cn-ru`）+ 实测成本经验
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆、项目编年史和长期项目脚手架（feature_list.json + init.sh）
 - `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具，包括 `harness-audit` 五子系统评估、`workflow-orchestration` 和 `gemini-delegate` 跨 CLI 委派）
@@ -367,13 +373,13 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 30 навыков, 27 hook-скриптов, 24 drop-in правила и шаблоны проектов.
+Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 30 навыков, 33 hook-скриптов, 25 drop-in правил и шаблоны проектов.
 
 **Что внутри:**
 - `principles/` - 29 принципов, каждый предотвращает конкретный тип отказа
-- `rules/` - 24 drop-in правила: рабочая дисциплина (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code), консолидированный safety-hooks reference; правила проектирования агентов (risk taxonomy, budgets, evals, observability) теперь в скилле `agent-harness-design`
+- `rules/` - 25 drop-in правил: рабочая дисциплина (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code), консолидированный safety-hooks reference; правила проектирования агентов (risk taxonomy, budgets, evals, observability) теперь в скилле `agent-harness-design`
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - 25 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
+- `hooks/` - 33 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
 - `workflows/` - готовые dynamic-workflow команды (`/deep-review-flow`, `/research-cn-ru`) + замеры стоимости агентов
 - `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник + **long-run harness pack** (drop-in `feature_list.json` + `init.sh` для проектов с 5+ фичами)
 - `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты, включая `harness-audit`, `workflow-orchestration` и `gemini-delegate` — делегирование в Gemini CLI с мульти-аккаунтом)

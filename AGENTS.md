@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 This is a configuration system repository for AI coding agents, not an application. It collects battle-tested architectural principles, security hardening, and decision frameworks that any coding agent can drop into any project.
 
@@ -6,10 +6,10 @@ This is a configuration system repository for AI coding agents, not an applicati
 
 - `principles/` - 29 architectural principles, each preventing a specific failure mode
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem
-- `hooks/` - 25 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
+- `hooks/` - 33 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types
 - `skills/` - domain-specific knowledge bundles (loaded on demand)
-- `rules/` - 24 drop-in `.claude/rules/` files (agent-harness design rules live on-demand in the `agent-harness-design` skill, not always-on)
+- `rules/` - 25 drop-in `.claude/rules/` files (agent-harness design rules live on-demand in the `agent-harness-design` skill, not always-on)
 - `workflows/` - dynamic-workflow commands + cost lessons
 - `scripts/` - utilities (hook installer, config drift validator, KV-cache stats, public-repo sync)
 - `CLAUDE.md` - Claude Code-specific overlay (extends this file)

@@ -25,7 +25,7 @@ If you read the [README](README.md) and thought "okay but HOW does this work mec
 3. Only matching rules are injected into the system prompt
 4. The rest never consume tokens
 
-**Measured impact:** 14 rule files, ~1400 lines total. In a typical session, 3-5 are active (250-400 lines). The other 1000+ lines never enter context.
+**Impact:** 25 rule files. Rules carrying a `paths:` frontmatter are elevated only in their target area; un-scoped rules are always-on — so the always-on set is kept deliberately lean and consolidated (fewer-but-focused files) rather than sprawling, since everything always-on competes for attention on every turn.
 
 ---
 
