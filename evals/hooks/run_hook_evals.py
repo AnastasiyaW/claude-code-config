@@ -11,7 +11,7 @@ Each case in cases.json:
     "id": "...",
     "hook": "<file name in HOOKS_DIR>",
     "stdin": { ... },              # JSON event fed to the hook
-    "expect": "allow" | "block" | "output",
+    "expect": "allow" | "block" | "output" | "no-output",
     "reason_contains": "...",      # optional, for expect=block
     "stdout_contains": [...],      # for expect=output
     "stdout_not_contains": [...],  # for expect=output
@@ -119,6 +119,12 @@ def run_case(case: dict) -> tuple[bool, str]:
             for s in case.get("stdout_not_contains", []):
                 if s in out:
                     return False, f"stdout must NOT contain {s!r}"
+            return True, ""
+        if expect == "no-output":
+            if out.strip():
+                return False, f"expected no output, got: {out[:200]!r}"
+            if decision == "block":
+                return False, f"expected no output, got block: {reason[:120]}"
             return True, ""
         return False, f"unknown expect: {expect}"
 

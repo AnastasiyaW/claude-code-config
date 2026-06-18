@@ -30,6 +30,24 @@ import sys
 # Each entry: pattern (regex, case-insensitive) → skill name + description
 # Patterns should be specific enough to avoid false positives on normal conversation
 ROUTES = [
+    # Retouch native / low-level memory
+    {
+        "patterns": [
+            r"\b(retouch-app|retouch plugin|photoshop plugin|uxp hybrid|uxp.*native|native addon|neural plugin|нейро\w*.*плагин|плагин.*нейро\w*)\b",
+            r"\b(плагин|plugin)\b.*\b(ретуш|retouch|photoshop|uxp)\b.*\b(c\+\+|native|натив|memory|памят|abi|onnx|directml|coreml|metal|gpu|buffer|tensor)\b",
+            r"\b(ретуш|retouch)\b.*\b(плагин|plugin|нейро\w*|onnx|directml|coreml|metal)\b.*\b(memory|памят|c\+\+|native|натив|buffer|tensor)\b",
+        ],
+        "skill": "native-cpp-memory",
+        "description": "REQUIRED for retouch/native/neural plugin memory, ABI, tensor, GPU, and C++ ownership work",
+        "refs": [
+            "references/retouch-native.md",
+            "references/low-level-retouch-memory.md",
+            "references/windows-memory-abi.md",
+            "references/macos-memory-abi.md",
+            "references/advanced-cpp.md",
+        ],
+        "required": True,
+    },
     # Planning & Architecture
     {
         "patterns": [
@@ -114,6 +132,8 @@ def detect_keywords(user_message: str) -> list[dict]:
                 matches.append({
                     "skill": route["skill"],
                     "description": route["description"],
+                    "refs": route.get("refs", []),
+                    "required": route.get("required", False),
                 })
                 break  # one match per route is enough
     return matches
@@ -122,7 +142,8 @@ def detect_keywords(user_message: str) -> list[dict]:
 def main() -> int:
     # Read the hook event from stdin
     try:
-        event = json.load(sys.stdin)
+        raw_input = sys.stdin.read().lstrip("\ufeff")
+        event = json.loads(raw_input)
     except (json.JSONDecodeError, EOFError):
         return 0
 
@@ -135,6 +156,8 @@ def main() -> int:
             message = event["content"]
         if not message and "prompt" in event:
             message = event["prompt"]
+        if not message and "user_prompt" in event:
+            message = event["user_prompt"]
 
     if not message or len(message) < 5:
         return 0
@@ -146,7 +169,13 @@ def main() -> int:
     # Output suggestions (agent sees this in context)
     suggestions = []
     for m in matches:
-        suggestions.append(f"  /{m['skill']} - {m['description']}")
+        prefix = "  REQUIRED" if m.get("required") else "  /"
+        if m.get("required"):
+            suggestions.append(f"{prefix}: Use skill {m['skill']} - {m['description']}")
+        else:
+            suggestions.append(f"{prefix}{m['skill']} - {m['description']}")
+        if m.get("refs"):
+            suggestions.append(f"    refs: {', '.join(m['refs'])}")
 
     print(f"[skill-router] Detected {len(matches)} matching skill(s):")
     for s in suggestions:

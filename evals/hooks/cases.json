@@ -14,6 +14,15 @@
   {"id": "non-Bash tool ignored", "hook": "destructive-command-guard.py",
    "stdin": {"tool_name": "Read", "tool_input": {"file_path": "C:/x.txt"}}, "expect": "allow"},
 
+  {"id": "retouch native memory routes to required skill", "hook": "keyword-skill-router.py",
+   "stdin": {"user_prompt": "We are working on the Photoshop retouch plugin UXP Hybrid native addon. Optimize ONNX tensor buffer memory and DirectML lifetime in C++."},
+   "expect": "output",
+   "stdout_contains": ["REQUIRED: Use skill native-cpp-memory", "references/low-level-retouch-memory.md"],
+   "stdout_not_contains": []},
+  {"id": "frontend dashboard does not route native memory skill", "hook": "keyword-skill-router.py",
+   "stdin": {"user_prompt": "Make a React dashboard prettier and fix mobile spacing."},
+   "expect": "no-output"},
+
   {"id": "git status allowed", "hook": "git-destructive-guard.py",
    "stdin": {"tool_name": "Bash", "tool_input": {"command": "git status -sb"}}, "expect": "allow"},
   {"id": "force-with-lease allowed", "hook": "git-destructive-guard.py",
