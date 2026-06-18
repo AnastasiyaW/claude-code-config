@@ -69,14 +69,43 @@ SKIP_PATTERNS = [
     "*",   # glob pattern (e.g. id_*, block_*.py, ~/.secrets/*, /proc/*/environ)
     "/api/",   # URL endpoints (e.g. /api/v1/projects/7/tasks)
     "docker/login-action",  # GitHub Actions ref, not a file path
+    "github.com/",
+    "gitlab.com/",
+    "huggingface.co/",
+    "ghcr.io/",
+    "docker.io/",
+    "AnastasiyaW/",  # GitHub owner/repo shorthand, not a local path
+    "walkinglabs/",  # GitHub owner/repo shorthand, not a local path
     "./script.sh",  # generic script placeholder
+    "./init.sh",  # generic project bootstrap convention
+    "./init-full.sh",  # generic project bootstrap convention
+    "./drop.sh",  # destructive script example in hook docs
     "cat/less/",    # tool list (cat/less/head/tail/grep/bat/xxd)
+    "ssh/scp/rsync",  # tool list
+    "Edit/Write",  # Claude tool list
+    "AKIA/ASIA",  # credential prefix family, not a path
     "YYYY-",        # date placeholder in template paths
+    "docs/_graph",  # project-local generated directory convention
+    "docs/layers/",  # project-local convention, not this config repo
+    "docs/layers.md",  # historical project artifact reference
+    "mailbox/all/",  # mailbox convention, may not exist until enabled
+    "mailbox/all",  # mailbox convention, may not exist until enabled
+    "~/.claude-restructure-backup-",  # historical backup path
+    "~/.claude/launch.json",  # optional frontend vault launcher
+    "C:\\Users\\black\\",  # historical path from another workstation
+    "Desktop\\CODE_Claude\\",  # historical workspace path
+    "Desktop/CODE_Claude/",  # historical workspace path
+    "CODE_Claude/vault/",  # optional frontend vault, not always present
+    "vault/",  # optional frontend vault, not always present
+    "04-page-nav/",
+    "02-margin-elements/",
+    "voice-learning-system/",
+    "web/animations-demo.html",
 ]
 
 # Linux/macOS-only system paths - skip on Windows (validator can't resolve them
 # locally but rule files reference them as concepts for SSH/system config docs).
-LINUX_SYSTEM_PREFIXES = ("/etc/", "/proc/", "/opt/", "/var/", "/usr/", "/dev/")
+LINUX_SYSTEM_PREFIXES = ("/etc/", "/proc/", "/opt/", "/var/", "/usr/", "/dev/", "/root/")
 
 # Cross-machine references - paths that live on a *different host* than this
 # Claude session (Hyper-V VMs, remote build hosts, container mount points).
@@ -135,6 +164,12 @@ def _build_workspace_roots() -> list[Path]:
                 roots.append(Path(entry).expanduser())
 
     # 2. Generic fallbacks
+    roots.append(Path.cwd())
+    roots.append(Path.home() / ".claude")
+    roots.append(Path.home() / ".claude" / "claude-code-config")
+    roots.append(Path.home() / ".claude" / "skills" / "agents-best-practices")
+    roots.append(Path.home() / ".claude" / "templates" / "kb-skeleton")
+    roots.append(Path.home() / "Desktop" / "Claude_code")
     roots.append(Path.home() / "Desktop")
     roots.append(Path.home())
 
