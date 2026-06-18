@@ -45,7 +45,7 @@ Env vars через inline `FOO=1 cmd` НЕ видны хуку — нужен m
 - `problems-md-validator.py` (Stop) — блок при OPEN-пунктах в PROBLEMS.md без 5-exception тикета.
 - `session-handoff-reminder.py` (Stop) — напоминает написать handoff в конце длинной сессии.
 - `backup-retention-cleanup.py` (Stop) — удаляет backup-ветки/stash старше 14 дней.
-- `precompact-handoff-guard.py` (PreCompact) — на авто/ручной компакт (= переполнение контекста): если свежего handoff (<25 мин) нет, ставит маркер `.claude/.precompact-handoff-needed` + требует дописать handoff (near-overflow exception из `finish-the-task.md`). Не блокирует компакт.
+- `precompact-handoff-guard.py` (PreCompact) — на авто/ручной компакт (= переполнение контекста): если свежего handoff (<25 мин) нет в `.claude/handoffs/<slug>/` или legacy-формате, ставит маркер `.claude/.precompact-handoff-needed` + требует дописать handoff (near-overflow exception из `finish-the-task.md`). Не блокирует компакт.
 - `session-handoff-check.py` (SessionStart) — показывает свежие handoff'ы: последний **на проект** (подпапки `.claude/handoffs/<slug>/` + legacy flat + глобальный `~/.claude/handoffs/`), сортировка по времени из ИМЕНИ файла; поднимает маркер от `precompact-handoff-guard` после компакта, затем чистит его.
 - `session-drift-validator.py` (SessionStart) — валидирует ссылки в CLAUDE.md/rules, ловит мёртвые пути.
 - `keyword-skill-router.py` (UserPromptSubmit) — подсказывает релевантный skill по ключевым словам.

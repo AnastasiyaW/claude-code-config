@@ -8,7 +8,7 @@ nuanced state (paths, decisions, what-did-NOT-work) is lost.
 
 What it does:
   - On `auto` (and `manual`) compaction, check for a FRESH handoff in
-    <cwd>/.claude/handoffs/*.md (written within HANDOFF_FRESH_MINUTES).
+    <cwd>/.claude/handoffs/**/*.md (written within HANDOFF_FRESH_MINUTES).
   - If a fresh handoff exists -> print a short OK note, exit 0.
   - If NOT -> drop a marker file <cwd>/.claude/.precompact-handoff-needed
     AND print a strong reminder to stdout (added to the compaction context),
@@ -60,7 +60,7 @@ def newest_handoff_age_minutes(handoffs_dir: Path, handoff_old: Path) -> float |
     now = time.time()
     best: float | None = None
     if handoffs_dir.exists():
-        for p in handoffs_dir.glob("*.md"):
+        for p in handoffs_dir.rglob("*.md"):
             if p.name == "INDEX.md":
                 continue
             age = (now - p.stat().st_mtime) / 60
@@ -124,7 +124,7 @@ def main() -> int:
         f"Trigger: {trigger}. The raw conversation detail is about to be "
         "summarized away.\n"
         "IMMEDIATELY after compaction, before any other work, write a handoff "
-        "to .claude/handoffs/YYYY-MM-DD_HH-MM_<session-short-id>.md "
+        "to .claude/handoffs/<project-slug>/YYYY-MM-DD_HH-MM_<session-short-id>.md "
         "(format: .claude/rules/session-handoff.md; <=1500 tokens; goal / done / "
         "what did NOT work / current state / key decisions / single next step) "
         "and append one line to .claude/handoffs/INDEX.md. "
