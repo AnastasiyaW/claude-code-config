@@ -130,7 +130,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [db-snapshot-guard](hooks/db-snapshot-guard.py) | `PreToolUse` | Auto-snapshots the database before bypassed destructive SQL |
 | [claude-attribution-guard](hooks/claude-attribution-guard.py) | `PreToolUse` | Blocks commits/PRs carrying `Co-Authored-By: Claude` footers (see [rules/no-claude-attribution.md](rules/no-claude-attribution.md)) |
 | [pre-push-claude-attribution](hooks/pre-push-claude-attribution.py) | git `pre-push` | Final attribution gate before commits reach the remote |
-| [precompact-handoff-guard](hooks/precompact-handoff-guard.py) | `PreCompact` | Demands a fresh handoff before context compaction (near-overflow exception) |
+| [precompact-handoff-guard](hooks/precompact-handoff-guard.py) | `PreCompact` | Demands a fresh handoff before context compaction; writes an AUTO-DRAFT fallback if none exists |
 | [test-gate-stop-hook](hooks/test-gate-stop-hook.py) | `Stop` | Blocks closing a session while tests are red |
 | [problems-md-validator](hooks/problems-md-validator.py) | `Stop` | Blocks closing with OPEN problems lacking a valid deferral reason |
 | [task-inbox-show](hooks/task-inbox-show.py) | `SessionStart` | Surfaces pending tasks from `.claude/task-inbox/` |

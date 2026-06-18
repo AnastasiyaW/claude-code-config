@@ -4,6 +4,14 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-18 (v3.30.1 — PreCompact AUTO-DRAFT handoff fallback)
+
+- **[`hooks/precompact-handoff-guard.py`](hooks/precompact-handoff-guard.py)** now writes a best-effort `.claude/handoffs/codex-auto/*-auto.md` transfer artifact when context compaction starts and no fresh semantic handoff exists. The draft is generated from the local Codex JSONL session log (recent user messages, assistant progress notes, and tool-call anchors) and is intentionally marked `AUTO-DRAFT`, so the next agent upgrades it into a normal handoff before substantive work.
+- The same hook now tolerates UTF-8 BOM on stdin, which makes manual PowerShell testing match hook behavior instead of falling back to the current working directory.
+- Docs updated in `README.md`, `hooks/README.md`, and `rules/safety-hooks.md`.
+
+---
+
 ## 2026-06-16 (v3.30.0 — rules consolidation: fewer-but-focused, agent-* demoted to a skill)
 
 Research-backed consolidation of the always-on rule set (fewer files, no duplicates, one concern per file). Driven by current best practice: thin always-on context + demote situational detail to on-demand skills — bloated rule sets cause context-rot / lost-in-the-middle, which hurts quality, not just cost.
