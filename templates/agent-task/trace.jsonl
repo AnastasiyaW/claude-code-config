@@ -1,0 +1,1 @@
+{"ts":"{{YYYY-MM-DDTHH:MM:SSZ}}","task_id":"{{task_id}}","phase":"spec","agent_role":"coordinator","event":"task_created","claim":"Task artifact directory initialized","evidence_path":"spec.md","decision":"continue","next_valid_actions":["freeze_spec","build"]}

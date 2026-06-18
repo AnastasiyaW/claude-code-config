@@ -180,6 +180,8 @@ A typical Proof Loop task directory in the repository:
     fix-log.md              # What the fixer changed and why
 ```
 
+Starter files live in [`templates/agent-task/`](../templates/agent-task/). Copy them into `.agent/tasks/<task-id>/` for long-running, multi-agent, high-risk, or compaction-prone work.
+
 ---
 
 ## When to Use

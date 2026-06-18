@@ -1,0 +1,20 @@
+{
+  "task_id": "{{task_id}}",
+  "status": "not-started",
+  "objective": "{{one_sentence_objective}}",
+  "owner": "{{session_or_agent_id}}",
+  "branch": "{{branch}}",
+  "current_phase": "spec",
+  "active_acceptance_criteria": ["AC1", "AC2", "AC3"],
+  "blocked_by": [],
+  "evidence": [],
+  "next_valid_actions": [
+    "freeze_spec",
+    "build",
+    "collect_evidence",
+    "fresh_verify",
+    "fix",
+    "handoff"
+  ],
+  "last_updated": "{{YYYY-MM-DDTHH:MM:SSZ}}"
+}

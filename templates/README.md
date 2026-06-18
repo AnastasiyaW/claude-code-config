@@ -14,6 +14,7 @@ Drop-in configuration files for common project types. Each template is a startin
 | [memory-project.md](memory-project.md) | Memory file for tracking a project | ~25 lines |
 | [memory-reference.md](memory-reference.md) | Memory file for reference material | ~20 lines |
 | [proof-plan.md](proof-plan.md) | Verification plan with acceptance criteria | ~30 lines |
+| [agent-task/](agent-task/) | `.agent/tasks/<task-id>/` artifact skeleton for long-running or verified work | directory |
 
 ## How to Use
 

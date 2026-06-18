@@ -4,6 +4,13 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-18 (v3.30.2 — agent task artifact skeleton)
+
+- NEW [`templates/agent-task/`](templates/agent-task/) provides a drop-in `.agent/tasks/<task-id>/` skeleton: `spec.md`, `state.json`, `scratchpad.md`, `trace.jsonl`, `evidence/`, `verdict.json`, `problems.md`, `fix-log.md`, and `handoff.md`.
+- [`principles/02-proof-loop.md`](principles/02-proof-loop.md) now links to the template so long-running, multi-agent, high-risk, or compaction-prone work starts with durable state/evidence instead of chat-only memory.
+
+---
+
 ## 2026-06-18 (v3.30.1 — PreCompact AUTO-DRAFT handoff fallback)
 
 - **[`hooks/precompact-handoff-guard.py`](hooks/precompact-handoff-guard.py)** now writes a best-effort `.claude/handoffs/codex-auto/*-auto.md` transfer artifact when context compaction starts and no fresh semantic handoff exists. The draft is generated from the local Codex JSONL session log (recent user messages, assistant progress notes, and tool-call anchors) and is intentionally marked `AUTO-DRAFT`, so the next agent upgrades it into a normal handoff before substantive work.

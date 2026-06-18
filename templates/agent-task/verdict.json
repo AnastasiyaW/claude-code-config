@@ -1,0 +1,26 @@
+{
+  "task_id": "{{task_id}}",
+  "verdict": "PENDING",
+  "verifier": "{{verifier_session_or_agent_id}}",
+  "checked_at": "{{YYYY-MM-DDTHH:MM:SSZ}}",
+  "acceptance_criteria": {
+    "AC1": {
+      "status": "PENDING",
+      "evidence": []
+    },
+    "AC2": {
+      "status": "PENDING",
+      "evidence": []
+    },
+    "AC3": {
+      "status": "PENDING",
+      "evidence": []
+    }
+  },
+  "global_constraints": {
+    "status": "PENDING",
+    "evidence": []
+  },
+  "findings": [],
+  "residual_risk": ""
+}
