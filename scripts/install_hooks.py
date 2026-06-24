@@ -33,6 +33,7 @@ Opt-in extras (use --extras):
   - ask-question-guard           PreToolUse    blocks deferral/menu AskUserQuestion on reversible work
   - over-engineering-advisor     PostToolUse   advisory nudge on large/dependency-adding code changes
   - precompact-handoff-guard     PreCompact    demands a fresh handoff before context compaction
+  - handoff-closure-audit-guard  PreToolUse    blocks handoff writes without closure audit
   - test-gate-stop-hook          Stop          blocks closing a session with red tests
   - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
   - plan-gate                    UserPromptSubmit  plan-artifact discipline for risky asks
@@ -60,6 +61,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -96,6 +98,7 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("ask-question-guard.py",        "PreToolUse", "AskUserQuestion"),
     ("over-engineering-advisor.py",   "PostToolUse", "Write|Edit|MultiEdit"),
     ("precompact-handoff-guard.py",  "PreCompact", None),
+    ("handoff-closure-audit-guard.py", "PreToolUse", "Write|Edit|MultiEdit"),
     ("test-gate-stop-hook.py",       "Stop", None),
     ("problems-md-validator.py",     "Stop", None),
     ("plan-gate.py",                 "UserPromptSubmit", None),
@@ -155,6 +158,12 @@ def _save_settings(path: Path, data: dict, dry_run: bool) -> None:
     os.replace(str(tmp), str(path))
 
 
+def _script_name_from_command(command: str) -> str:
+    """Best-effort script basename extraction from a hook command."""
+    matches = re.findall(r"([^\\/\"'\s]+\.py)\b", command)
+    return matches[-1].lower() if matches else ""
+
+
 def _merge_hook(settings: dict, event: str, script_path: Path,
                 matcher: str | None) -> bool:
     """Register one hook in settings. Returns True if added (False if duplicate)."""
@@ -162,11 +171,15 @@ def _merge_hook(settings: dict, event: str, script_path: Path,
     settings["hooks"].setdefault(event, [])
 
     command = f"python {script_path}"
+    script_name = script_path.name.lower()
 
-    # Look for an existing entry with the same command - skip if found
+    # Existing installs may point at a linked config repo instead of ~/.claude/hooks.
+    # Treat the same script basename in the same event as installed to avoid duplicate
+    # hooks firing on every matching tool call.
     for entry in settings["hooks"][event]:
         for h in entry.get("hooks", []):
-            if h.get("command", "").strip() == command:
+            existing = h.get("command", "").strip()
+            if existing == command or _script_name_from_command(existing) == script_name:
                 return False  # already present
 
     new_entry: dict = {"hooks": [{"type": "command", "command": command}]}

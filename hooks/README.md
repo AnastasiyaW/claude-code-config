@@ -33,6 +33,7 @@ Add any hook to your `~/.claude/settings.json`:
 | [session-drift-validator.py](session-drift-validator.py) | `SessionStart` | Validates file path references in CLAUDE.md and rules/ at session start. Catches stale pointers before the agent acts on them. |
 | [session-handoff-reminder.py](session-handoff-reminder.py) | `Stop` | Reminds to write a handoff file when closing a long session. Prevents context loss between sessions. |
 | [session-handoff-check.py](session-handoff-check.py) | `SessionStart` | Shows recent handoffs (single-file or multi-session format) at chat open so the agent can offer to continue. |
+| [handoff-closure-audit-guard.py](handoff-closure-audit-guard.py) | `PreToolUse` | Blocks handoff writes that do not include a mandatory Closure Audit proving the primary request and related/scope-adjacent tasks were checked. |
 | [precompact-handoff-guard.py](precompact-handoff-guard.py) | `PreCompact` | Requires a fresh handoff before compaction and writes a best-effort `AUTO-DRAFT` from the local Codex session log when none exists. |
 | [stop-phrase-guard.py](stop-phrase-guard.py) | `Stop` | Detects behavioral-regression phrases (ownership dodging, permission-seeking, premature stopping, known-limitation labeling, session-length excuses) in the final assistant message. Blocks Stop when match found so the agent either finishes or explains the blocker. Based on AMD Claude Code regression investigation ([issue #42796](https://github.com/anthropics/claude-code/issues/42796)). |
 

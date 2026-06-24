@@ -99,7 +99,11 @@ def main() -> int:
             f"YYYY-MM-DD_HH-MM_<session-short-id>.md. "
             f"Keep it under 1500 tokens. Must include: goal, what was done, "
             f"what did NOT work (with reasons), current state, key decisions, "
-            f"single next step. Append one line to .claude/handoffs/INDEX.md "
+            f"single next step, and a mandatory Closure Audit proving the "
+            f"primary request plus related/scope-adjacent tasks were checked. "
+            f"Closure Audit fields: Primary request status; Acceptance/checklist "
+            f"verified; Related/scope-adjacent tasks checked; Unfinished related "
+            f"tasks; Why not continuing now. Append one line to .claude/handoffs/INDEX.md "
             f"(format: date time | session-id | project | summary | status). "
             f"After writing, you may end the session normally."
         ),

@@ -94,6 +94,11 @@ mkdir -p .claude/handoffs/<project-slug>
 
 Where `<session-short-id>` is the first 8 chars of the session ID, or 8 random hex chars if the ID is unavailable.
 
+Before writing, complete the closure audit in the handoff body. The handoff is
+not valid without it. This is the guard against "handoff instead of finishing":
+the agent must explicitly check the primary request and related/scope-adjacent
+tasks before transferring context.
+
 **Step 4.** Append one line to `.claude/handoffs/INDEX.md` (append, never overwrite):
 ```markdown
 - 2026-04-09 14:32 | 373d1618 | project-alpha | Cleanup: drift validator + security case study | ACTIVE
@@ -197,6 +202,13 @@ Used by both modes. Structure is the same; only the storage location differs.
 ## Next step
 [One concrete action to begin the next session - not a list]
 
+## Closure Audit
+- Primary request status: COMPLETE | BLOCKED-<external-reason> | HANDOFF-NEAR-CONTEXT-LIMIT | USER-REDIRECTED
+- Acceptance/checklist verified: [tests/checks/evidence, or exact blocker]
+- Related/scope-adjacent tasks checked: [what adjacent work was checked]
+- Unfinished related tasks: NONE | [durable tracker + reason: PROBLEMS.md / feature_list.json / issue / backlog / BLOCKED-*]
+- Why not continuing now: NONE | [external blocker / context limit / user redirect]
+
 ## Background tasks (if any)
 - [agent-id or task-id] - [what it does] - [status]
 ```
@@ -205,6 +217,9 @@ Used by both modes. Structure is the same; only the storage location differs.
 - Max 1500 tokens - this is a briefing, not a log
 - Include real error messages, not descriptions
 - "What did NOT work" is mandatory, even if everything succeeded
+- "Closure Audit" is mandatory. Do not write a handoff until it says whether the
+  primary request is complete, what related/scope-adjacent work was checked, and
+  where any unfinished related task is durably tracked.
 - File paths are absolute
 - Do NOT include: tool call history, intermediate file reads, raw command output
 

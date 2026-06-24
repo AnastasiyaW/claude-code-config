@@ -32,9 +32,10 @@ LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
 def read_event() -> dict:
     """Parse PreToolUse event from stdin. Returns empty dict on failure."""
     try:
-        raw = sys.stdin.read()
-        if not raw.strip():
+        raw = sys.stdin.read().strip()
+        if not raw:
             return {}
+        raw = raw.lstrip("\ufeff")
         return json.loads(raw)
     except (json.JSONDecodeError, OSError):
         return {}

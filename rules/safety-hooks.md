@@ -44,6 +44,7 @@ Env vars через inline `FOO=1 cmd` НЕ видны хуку — нужен m
 - `test-gate-stop-hook.py` (Stop) — не даёт закрыть с красными тестами.
 - `problems-md-validator.py` (Stop) — блок при OPEN-пунктах в PROBLEMS.md без 5-exception тикета.
 - `session-handoff-reminder.py` (Stop) — напоминает написать handoff в конце длинной сессии.
+- `handoff-closure-audit-guard.py` (PreToolUse) — блокирует запись handoff-файла без `## Closure Audit`: primary task status, acceptance checks, related/scope-adjacent tasks, unfinished related tasks, почему не продолжаем сейчас.
 - `backup-retention-cleanup.py` (Stop) — удаляет backup-ветки/stash старше 14 дней.
 - `precompact-handoff-guard.py` (PreCompact) — на авто/ручной компакт (= переполнение контекста): если свежего handoff (<25 мин) нет в `.claude/handoffs/<slug>/` или legacy-формате, пишет best-effort `AUTO-DRAFT` в `.claude/handoffs/codex-auto/`, ставит маркер `.claude/.precompact-handoff-needed` + требует дописать качественный handoff (near-overflow exception из `finish-the-task.md`). Не блокирует компакт.
 - `session-handoff-check.py` (SessionStart) — показывает свежие handoff'ы: последний **на проект** (подпапки `.claude/handoffs/<slug>/` + legacy flat + глобальный `~/.claude/handoffs/`), сортировка по времени из ИМЕНИ файла; поднимает маркер от `precompact-handoff-guard` после компакта, затем чистит его.

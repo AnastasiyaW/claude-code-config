@@ -6,7 +6,7 @@ This is a configuration system repository for AI coding agents, not an applicati
 
 - `principles/` - 29 architectural principles, each preventing a specific failure mode
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem
-- `hooks/` - 33 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
+- `hooks/` - 34 ready-to-use Python hook scripts (session management, safety guards); installer: `scripts/install_hooks.py`
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types
 - `skills/` - domain-specific knowledge bundles (loaded on demand)
 - `rules/` - 25 drop-in `.claude/rules/` files (agent-harness design rules live on-demand in the `agent-harness-design` skill, not always-on)

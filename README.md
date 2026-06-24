@@ -2,7 +2,7 @@
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code, Codex, and other coding agents. 29 architectural principles, 33 enforcement hooks, 30 skills, 25 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code, Codex, and other coding agents. 29 architectural principles, 34 enforcement hooks, 30 skills, 25 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -107,6 +107,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [secret-leak-guard](hooks/secret-leak-guard.py) | `PreToolUse` | Prevents committing API keys, tokens, passwords |
 | [session-handoff-reminder](hooks/session-handoff-reminder.py) | `Stop` | Reminds to write handoff before closing long sessions |
 | [session-handoff-check](hooks/session-handoff-check.py) | `SessionStart` | Shows recent handoffs from previous sessions (latest per project) |
+| [handoff-closure-audit-guard](hooks/handoff-closure-audit-guard.py) | `PreToolUse` | Blocks handoff writes that lack a closure audit for the primary task and related/scope-adjacent tasks |
 | [stop-phrase-guard](hooks/stop-phrase-guard.py) | `Stop` | Detects behavioral-regression phrases (ownership dodging, permission-seeking, premature stopping, deferral-via-"what next?") |
 | [keyword-skill-router](hooks/keyword-skill-router.py) | `UserPromptSubmit` | Detects natural-language keywords and suggests matching skills (bilingual RU/EN) |
 | [api-key-leak-detector](hooks/api-key-leak-detector.py) | `PostToolUse` | Scans tool output for exposed API keys, tokens, secrets |
@@ -194,7 +195,7 @@ See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the
 - `principles/` - 29 standalone architectural principles. Read the one that matches your current problem.
 - `rules/` - 25 drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
-- `hooks/` - 33 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
+- `hooks/` - 34 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
 - `workflows/` - drop-in dynamic-workflow commands (`/deep-review-flow`, `/research-cn-ru`) + measured cost lessons.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types, plus the kb-skeleton and long-run-project scaffolding packs.
 - `skills/` - 30 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
@@ -360,7 +361,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 - `principles/` - 29 个独立架构原则，每个解决一个具体失败模式
 - `rules/` - 25 条 drop-in 规则（工作纪律、安全 Hook 配套文档；Agent 设计规则已移至 `agent-harness-design` 技能）
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 33 个即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
+- `hooks/` - 34 个即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
 - `workflows/` - 动态工作流命令（`/deep-review-flow`、`/research-cn-ru`）+ 实测成本经验
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆、项目编年史和长期项目脚手架（feature_list.json + init.sh）
 - `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具，包括 `harness-audit` 五子系统评估、`workflow-orchestration` 和 `gemini-delegate` 跨 CLI 委派）
@@ -380,7 +381,7 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 - `principles/` - 29 принципов, каждый предотвращает конкретный тип отказа
 - `rules/` - 25 drop-in правил: рабочая дисциплина (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code), консолидированный safety-hooks reference; правила проектирования агентов (risk taxonomy, budgets, evals, observability) теперь в скилле `agent-harness-design`
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - 33 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
+- `hooks/` - 34 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
 - `workflows/` - готовые dynamic-workflow команды (`/deep-review-flow`, `/research-cn-ru`) + замеры стоимости агентов
 - `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник + **long-run harness pack** (drop-in `feature_list.json` + `init.sh` для проектов с 5+ фичами)
 - `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты, включая `harness-audit`, `workflow-orchestration` и `gemini-delegate` — делегирование в Gemini CLI с мульти-аккаунтом)
