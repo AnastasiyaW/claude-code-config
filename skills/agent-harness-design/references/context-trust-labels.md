@@ -18,7 +18,7 @@
 
 ### Relationship to principle 10 (2-level baseline)
 
-[Principle 10 - Agent Security](../principles/10-agent-security.md) Layer 1 uses a stricter **2-level model** (trusted vs everything-else-untrusted) which puts code files, agent memory, and even other agents' messages in the untrusted bucket.
+[Principle 10 - Agent Security](../../../principles/10-agent-security.md) Layer 1 uses a stricter **2-level model** (trusted vs everything-else-untrusted) which puts code files, agent memory, and even other agents' messages in the untrusted bucket.
 
 The 3-level model in this rule is a **refinement** for everyday operational use, not a relaxation:
 

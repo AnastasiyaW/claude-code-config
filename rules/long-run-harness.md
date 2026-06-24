@@ -106,7 +106,7 @@ echo "4. Re-run ./init.sh before claiming 'done'"
 
 - `feature_list.json` в **корне проекта** (рядом с CLAUDE.md, PROBLEMS.md)
 - `init.sh` в **корне проекта** с исполняемым битом
-- При создании нового `[LONG-RUN]` проекта — взять шаблоны из `claude-code-skills/templates/long-run-project/` (или с GitHub: `gh api repos/AnastasiyaW/claude-code-config/contents/templates/long-run-project/feature_list.template.json`)
+- При создании нового `[LONG-RUN]` проекта — взять шаблоны из `templates/long-run-project/` (или с GitHub: `gh api repos/AnastasiyaW/claude-code-config/contents/templates/long-run-project/feature_list.template.json`)
 - При закрытии каждой фичи (`status: "done"`) — coordinated update в session handoff: "feat-NNN done"
 - Сторонне: `feature_list.json` НЕ заменяет PROBLEMS.md. PROBLEMS = баги/инциденты, features = фичи/scope
 

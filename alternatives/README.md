@@ -14,11 +14,12 @@ Each document below compares 2-4 approaches to the same problem, with pros, cons
 | [code-review.md](code-review.md) | Code review strategies | Sequential checklist, Parallel competency, Cross-model adversarial, LLM + static analysis |
 | [optimization.md](optimization.md) | Iterative code/prompt optimization | Autoresearch, HyperAgent, Manual iteration, Eval-driven development |
 | [context-management.md](context-management.md) | Managing context in long sessions | JIT Loading, Full Context Upfront, Compaction + Re-injection, Fresh Sessions |
+| [codebase-map-scoping.md](codebase-map-scoping.md) | Scoping code reads before changes | Belief Map / Code Graph, Symbol Index / LSP, Targeted `rg`, Full Context Upfront |
 | [session-handoff.md](session-handoff.md) | Seamless transitions between sessions | Manual HANDOFF.md, Stop Hook, Session Journal, ContextHarness, Memory Only |
 | [design-md-pattern.md](design-md-pattern.md) | Brand identity for AI-generated UI / decks / design | Claude Design (canvas, first-party), getdesign.md (69 brand files), bluzir/claude-code-design (CLI reproduction) |
 | [skill-management-tools.md](skill-management-tools.md) | Syncing skills/rules/agents across machines and projects | ai-dotfiles (Python CLI, symlink-based, vendor system), Skiller (Electron GUI, 30+ agent tools), manual cp + git push (this repo's current approach) |
 
-> Note: this table currently lists 7 entries but the directory contains 16 comparison files. Adding entries to the table when new alternatives are added is a manual step.
+> Note: this table currently lists 8 entries but the directory contains more comparison files. Adding entries to the table when new alternatives are added is a manual step.
 
 ## How to Use These
 

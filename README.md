@@ -1,8 +1,8 @@
-﻿# Claude Code Configuration System
+﻿# Claude Code + Codex Agent Configuration System
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code agents. 29 architectural principles, 33 enforcement hooks, 30 skills, 25 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code, Codex, and other coding agents. 29 architectural principles, 33 enforcement hooks, 30 skills, 25 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -149,6 +149,7 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and
 | [Multi-step orchestration](alternatives/orchestration.md) | Harness Design, Proof Loop, Deterministic Orchestration, Prompt-only |
 | [Code review](alternatives/code-review.md) | Sequential checklist, Parallel competency, Cross-model, LLM + static |
 | [Iterative optimization](alternatives/optimization.md) | Autoresearch, HyperAgent, Manual, Eval-driven |
+| [Codebase scoping before changes](alternatives/codebase-map-scoping.md) | Belief Map / Code Graph, Symbol Index / LSP, Targeted `rg`, Full Context Upfront |
 | [Context in long sessions](alternatives/context-management.md) | JIT Loading, Full Context Upfront, Compaction, Fresh Sessions |
 | [Session transitions](alternatives/session-handoff.md) | Manual HANDOFF.md, Auto hooks, Session Journal, ContextHarness, Memory |
 | [Reasoning-quality regression](alternatives/reasoning-regression-debugging.md) | Config reset, Stop-phrase guard, Metric monitoring, Fresh-session A/B, Proof Loop |

@@ -138,9 +138,9 @@ Output структурирован так:
 
 | Этот принцип | Связанные |
 |---|---|
-| Section 5 (Context) | [rules/context-trust-labels.md](../rules/context-trust-labels.md) (trust levels), [principle 07](07-codified-context.md) (Codified Context) |
-| Section 6 (Tools) | [rules/agent-tool-design.md](../rules/agent-tool-design.md) (risk taxonomy + permissions), [principle 10](10-agent-security.md) (Agent Security) |
-| Section 8 (Goal loop) | [rules/agent-budgets.md](../rules/agent-budgets.md) (10 budgets), [principle 03](03-autoresearch.md) (Autoresearch) |
+| Section 5 (Context) | [context-trust-labels.md](../skills/agent-harness-design/references/context-trust-labels.md) (trust levels), [principle 07](07-codified-context.md) (Codified Context) |
+| Section 6 (Tools) | [agent-tool-design.md](../skills/agent-harness-design/references/agent-tool-design.md) (risk taxonomy + permissions), [principle 10](10-agent-security.md) (Agent Security) |
+| Section 8 (Goal loop) | [agent-budgets.md](../skills/agent-harness-design/references/agent-budgets.md) (10 budgets), [principle 03](03-autoresearch.md) (Autoresearch) |
 | Section 9 (Memory/Compaction) | [principle 04](04-deterministic-orchestration.md) (Deterministic Orchestration), [principle 18](18-multi-session-coordination.md) (Multi-Session Coordination) |
 | Section 13 (Evals) | [principle 02](02-proof-loop.md) (Proof Loop), [principle 21](21-knowledge-base-enforcement.md) (Knowledge Base Enforcement) |
 | Section 15 (Release checklist) | [rules/long-run-harness.md](../rules/long-run-harness.md) (First Release Checklist) |

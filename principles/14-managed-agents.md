@@ -61,7 +61,7 @@ When deciding between Anthropic Managed Agents (or any provider's managed offeri
 
 **Rule of thumb:** Start with Managed Agents when ≥3 «✅ Managed» columns hit, and your workload doesn't touch any «❌ Managed» row. As soon as one «❌ Managed» row applies (regulated data, custom audit, financial actions, tenant model, IAM), you need a self-built harness for at least that portion.
 
-**Hybrid pattern (common in production):** Use Managed Agents for **standard sub-tasks** (research, web browse, code execution in sandbox) **invoked by** a self-built brain that owns business authorization, approval flow, audit log, and tenant-specific permissions. The managed agent is treated as just-another-tool from the self-built brain's perspective — with the same risk taxonomy, approval gating, and trust boundary rules from [rules/agent-tool-design.md](../rules/agent-tool-design.md) applied to its results.
+**Hybrid pattern (common in production):** Use Managed Agents for **standard sub-tasks** (research, web browse, code execution in sandbox) **invoked by** a self-built brain that owns business authorization, approval flow, audit log, and tenant-specific permissions. The managed agent is treated as just-another-tool from the self-built brain's perspective — with the same risk taxonomy, approval gating, and trust boundary rules from [agent-tool-design.md](../skills/agent-harness-design/references/agent-tool-design.md) applied to its results.
 
 ### Relationship to Other Patterns
 

@@ -99,7 +99,7 @@ Bad: `"Helps with servers."` -- Good: `"Use when: service hangs, GPU health chec
 
 ## Agent-Legible Environment -- Foundational Principle (2026-05-16)
 
-Source: Denis Sergeevitch -- "agents-best-practices" skill (MIT, https://github.com/DenisSergeevitch/agents-best-practices), `references/agent-legibility-feedback-loops.md`.
+Source: Denis Sergeevitch -- "agents-best-practices" skill (MIT, https://github.com/DenisSergeevitch/agents-best-practices), upstream reference file: references/agent-legibility-feedback-loops.md.
 
 > **What the agent cannot inspect, retrieve, validate, or act on through approved tools is operationally absent from the agent's world.**
 
@@ -384,6 +384,11 @@ Source: [2602.20478] Codified Context: Infrastructure for AI Agents in a Complex
 **Practice: JIT context loading**
 - Do not load the entire project into context
 - Load only what is needed for the current step
+- For non-trivial code changes, prefer a current machine-readable code map
+  before broad source reads: `search -> analyze -> rdeps/boundary -> read
+  boundary files`. If no verified map exists, fall back to targeted `rg` and
+  record the skipped graph path. See
+  [alternatives/codebase-map-scoping.md](alternatives/codebase-map-scoping.md).
 - Step result -> to a file, not to chat
 - After compaction -> re-inject only critical state
 
