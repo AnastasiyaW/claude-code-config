@@ -15,11 +15,12 @@
         "safety-hooks.md",
         "post-ui-change-review.md",
         "cross-harness-agents-md.md",
-        "file-organization-cohesion.md"
+        "file-organization-cohesion.md",
+        "activity-journal-and-state-registry.md"
       ],
       "add": ["rlm-context-as-program.md", "learn-from-corrections.md"]
     },
-    { "from": "principles", "to": "principles", "deny": [], "add": [] },
+    { "from": "principles", "to": "principles", "deny": ["25-coordination-primitives-mapping.md"], "add": [] },
     { "from": "templates", "to": "templates", "deny": [], "add": [] },
     { "from": "agents", "to": "agents", "deny": [], "add": [] },
     { "from": "alternatives", "to": "alternatives", "deny": [], "add": [] },
