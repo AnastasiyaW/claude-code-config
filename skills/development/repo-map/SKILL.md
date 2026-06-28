@@ -1,6 +1,6 @@
 ---
 name: repo-map
-description: Ranked symbol map of a codebase within a token budget — a compact "what matters in this repo" before reading files. Use when starting work in an unfamiliar/large codebase, before a refactor or deep-review fan-out, when you need JIT context instead of dumping whole files, or asked "give me a map of this repo / where are the important functions / what's the structure". Zero-dependency (stdlib only); faithful reimplementation of Aider's repo-map (tree-sitter+PageRank → ranked tags).
+description: Ranked symbol map of a codebase within a token budget — a compact "what matters in this repo" before reading files. Use when starting work in an unfamiliar/large codebase, before a refactor or deep-review fan-out, when you need JIT context instead of dumping whole files, or asked "give me a map of this repo / where are the important functions / what's the structure". Zero-dependency (stdlib only); faithful reimplementation of Aider's repo-map (tree-sitter+PageRank → ranked tags). Do NOT use to find correctness/security defects in a change or to audit a diff; use deep-review for that (this only ranks and lists symbols, it does not evaluate code quality).
 ---
 
 # repo-map

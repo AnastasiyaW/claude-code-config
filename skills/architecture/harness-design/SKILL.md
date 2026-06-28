@@ -10,6 +10,8 @@ description: >
   "Claude Agent SDK architecture", or when building complex full-stack apps
   that need planning → generation → evaluation cycles. Also use when discussing
   context degradation, self-evaluation bias, or assumption testing in AI workflows.
+  Do NOT use to stress-test or critique an already-written plan document; use
+  plan-swarm-review for that (this skill designs the harness, it does not review plans).
 user-invocable: true
 model: opus
 ---

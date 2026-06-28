@@ -8,7 +8,9 @@ description: >
   README features table, and adds entry to feature_list.json if
   present. Use when: "create a new feature", "start work on feature",
   "scaffold feature doc", "/feature-new", "new feature in <layer>",
-  "begin feature narrative". Auto-allocates next F-NNN ID.
+  "begin feature narrative". Auto-allocates next F-NNN ID. Do NOT use to
+  create the layer itself or its bounded-concern KB scaffold; use /layer-new
+  for that (a feature lives inside an already-existing layer).
 user-invocable: true
 model: sonnet
 ---

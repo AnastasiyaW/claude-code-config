@@ -4,6 +4,29 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-28 (v3.32.0 — skill description discipline + skill-lint)
+
+Applied the Google *Agent Skills* whitepaper (May 2026) description discipline to the whole skill
+library, and shipped the checker that enforces it.
+
+- NEW [`scripts/skill_lint.py`](scripts/skill_lint.py) — deterministic SKILL.md smell checker (shift-left,
+  advisory): flags a missing/`vague` description, a missing **"when NOT to use"** boundary, a missing
+  positive trigger, a missing/non-kebab `name`, an over-budget body (>5000 words), and the
+  "references-nothing" smell. Code-aware (skips fenced/inline code). Run:
+  `python scripts/skill_lint.py skills`.
+- [`skills/development/proof-verify`](skills/development/proof-verify/SKILL.md) had **no YAML
+  frontmatter at all** (so the model couldn't route to it) — added `name` + a full what/when/when-not
+  description.
+- **Added a tailored "when NOT to use" boundary to 30 skills** — each names the actual adjacent
+  sibling skill for routing disambiguation (e.g. `flux2-klein-prompting` ↔ `flux2-lora-training`,
+  `humanize-english` ↔ `humanize-russian`, the video-production pipeline stages), not generic filler.
+- Fixed 3 Title-Case `name:` fields to kebab and added the missing `name:` to 5 video-production skills.
+- Result: **`skill_lint.py` reports 31/31 skills clean, 0 findings.** Evidence: the linter was itself
+  independently re-tested (a YAML folded-scalar parse bug and a regex gap were found and fixed before
+  trusting its output).
+
+---
+
 ## 2026-06-28 (v3.31.0 — learn-from-corrections loop)
 
 The agent should learn a lesson every time the user corrects it (the most-missed lever of

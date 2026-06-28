@@ -8,6 +8,9 @@ description: >
   dataset preparation for edit models, zero_cond_t, ai-toolkit/SimpleTuner/DiffSynth configs, BFS head swap
   LoRA methodology, Qwen Edit architecture, consistency mode, dual encoding, FuseAnyPart, ACE++, maximum
   training resolution, или любые вопросы об обучении диффузионных моделей. ВСЕГДА используй этот скилл.
+  Do NOT use for writing FLUX.2 Klein generation/edit prompts at inference time (use flux2-klein-prompting),
+  nor for general non-training diffusion architecture/inference/memory work (use diffusion-engineering);
+  this skill is about LoRA/VAE training, not prompting or serving.
 user-invocable: true
 model: sonnet
 ---

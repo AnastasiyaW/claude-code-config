@@ -1,6 +1,6 @@
 ---
 name: desktop-sessions-discovery
-description: Discover, search, and selectively restore Claude desktop app sessions hidden across multiple accountIds. Use when user mentions "missing sessions after account switch", "lost desktop sessions", "where do my old sessions live", or runs multiple Claude accounts on the same machine.
+description: Discover, search, and selectively restore Claude desktop app sessions hidden across multiple accountIds. Use when user mentions "missing sessions after account switch", "lost desktop sessions", "where do my old sessions live", or runs multiple Claude accounts on the same machine. Do NOT use for Claude Code CLI session history or resuming work within one session — this only recovers the native desktop app's per-accountId session files; for in-session continuity use handoffs.
 ---
 
 # Claude Desktop Sessions Discovery Toolkit

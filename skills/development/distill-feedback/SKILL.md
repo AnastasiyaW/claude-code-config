@@ -1,6 +1,6 @@
 ---
 name: distill-feedback
-description: Turn captured user-correction signals into durable rules (learn-from-corrections loop). Use when - /distill-feedback, "process feedback queue", "what corrections did I give you", "encode lessons from my corrections", session-feedback-capture queued sessions, "обнови правила по моим поправкам", "разбери очередь обратной связи". Reads ~/.claude/feedback/queue.jsonl, LLM-semantically detects durable corrections, proposes atomic rules, applies human-gated via delta-merge.
+description: Turn captured user-correction signals into durable rules (learn-from-corrections loop). Use when - /distill-feedback, "process feedback queue", "what corrections did I give you", "encode lessons from my corrections", session-feedback-capture queued sessions, "обнови правила по моим поправкам", "разбери очередь обратной связи". Reads ~/.claude/feedback/queue.jsonl, LLM-semantically detects durable corrections, proposes atomic rules, applies human-gated via delta-merge. Do NOT use to act on a single in-session correction (just apply the fix directly) or to hand-edit settings.json behaviors; this only mines the queued feedback backlog into durable rules.
 ---
 
 # distill-feedback — close the learn-from-corrections loop

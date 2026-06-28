@@ -8,7 +8,9 @@ description: >
   text-to-image prompts for FLUX, product mockups, poster generation, UI mockups, sticker packs,
   character design, seamless textures, or any request to write/improve/translate prompts for
   FLUX-family models. Also trigger when user asks about guidance_scale, inference steps, distilled
-  vs base modes, or multi-reference workflows.
+  vs base modes, or multi-reference workflows. Do NOT use for training a FLUX.2 Klein / Qwen-Edit
+  LoRA (use flux2-lora-training), nor for reconstructing a prompt FROM an existing source image
+  (use forensic-prompt-compiler); this skill is for authoring generation/edit prompts only.
 ---
 
 # FLUX.2 [klein] — Prompt Engineering Guide

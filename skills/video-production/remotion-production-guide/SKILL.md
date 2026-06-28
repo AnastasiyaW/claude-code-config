@@ -1,5 +1,6 @@
 ---
-description: "Remotion (React video framework) production guide with Apple-style design rules. Use when: 'create video with remotion', 'remotion project', 'render video', 'product demo video', 'animated video', 'video from code'. Covers project setup, animation library, spring presets, typography rules, color palettes, pacing tables, scene templates, 3D integration, and export settings for all platforms."
+name: remotion-production-guide
+description: "Remotion (React video framework) production guide with Apple-style design rules. Use when: 'create video with remotion', 'remotion project', 'render video', 'product demo video', 'animated video', 'video from code'. Covers project setup, animation library, spring presets, typography rules, color palettes, pacing tables, scene templates, 3D integration, and export settings for all platforms. Do NOT use to write the script or narrative beats (use video-narrative-arc), to critique a script's impact (use script-evaluator), or for FFmpeg audio mastering/captions/platform color-grade on a finished render (use video-post-production); this stage builds and renders scenes in React/code."
 ---
 
 # Remotion Production Guide

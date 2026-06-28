@@ -1,6 +1,6 @@
 ---
 name: lean-code
-description: On-demand minimalism intensifier — write the leanest correct code, kill over-engineering before it starts. Use when the user says "be lazy / yagni / simplest / minimal / shortest / don't over-engineer", complains about bloat / boilerplate / unnecessary dependencies / abstraction, or before writing a substantial chunk of new code. Supports intensity: lite / full / ultra. Pairs with the always-on quality-code rule and the over-engineering-advisor hook.
+description: On-demand minimalism intensifier — write the leanest correct code, kill over-engineering before it starts. Use when the user says "be lazy / yagni / simplest / minimal / shortest / don't over-engineer", complains about bloat / boilerplate / unnecessary dependencies / abstraction, or before writing a substantial chunk of new code. Supports intensity: lite / full / ultra. Pairs with the always-on quality-code rule and the over-engineering-advisor hook. Do NOT use as a general code-review or bug-hunting pass — it only strips over-engineering and won't catch correctness defects; use /code-review or /review for those.
 ---
 
 # Lean Code

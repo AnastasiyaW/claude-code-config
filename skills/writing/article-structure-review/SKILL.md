@@ -1,5 +1,5 @@
 ---
-name: Article Structure Review
+name: article-structure-review
 description: |
   Структурный self-review технической статьи перед публикацией. Покрывает три дыры,
   которые не ловятся точечными скиллами типа humanize/infostyle:
@@ -8,6 +8,9 @@ description: |
   Основано на фидбеке реальных читателей на опубликованные статьи - классический паттерн
   "много тезисов / мало доказательств" и отсутствие честного блока про то, что не решено.
   Use AFTER first draft is done, BEFORE word-level audits.
+  Do NOT use for word-level / sentence-level style fixes or removing AI-generation markers
+  (use humanize-english or humanize-russian for that); this skill only reviews macro-structure
+  (thesis/proof balance, genre purity, limitations block), not phrasing.
 ---
 
 # Структурный review статьи

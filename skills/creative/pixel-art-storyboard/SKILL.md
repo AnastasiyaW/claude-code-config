@@ -13,7 +13,10 @@ description: >
   loop period selection by mood, three prompt registers (LLM agent / human artist / SDXL
   LoRA), single-HTML-file deliverable in dark-atmospheric style with parametrized canvas
   rendering. Generates the same engine pattern as the user's `Grass Field with City.html`
-  reference (canvas + requestAnimationFrame + phase-derived parameters).
+  reference (canvas + requestAnimationFrame + phase-derived parameters). Do NOT use for
+  individual game sprites, character sheets, walk/attack cycles, or PNG/GIF sprite-sheet
+  export; use pixel-art-studio for that (this skill makes looped HTML+canvas scene covers,
+  not raster sprite assets).
 version: 1.0.0
 ---
 

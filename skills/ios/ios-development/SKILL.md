@@ -8,6 +8,8 @@ description: >
   Xcode, iPhone/iPad app, Combine, CoreData, SwiftData, MVVM, TCA, URLSession, async/await,
   @State/@Binding/@ObservableObject, NavigationStack, XCTest, TestFlight, provisioning profiles,
   or any Apple platform development. Always use this skill before writing iOS code or architecture.
+  Do NOT use for web frontends (HTML/CSS/JS, React/Vue, browser UI) — even a WebView's page content
+  is web work; use frontend-design for that. This skill is native Apple-platform code only.
 ---
 
 # iOS Development Skill

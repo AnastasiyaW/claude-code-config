@@ -11,7 +11,10 @@ description: >
   Endesga 32/64, DawnBringer 16/32, Sweetie 16, Resurrect 64, Korean 오방색/단청, Chinese 故宫/青花/五行,
   Russian Stoneshard-inspired), 5 dithering algorithms (Bayer 2/4/8, Floyd-Steinberg, Atkinson, Ordered,
   Blue Noise), automated quality scoring (orphan pixels, doublies, banding, pillow-shading, AI-slop
-  detection), and Generator-Evaluator review via the pixel-art-reviewer agent.
+  detection), and Generator-Evaluator review via the pixel-art-reviewer agent. Do NOT use for
+  seamless-loop animated scene/book/album covers as self-contained HTML+canvas; use
+  pixel-art-storyboard for that (this skill outputs raster sprites and sprite sheets, not
+  narrative loop-cover HTML).
 version: 1.0.0
 ---
 

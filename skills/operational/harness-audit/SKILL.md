@@ -1,6 +1,6 @@
 ---
 name: harness-audit
-description: Score a project's agent harness across 5 subsystems (Instructions / State / Verification / Scope / Lifecycle), identify the bottleneck, and produce a prioritized improvement plan. Use when assessing if a project is ready to graduate to [LONG-RUN] status, when an agent keeps failing despite good models, or when adopting our stack on a new codebase.
+description: Score a project's agent harness across 5 subsystems (Instructions / State / Verification / Scope / Lifecycle), identify the bottleneck, and produce a prioritized improvement plan. Use when assessing if a project is ready to graduate to [LONG-RUN] status, when an agent keeps failing despite good models, or when adopting our stack on a new codebase. Do NOT use to design or build a new harness from scratch — this only scores an existing one; for greenfield harness/agent architecture use harness-design (or agent-harness-design).
 when_to_use: |
   Trigger on phrases like: "audit my harness", "evaluate my agent setup", "score my CLAUDE.md", "is my project ready for long-run", "5-subsystem assessment", "what's missing from my project setup", "/harness-audit". Run proactively when joining an unfamiliar codebase that has agent artifacts (CLAUDE.md, .claude/, AGENTS.md) but obvious gaps. Skip for single-file scripts and pure exploration.
 license: MIT

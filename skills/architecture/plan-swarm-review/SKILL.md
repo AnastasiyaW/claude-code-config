@@ -8,7 +8,10 @@ description: |
   "multisample review", "deep plan review", "plan swarming", "stress test
   the plan", or before implementing any plan >500 lines or with >3
   interacting components. Also use proactively when a large plan is about
-  to be implemented — catch issues before code, not after.
+  to be implemented — catch issues before code, not after. Do NOT use to
+  design a multi-agent harness or Generator-Evaluator architecture from scratch;
+  use harness-design for that. Do NOT use to review already-written code/diffs;
+  use deep-review for that (this reviews plans, not implementations).
 user-invocable: true
 model: opus
 allowed-tools:

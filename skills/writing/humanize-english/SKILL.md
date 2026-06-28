@@ -1,11 +1,14 @@
 ---
-name: English Text Humanization
+name: humanize-english
 description: |
   Make AI-generated English text sound natural and human. Use when: writing blog posts,
   articles, marketing copy, any English content that must not read as AI-generated.
   Covers: burstiness, perplexity, banned words, sentence patterns, transitions, tone.
   Based on: Liang et al. (arxiv 2406.07016, 15M+ abstracts), GPTZero/Originality research.
   Use BEFORE publishing any AI-generated English text.
+  Do NOT use for Russian text (use humanize-russian) or for macro-level article structure
+  such as thesis/proof balance or a limitations block (use article-structure-review);
+  this skill operates at the word/sentence level on English only.
 ---
 
 # English Text Humanization Skill

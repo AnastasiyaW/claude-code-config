@@ -1,5 +1,6 @@
 ---
-description: "Proven narrative arc templates for product videos and ads. Use when: 'write script', 'video structure', 'narrative arc', 'scene plan', 'storyboard', '15 second video', '30 second video', '60 second video', 'how to structure the video', 'video script template'. Provides beat-by-beat templates with timing, emotional arc mapping, hook formulas, and pacing rules. Covers 10s-90s formats for social, product demos, launches, and pitches."
+name: video-narrative-arc
+description: "Proven narrative arc templates for product videos and ads. Use when: 'write script', 'video structure', 'narrative arc', 'scene plan', 'storyboard', '15 second video', '30 second video', '60 second video', 'how to structure the video', 'video script template'. Provides beat-by-beat templates with timing, emotional arc mapping, hook formulas, and pacing rules. Covers 10s-90s formats for social, product demos, launches, and pitches. Do NOT use to judge or score an already-written script (use script-evaluator), to derive the product insight/brief from scratch (use product-meaning-extractor), or to render the video in code (use remotion-production-guide); this stage only produces the structured script/beats."
 ---
 
 # Video Narrative Arc Templates

@@ -7,7 +7,9 @@ description: |
   each with a focused checklist and isolated context. Synthesizes findings into unified report
   with FIX/DEFER/ACCEPT triage. Use when: "deep review", "thorough review", "parallel review",
   "review by competency", "full code review", or for large diffs (200+ lines) where /review
-  may be too shallow. Complements /review (pre-landing) — this is for deep dives.
+  may be too shallow. Complements /review (pre-landing) — this is for deep dives. Do NOT use just to
+  orient in an unfamiliar codebase or get a structural symbol overview; use repo-map
+  for that (this audits a concrete diff for defects, it is not a navigation map).
 allowed-tools:
   - Bash
   - Read

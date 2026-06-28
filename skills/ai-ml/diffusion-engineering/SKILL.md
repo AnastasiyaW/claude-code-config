@@ -10,6 +10,9 @@ description: >
   latent diffusion, VAE, guidance/CFG, rectified flow, Stable Diffusion, SDXL, Flux.
   Также применять при вопросах про GPU-память при обучении генеративных моделей,
   text-to-image пайплайны, ControlNet, multi-encoder fusion, WebDataset.
+  Do NOT use for writing FLUX.2 Klein generation prompts (use flux2-klein-prompting)
+  или для FLUX.2 Klein / Qwen-Edit LoRA-тренинга и edit-LoRA (use flux2-lora-training);
+  это общая диффузионная инженерия, не специфика FLUX.2 Klein.
 ---
 
 # Diffusion Engineering Skill

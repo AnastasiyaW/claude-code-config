@@ -1,5 +1,6 @@
 ---
-description: "Deep product analysis before creating videos, presentations, or ads. Use when: 'analyze product', 'extract value', 'product brief', 'what makes this product special', 'prepare brief', 'understand the product', 'video brief'. Takes a URL or product description and outputs a structured brief with core insight, enemy, transformation, proof, mechanism, and emotional hooks. Based on JTBD, StoryBrand, Obviously Awesome (April Dunford), and Value Proposition Canvas frameworks."
+name: product-meaning-extractor
+description: "Deep product analysis before creating videos, presentations, or ads. Use when: 'analyze product', 'extract value', 'product brief', 'what makes this product special', 'prepare brief', 'understand the product', 'video brief'. Takes a URL or product description and outputs a structured brief with core insight, enemy, transformation, proof, mechanism, and emotional hooks. Based on JTBD, StoryBrand, Obviously Awesome (April Dunford), and Value Proposition Canvas frameworks. Do NOT use for writing the script or scene timing (use video-narrative-arc), scoring an existing script (use script-evaluator), or rendering video (use remotion-production-guide); this is the upstream brief-only step before any script is written."
 ---
 
 # Product Meaning Extractor

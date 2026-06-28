@@ -1,5 +1,6 @@
 ---
-description: "Video post-production rules: audio mastering, color, captions, platform export. Use when: 'add music', 'add voiceover', 'export for tiktok', 'add captions', 'color grade', 'audio levels', 'master audio', 'export settings', 'platform requirements'. Covers FFmpeg patterns, audio chain, subtitle standards, and platform-specific export configs."
+name: video-post-production
+description: "Video post-production rules: audio mastering, color, captions, platform export. Use when: 'add music', 'add voiceover', 'export for tiktok', 'add captions', 'color grade', 'audio levels', 'master audio', 'export settings', 'platform requirements'. Covers FFmpeg patterns, audio chain, subtitle standards, and platform-specific export configs. Do NOT use to generate or animate the video frames/scenes in code (use remotion-production-guide), to write the script (use video-narrative-arc), or to evaluate script quality (use script-evaluator); this is the finishing stage applied to an already-rendered video."
 ---
 
 # Video Post-Production Guide

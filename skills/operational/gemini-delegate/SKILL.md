@@ -1,6 +1,6 @@
 ---
 name: gemini-delegate
-description: Делегирование задач в Gemini CLI (несколько OAuth-аккаунтов, свитчер, квоты, передача контекста). Use when - спроси/делегируй gemini, second opinion от другого вендора, bulk-курация картинок/данных, нужен 1M-контекст на чтение, квота gemini выгорела (TerminalQuotaError), переключи gemini аккаунт, прогнать N задач через gemini пока Claude занят.
+description: Делегирование задач в Gemini CLI (несколько OAuth-аккаунтов, свитчер, квоты, передача контекста). Use when - спроси/делегируй gemini, second opinion от другого вендора, bulk-курация картинок/данных, нужен 1M-контекст на чтение, квота gemini выгорела (TerminalQuotaError), переключи gemini аккаунт, прогнать N задач через gemini пока Claude занят. НЕ используй для делегирования в OpenAI Codex (другой вендор/CLI — это скилл codex) и не передавай секреты во внешний LLM.
 ---
 
 # Gemini Delegate — мульти-аккаунт, квоты, передача контекста

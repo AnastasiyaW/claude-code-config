@@ -1,5 +1,6 @@
 ---
-description: "Evaluate video scripts and presentations for flatness, tension, and emotional impact. Use when: 'is this script good', 'review script', 'evaluate video', 'why is this boring', 'flatness check', 'script review', 'improve script', 'rate this video'. Scores 6 dimensions (tension, specificity, emotional arc, hook, customer voice, visual variety), identifies specific problems, and suggests concrete fixes with examples."
+name: script-evaluator
+description: "Evaluate video scripts and presentations for flatness, tension, and emotional impact. Use when: 'is this script good', 'review script', 'evaluate video', 'why is this boring', 'flatness check', 'script review', 'improve script', 'rate this video'. Scores 6 dimensions (tension, specificity, emotional arc, hook, customer voice, visual variety), identifies specific problems, and suggests concrete fixes with examples. Do NOT use to generate a new script or scene structure from scratch (use video-narrative-arc), to build the product brief (use product-meaning-extractor), or to render/finish the video (use remotion-production-guide or video-post-production); this only critiques an existing script/scene."
 ---
 
 # Script Evaluator / Flatness Detector

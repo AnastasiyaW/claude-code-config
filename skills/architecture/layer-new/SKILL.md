@@ -8,7 +8,9 @@ description: >
   Use when: "create a new layer", "add security layer", "scaffold
   layer", "start tracking <concern> separately", "/layer-new", "add
   bounded concern". Operates on the kb-skeleton structure; idempotent
-  -- will not overwrite existing layers.
+  -- will not overwrite existing layers. Do NOT use to scaffold an
+  individual feature narrative inside an existing layer; use /feature-new
+  for that (a layer is the container, not the per-feature doc).
 user-invocable: true
 model: sonnet
 ---

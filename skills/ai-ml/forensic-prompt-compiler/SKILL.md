@@ -10,7 +10,9 @@ description: >
   special cases (floating scenes, collages, close-ups, jewelry, garments, surreal elements).
   Also trigger for requests involving: image editing prompts, reference-driven generation,
   pose description, camera angle locking, fabric/material description, or any
-  "turn this image into a prompt" task.
+  "turn this image into a prompt" task. Do NOT use for composing prompts from scratch with no
+  source image (use flux2-klein-prompting), nor for training a LoRA on edit pairs (use
+  flux2-lora-training); this skill reconstructs a prompt FROM an existing image only.
 ---
 
 # Forensic Prompt Compiler

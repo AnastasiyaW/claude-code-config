@@ -11,6 +11,9 @@ description: >
   Триггеры: SAM, Florence, LLaVA, Grounding DINO, YOLO-World, diffusion, UNet, DiT, Flux, LoRA,
   scheduler, guidance_scale, VAE, CLIP embeddings, Qwen embedder, MIG, MPS, TorchAO, Triton inference,
   сегментация по тексту, instance masks, open-vocab detection, text-conditioned segmentation.
+  Do NOT use for pure diffusion-only work without a VLM/segmentation component — general
+  diffusion architecture/inference -> diffusion-engineering, FLUX.2 Klein prompting ->
+  flux2-klein-prompting, FLUX.2 Klein / Qwen-Edit LoRA training -> flux2-lora-training.
 ---
 
 # VLM + Segmentation + Diffusion Engineering

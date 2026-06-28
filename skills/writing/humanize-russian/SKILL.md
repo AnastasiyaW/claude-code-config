@@ -1,11 +1,14 @@
 ---
-name: Russian Text Humanization
+name: humanize-russian
 description: |
   Натурализация русскоязычного текста - убрать маркеры ИИ-генерации. Использовать когда:
   Хабр-статьи, блоги, маркетинг, любой русский текст который не должен читаться как ИИ.
   Покрывает: слова-маркеры, калькирование, канцелярит, ритм, отглагольные существительные.
   Источники: Liang et al. (arxiv 2406.07016), gramota.ru, Хабр 918226, Sber GigaCheck.
   Use BEFORE publishing any AI-generated Russian text.
+  Do NOT use for English text (use humanize-english) or for macro-level article structure
+  such as thesis/proof balance or a limitations block (use article-structure-review);
+  this skill operates at the word/sentence level on Russian only.
 ---
 
 # Натурализация русского текста

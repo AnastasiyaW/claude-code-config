@@ -1,6 +1,6 @@
 ---
 name: agent-harness-design
-description: Designing agent harnesses and tool systems — risk taxonomy for tools, permission decisions, draft/commit pattern, structured tool results, agent budgets (10 types), context trust labels against prompt injection, plan-artifact, approval records, observability and traces, evals (13 categories), event model, streaming buffering, 3rd-party skill install checklist. Use when building a new Agent SDK app, custom orchestrator, MCP server, or Cloudflare Worker with tool calls; when designing tools and permissions; when writing an agent loop; or when you need trust labels for external content.
+description: Designing agent harnesses and tool systems — risk taxonomy for tools, permission decisions, draft/commit pattern, structured tool results, agent budgets (10 types), context trust labels against prompt injection, plan-artifact, approval records, observability and traces, evals (13 categories), event model, streaming buffering, 3rd-party skill install checklist. Use when building a new Agent SDK app, custom orchestrator, MCP server, or Cloudflare Worker with tool calls; when designing tools and permissions; when writing an agent loop; or when you need trust labels for external content. Do NOT use for improving or auditing an already-built harness (use harness-audit / harness-design instead), nor for ordinary Claude Code sessions where the harness is already given.
 ---
 
 # Agent Harness Design
