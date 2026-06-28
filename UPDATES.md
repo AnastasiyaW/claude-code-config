@@ -4,6 +4,32 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-06-28 (v3.31.0 — learn-from-corrections loop)
+
+The agent should learn a lesson every time the user corrects it (the most-missed lever of
+self-improving agents). This release closes that loop with an **evidence-driven** design.
+
+- NEW [`hooks/session-feedback-capture.py`](hooks/session-feedback-capture.py) (`Stop`) — queues
+  finished sessions with real back-and-forth into `~/.claude/feedback/queue.jsonl`. Non-blocking,
+  deterministic, opt-out via `CLAUDE_SKIP_FEEDBACK_CAPTURE=1`.
+- NEW [`hooks/feedback-pending-show.py`](hooks/feedback-pending-show.py) (`SessionStart`) — surfaces
+  the pending count so the loop closes; silent when empty, self-clearing.
+- NEW skill [`skills/development/distill-feedback/`](skills/development/distill-feedback/SKILL.md) —
+  `/distill-feedback`: LLM-semantically detects durable corrections, proposes atomic rules, applies
+  **human-gated** via delta-merge. Ships a deterministic `extract_feedback_queue.py`.
+- NEW [`rules/learn-from-corrections.md`](rules/learn-from-corrections.md) — the protocol + the test
+  evidence + cross-links (memory-maintenance delta-merge, autonomy-risk-tiers human-gate).
+- **Evidence:** detection was tested independently before adoption. A keyword detector scored
+  **F1 0.42** on held-out adversarial cases (missed ~60% of real corrections, incl. all keyword-free
+  ones); an LLM-semantic detector scored **F1 0.97** on the same set. So the hook does NO keyword
+  judgment — detection is LLM, in the human-gated distill step. (KV-cache hygiene was also tested and
+  **skipped** — low yield: the dominant cache-buster is harness-injected, not our authored files.)
+- **Privacy:** fixed two pre-existing privacy-marker leaks found by the full-tree scan — a host name
+  in `hooks/activity-journal-guard.py` and personal historical paths in `scripts/validate_config.py`.
+- README counts refreshed (36 hooks / 31 skills / 26 rules).
+
+---
+
 ## 2026-06-18 (v3.30.2 — agent task artifact skeleton)
 
 - NEW [`templates/agent-task/`](templates/agent-task/) provides a drop-in `.agent/tasks/<task-id>/` skeleton: `spec.md`, `state.json`, `scratchpad.md`, `trace.jsonl`, `evidence/`, `verdict.json`, `problems.md`, `fix-log.md`, and `handoff.md`.

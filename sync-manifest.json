@@ -17,7 +17,7 @@
         "cross-harness-agents-md.md",
         "file-organization-cohesion.md"
       ],
-      "add": ["rlm-context-as-program.md"]
+      "add": ["rlm-context-as-program.md", "learn-from-corrections.md"]
     },
     { "from": "principles", "to": "principles", "deny": [], "add": [] },
     { "from": "templates", "to": "templates", "deny": [], "add": [] },
@@ -27,7 +27,7 @@
       "from": "claude-code-config/hooks",
       "to": "hooks",
       "deny": ["mashinki-journal-reminder.py", "ssh-connection-guard.py"],
-      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py", "cyrillic-bash-guard.py", "handoff-resume-gate.py"]
+      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py", "cyrillic-bash-guard.py", "handoff-resume-gate.py", "session-feedback-capture.py", "feedback-pending-show.py"]
     },
     {
       "from": "workflows",
@@ -40,6 +40,12 @@
       "to": "skills/development/workflow-orchestration",
       "deny": [],
       "add": []
+    },
+    {
+      "from": "skills/distill-feedback",
+      "to": "skills/development/distill-feedback",
+      "deny": [],
+      "add": ["SKILL.md", "scripts/extract_feedback_queue.py"]
     }
   ],
   "privacy_markers": [

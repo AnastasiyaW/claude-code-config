@@ -13,6 +13,7 @@ Hard user directives, codified as drop-in `rules/` + mirrored on hooks:
 - [`rules/git-source-of-truth.md`](rules/git-source-of-truth.md) -- git is the single source of truth: everything committable gets committed and pushed; deployed == committed; only 4 classes stay out (regenerable, secrets, machine junk, heavy binaries).
 - [`rules/file-organization-cohesion.md`](rules/file-organization-cohesion.md) -- durable artifacts go into the existing structure (repo / KB / project folder); related files stay TOGETHER, not scattered across /tmp, home root, Desktop, Downloads. Advisory hook `file-cohesion-guard` reminds.
 - [`rules/cross-harness-agents-md.md`](rules/cross-harness-agents-md.md) -- multi-harness projects keep canonical context in `AGENTS.md` (Claude Code imports it via `@AGENTS.md`, Gemini CLI reads it via `context.fileName`, Codex natively); NO symlinks; markdown briefs/handoffs are the cross-harness context currency.
+- [`rules/learn-from-corrections.md`](rules/learn-from-corrections.md) -- the agent learns a lesson every time the user corrects it: `session-feedback-capture` (Stop) auto-queues sessions, `/distill-feedback` extracts durable corrections into rules **human-gated**. Detection is LLM-semantic (a keyword detector was independently tested and **rejected** at held-out F1 0.42 vs 0.97). Operationalizes TRACE — compile corrections into rules, and into hooks where mechanically checkable.
 
 ## Quality of Solutions -- Core Principle
 
@@ -367,7 +368,7 @@ Source: Lukyanenko BigTech patterns (Mar 2026)
 4. **Bugs + fixes** -- symptom -> cause -> fix (-> gotchas in skill or CLAUDE.md)
 5. **Decisions** -- architectural decisions with rationale (-> DECISIONS.md or memory)
 
-**Mechanism**: hook at session end or `/revise-claude-md` skill + structured extraction -> merge into memory/CLAUDE.md.
+**Mechanism**: hook at session end or `/revise-claude-md` skill + structured extraction -> merge into memory/CLAUDE.md. For the **Corrections** branch this is now automated + evidence-driven: `session-feedback-capture.py` (Stop) queues sessions, and `/distill-feedback` ([rules/learn-from-corrections.md](rules/learn-from-corrections.md)) LLM-semantically extracts durable corrections into rules, human-gated. A keyword detector was tested first and rejected (held-out F1 0.42, missed ~60% of corrections); LLM-semantic scored 0.97.
 
 ## Codified Context -- Context as Infrastructure
 

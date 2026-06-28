@@ -91,16 +91,7 @@ SKIP_PATTERNS = [
     "mailbox/all/",  # mailbox convention, may not exist until enabled
     "mailbox/all",  # mailbox convention, may not exist until enabled
     "~/.claude-restructure-backup-",  # historical backup path
-    "~/.claude/launch.json",  # optional frontend vault launcher
-    "C:\\Users\\black\\",  # historical path from another workstation
-    "Desktop\\CODE_Claude\\",  # historical workspace path
-    "Desktop/CODE_Claude/",  # historical workspace path
-    "CODE_Claude/vault/",  # optional frontend vault, not always present
-    "vault/",  # optional frontend vault, not always present
-    "04-page-nav/",
-    "02-margin-elements/",
-    "voice-learning-system/",
-    "web/animations-demo.html",
+    "~/.claude/launch.json",  # optional launcher path, may not exist
 ]
 
 # Linux/macOS-only system paths - skip on Windows (validator can't resolve them

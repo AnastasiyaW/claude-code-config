@@ -33,9 +33,9 @@ Add any hook to your `~/.claude/settings.json`:
 | [session-drift-validator.py](session-drift-validator.py) | `SessionStart` | Validates file path references in CLAUDE.md and rules/ at session start. Catches stale pointers before the agent acts on them. |
 | [session-handoff-reminder.py](session-handoff-reminder.py) | `Stop` | Reminds to write a handoff file when closing a long session. Prevents context loss between sessions. |
 | [session-handoff-check.py](session-handoff-check.py) | `SessionStart` | Shows recent handoffs (single-file or multi-session format) at chat open so the agent can offer to continue. |
-| [handoff-closure-audit-guard.py](handoff-closure-audit-guard.py) | `PreToolUse` | Blocks handoff writes that do not include a mandatory Closure Audit proving the primary request and related/scope-adjacent tasks were checked. |
-| [precompact-handoff-guard.py](precompact-handoff-guard.py) | `PreCompact` | Requires a fresh handoff before compaction and writes a best-effort `AUTO-DRAFT` from the local Codex session log when none exists. |
 | [stop-phrase-guard.py](stop-phrase-guard.py) | `Stop` | Detects behavioral-regression phrases (ownership dodging, permission-seeking, premature stopping, known-limitation labeling, session-length excuses) in the final assistant message. Blocks Stop when match found so the agent either finishes or explains the blocker. Based on AMD Claude Code regression investigation ([issue #42796](https://github.com/anthropics/claude-code/issues/42796)). |
+| [session-feedback-capture.py](session-feedback-capture.py) | `Stop` | Learn-from-corrections (capture): queues finished sessions with real back-and-forth into `~/.claude/feedback/queue.jsonl` for later distillation. Non-blocking, does NO keyword judgment (a keyword detector scored F1 0.42 on held-out tests — see [rules/learn-from-corrections.md](../rules/learn-from-corrections.md)); the LLM-semantic detection happens in `/distill-feedback`. |
+| [feedback-pending-show.py](feedback-pending-show.py) | `SessionStart` | Learn-from-corrections (nudge): surfaces how many sessions are queued for feedback-distill so the loop closes. Silent when the queue is empty; self-clearing as sessions are processed. |
 
 ### Safety Guards
 

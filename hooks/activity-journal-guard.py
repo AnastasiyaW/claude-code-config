@@ -25,8 +25,8 @@ Config (so this is reusable, not tied to any one host) — first match wins:
     }
 
 INERT BY DEFAULT: with no config file (or empty `resources`), this hook allows everything —
-shipping it in a shared config never blocks anyone who has not opted in. Concrete hardcoded
-instance for a specific host: see `mashinki-journal-reminder.py` (same pattern, fixed targets).
+shipping it in a shared config never blocks anyone who has not opted in. For a host-specific
+instance, fork this with your targets hardcoded (same pattern, fixed targets).
 
 Bypass: `# claude-bypass: journal` in the command, or CLAUDE_ALLOW_NO_JOURNAL=1.
 Fail-OPEN on any error (a hook bug must never block every command).
