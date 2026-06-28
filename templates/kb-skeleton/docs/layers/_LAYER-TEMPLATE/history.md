@@ -28,7 +28,7 @@ What changed: <one sentence>.
 
 Why: <one sentence with link to the originating finding, incident, or ADR>.
 
-See: [feat-NNN-slug.md](features/feat-NNN-slug.md). New invariants:
+See: `features/feat-NNN-slug.md`. New invariants:
 [IV-N](kb/invariants.md#iv-n). New decisions: [D-N](kb/decisions.md#d-n).
 
 ---

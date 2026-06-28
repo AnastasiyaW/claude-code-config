@@ -35,15 +35,15 @@ This table is for human navigation -- regenerate via /feature-new and
 
 | ID | Title | Status | Last touch | Doc |
 |----|-------|--------|------------|-----|
-| F-001 | <feature title> | done | 2026-MM-DD | [feat-001-slug.md](features/feat-001-slug.md) |
-| F-002 | <feature title> | in-progress | 2026-MM-DD | [feat-002-slug.md](features/feat-002-slug.md) |
+| F-001 | <feature title> | done | 2026-MM-DD | `features/feat-001-slug.md` |
+| F-002 | <feature title> | in-progress | 2026-MM-DD | `features/feat-002-slug.md` |
 
 ## Dependencies on other layers
 
 <!-- Explicit edges in the layer dependency graph. If this layer reads
 from or writes to another layer's contract, declare it here. -->
 
-- **<other-layer>**: <one sentence about what we use>. See [layers/<other>/README.md](../<other>/README.md).
+- **<other-layer>**: <one sentence about what we use>. See `../<other>/README.md`.
 
 ## See also
 

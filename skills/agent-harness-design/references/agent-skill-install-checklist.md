@@ -17,7 +17,7 @@
 - [ ] **License explicit** — MIT / Apache 2.0 / etc. файл присутствует? Без лицензии — legal risk + signal author не serious
 - [ ] **README claims map к code** — описание скилла соответствует actual content? Mismatch = red flag (deception or stale repo)
 - [ ] **Version pinning available** — есть tags / releases? Можно ли pin на `v1.2.0` вместо floating `main`?
-- [ ] **Min-release-age для package managers** — pipx/npm install свежего пакета (<7 дней) bypass'ит наш [`~/.npmrc`](../../.npmrc) gate; verify upstream существует минимум неделю или подтвердить explicit override
+- [ ] **Min-release-age для package managers** — pipx/npm install свежего пакета (<7 дней) bypass'ит наш `~/.npmrc` gate; verify upstream существует минимум неделю или подтвердить explicit override
 
 **Red flags на этом этапе → STOP**, не install:
 
