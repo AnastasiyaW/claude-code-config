@@ -20,6 +20,7 @@ from pathlib import Path
 
 HOOKS_JSON = Path.home() / ".codex" / "hooks.json"
 STOP_GUARD = Path.home() / ".claude" / "claude-code-config" / "hooks" / "stop-phrase-guard.py"
+PLUGIN_CACHE = Path.home() / ".codex" / "plugins" / "cache"
 
 REQUIRED_STOP_HOOKS = (
     "stop-phrase-guard.py",
@@ -51,6 +52,19 @@ def hook_commands(event_name: str) -> list[str]:
 
 
 class TaskCompletionHookTests(unittest.TestCase):
+    def test_plugin_hook_configs_have_supported_top_level_schema(self) -> None:
+        if not PLUGIN_CACHE.exists():
+            self.skipTest("plugin cache is absent")
+        offenders: list[str] = []
+        for path in PLUGIN_CACHE.rglob("hooks/hooks.json"):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            extra = sorted(set(data) - {"hooks"})
+            if extra:
+                offenders.append(f"{path}: unsupported top-level keys {extra}")
+            if "hooks" not in data:
+                offenders.append(f"{path}: missing top-level hooks")
+        self.assertEqual(offenders, [], "\n".join(offenders))
+
     def test_stop_hooks_include_completion_guards(self) -> None:
         commands = "\n".join(hook_commands("Stop"))
         for required in REQUIRED_STOP_HOOKS:
