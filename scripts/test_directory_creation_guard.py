@@ -47,9 +47,21 @@ def main() -> int:
     assert_allowed("New-Item -ItemType Directory -Path docs/new-section")
     assert_allowed("mkdir reports/hook-evidence/run-001", tool="Bash")
     assert_blocked("New-Item -ItemType Directory -Path random-new-folder", "project root")
-    assert_blocked("mkdir .tmp/probe-run", "delete marker")
     assert_allowed(
-        "mkdir .tmp/probe-run; New-Item -ItemType File -Path .tmp/probe-run/_DELETE_OK.md"
+        "New-Item -ItemType Directory -Path retouch-app; "
+        "Set-Content -Path retouch-app/.folder-meta.json -Value '{\"label\":\"PROJECT_ROOT\"}'"
+    )
+    assert_blocked("mkdir .tmp/probe-run", "lifecycle marker")
+    assert_allowed(
+        "mkdir .tmp/probe-run; "
+        "Set-Content .tmp/probe-run/.folder-meta.json '{\"label\":\"TEMP_REPRODUCIBLE\"}'"
+    )
+    assert_allowed("mkdir .tmp/probe-run; New-Item -ItemType File -Path .tmp/probe-run/_DELETE_OK.md")
+    assert_blocked("mkdir datasets/smoke-images", "looks dataset")
+    assert_allowed(
+        "mkdir datasets/smoke-images; "
+        "Set-Content datasets/smoke-images/.folder-meta.json '{\"label\":\"DATASET_REBUILDABLE\"}'",
+        tool="Bash",
     )
     desktop_probe = (Path.home() / "Desktop" / "random-test").as_posix()
     assert_blocked(
