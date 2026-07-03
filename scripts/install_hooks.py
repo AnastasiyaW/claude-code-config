@@ -14,6 +14,7 @@ Safety-critical hooks installed by default (--safe-defaults):
   - git-auto-backup              PreToolUse    creates branch snapshot before rewrites
   - session-drift-validator      SessionStart  reports broken file paths in CLAUDE.md
   - command-injection-guard      PreToolUse    blocks `cmd $(evil)` shell substitution
+  - directory-creation-guard     PreToolUse    keeps new folders in project hierarchy
   - self-harm-guard              PreToolUse    stops agent from killing its own process
 
 Opt-in extras (use --extras):
@@ -77,6 +78,8 @@ SAFE_DEFAULTS: list[tuple[str, str, str | None]] = [
     ("git-destructive-guard.py",     "PreToolUse", "Bash"),
     ("git-auto-backup.py",           "PreToolUse", "Bash"),
     ("command-injection-guard.py",   "PreToolUse", "Bash"),
+    ("directory-creation-guard.py",  "PreToolUse", "Bash"),
+    ("directory-creation-guard.py",  "PreToolUse", "PowerShell"),
     ("self-harm-guard.py",           "PreToolUse", "Bash"),
     ("session-drift-validator.py",   "SessionStart", None),
 ]
