@@ -1,6 +1,6 @@
 ---
 name: plan-to-tickets
-description: Use when a large plan, PRD, feature, refactor, research plan, or multi-step coding task must be split into small ready-for-agent tickets with acceptance criteria, verification commands, blockers, and vertical tracer-bullet slices.
+description: Use when a large plan, PRD, feature, refactor, research plan, or multi-step coding task must be split into small ready-for-agent tickets with acceptance criteria, verification commands, blockers, and vertical tracer-bullet slices. Do not use for small tasks that should be implemented directly, single-bug fixes, or chat-only summaries.
 ---
 
 # Plan To Tickets
