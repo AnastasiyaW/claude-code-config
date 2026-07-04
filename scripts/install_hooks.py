@@ -38,6 +38,7 @@ Opt-in extras (use --extras):
   - test-gate-stop-hook          Stop          blocks closing a session with red tests
   - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
   - plan-gate                    UserPromptSubmit  plan-artifact discipline for risky asks
+  - conversation-history-capture Stop          archives and indexes local Codex session JSONL histories
 
 Usage
 -----
@@ -105,6 +106,7 @@ EXTRAS: list[tuple[str, str, str | None]] = [
     ("test-gate-stop-hook.py",       "Stop", None),
     ("problems-md-validator.py",     "Stop", None),
     ("plan-gate.py",                 "UserPromptSubmit", None),
+    ("conversation-history-capture.py", "Stop", None),
 ]
 
 # Shared utility (not a hook itself - but needed by hooks)
