@@ -1,0 +1,1150 @@
+{
+  "source": "synthetic-sciences/openscience",
+  "total_skills": 292,
+  "top": [
+    {
+      "path": "ml-training/hugging-face-model-trainer/SKILL.md",
+      "category": "ml-training",
+      "name": "hugging-face-model-trainer",
+      "description": "This skill should be used when users want to train or fine-tune language models using TRL (Transformer Reinforcement Learning) on Hugging Face Jobs infrastructure. Covers SFT, DPO, GRPO and reward modeling training methods, plus GGUF conversion for local deployment. Includes guidance on the TRL Jobs package, UV scripts with PEP 723 format, dataset preparation and validation, hardware selection, cost estimation, Trackio monitoring, Hub authentication, and model persistence. Should be invoked for tasks involving cloud GPU training, GGUF conversion, or when users mention training on Hugging Face Jobs without local GPU setup.",
+      "license": "MIT",
+      "references": 8,
+      "scripts": 6,
+      "lines": 724,
+      "domains": {
+        "dataset": 1,
+        "training": 2,
+        "evaluation": 1,
+        "inference": 1,
+        "tracking": 1
+      },
+      "score": 12
+    },
+    {
+      "path": "coding/exploratory-data-analysis/SKILL.md",
+      "category": "coding",
+      "name": "exploratory-data-analysis",
+      "description": "Perform comprehensive exploratory data analysis on scientific data files across 200+ file formats. This skill should be used when analyzing any scientific data file to understand its structure, content, quality, and characteristics. Automatically detects file type and generates detailed markdown reports with format-specific analysis, quality metrics, and downstream analysis recommendations. Covers chemistry, bioinformatics, microscopy, spectroscopy, proteomics, metabolomics, and general scientific data formats.",
+      "license": "MIT license",
+      "references": 6,
+      "scripts": 1,
+      "lines": 446,
+      "domains": {
+        "dataset": 2,
+        "training": 1,
+        "evaluation": 1,
+        "vision": 1
+      },
+      "score": 11
+    },
+    {
+      "path": "data-engineering/geopandas/SKILL.md",
+      "category": "data-engineering",
+      "name": "geopandas",
+      "description": "Python library for working with geospatial vector data including shapefiles, GeoJSON, and GeoPackage files. Use when working with geographic data for spatial analysis, geometric operations, coordinate transformations, spatial joins, overlay operations, choropleth mapping, or any task involving reading/writing/analyzing vector geographic data. Supports PostGIS databases, interactive maps, and integration with matplotlib/folium/cartopy. Use for tasks like buffer analysis, spatial joins between datasets, dissolving boundaries, clipping data, calculating areas/distances, reprojecting coordinate systems, creating maps, or converting between spatial file formats.",
+      "license": "BSD-3-Clause license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 251,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1,
+        "explainability": 1,
+        "vision": 1
+      },
+      "score": 10
+    },
+    {
+      "path": "ml-training/nemo-curator/SKILL.md",
+      "category": "ml-training",
+      "name": "nemo-curator",
+      "description": "GPU-accelerated data curation for LLM training. Supports text/image/video/audio. Features fuzzy deduplication (16× faster), quality filtering (30+ heuristics), semantic deduplication, PII redaction, NSFW detection. Scales across GPUs with RAPIDS. Use for preparing high-quality training datasets, cleaning web data, or deduplicating large corpora.",
+      "license": "MIT",
+      "references": 2,
+      "scripts": 0,
+      "lines": 385,
+      "domains": {
+        "dataset": 5,
+        "training": 2,
+        "vision": 1
+      },
+      "score": 10
+    },
+    {
+      "path": "biology/bioimage-analysis/SKILL.md",
+      "category": "biology",
+      "name": "bioimage-analysis",
+      "description": "Microscopy image analysis for cell biology. Cell segmentation (Cellpose, watershed), object tracking (trackpy), morphology quantification, colony counting, colocalization analysis, and cytoskeleton characterization. For pathology WSI use pathml; for flow cytometry use flow-cytometry-analysis.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 548,
+      "domains": {
+        "vision": 3
+      },
+      "score": 9
+    },
+    {
+      "path": "biology/lamindb/SKILL.md",
+      "category": "biology",
+      "name": "lamindb",
+      "description": "This skill should be used when working with LaminDB, an open-source data framework for biology that makes data queryable, traceable, reproducible, and FAIR. Use when managing biological datasets (scRNA-seq, spatial, flow cytometry, etc.), tracking computational workflows, curating and validating data with biological ontologies, building data lakehouses, or ensuring data lineage and reproducibility in biological research. Covers data management, annotation, ontologies (genes, cell types, diseases, tissues), schema validation, integrations with workflow managers (Nextflow, Snakemake) and MLOps platforms (W&B, MLflow), and deployment strategies.",
+      "license": "Apache-2.0 license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 390,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1,
+        "tracking": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "biology/neuropixels-analysis/SKILL.md",
+      "category": "biology",
+      "name": "neuropixels-analysis",
+      "description": "Neuropixels neural recording analysis. Load SpikeGLX/OpenEphys data, preprocess, motion correction, Kilosort4 spike sorting, quality metrics, Allen/IBL curation, AI-assisted visual analysis, for Neuropixels 1.0/2.0 extracellular electrophysiology. Use when working with neural recordings, spike sorting, extracellular electrophysiology, or when the user mentions Neuropixels, SpikeGLX, Open Ephys, Kilosort, quality metrics, or unit curation.",
+      "license": "MIT license",
+      "references": 10,
+      "scripts": 6,
+      "lines": 350,
+      "domains": {
+        "dataset": 2,
+        "evaluation": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "biology/omero-integration/SKILL.md",
+      "category": "biology",
+      "name": "omero-integration",
+      "description": "Microscopy data management platform. Access images via Python, retrieve datasets, analyze pixels, manage ROIs/annotations, batch processing, for high-content screening and microscopy workflows.",
+      "license": "Unknown",
+      "references": 8,
+      "scripts": 0,
+      "lines": 251,
+      "domains": {
+        "dataset": 1,
+        "vision": 2
+      },
+      "score": 9
+    },
+    {
+      "path": "cloud-compute/tinker/SKILL.md",
+      "category": "cloud-compute",
+      "name": "tinker-fine-tuning",
+      "description": "Provides guidance for fine-tuning LLMs using the Tinker cloud training API from Thinking Machines Lab. Use when running supervised fine-tuning, reinforcement learning (GRPO/PPO), or LoRA training on cloud GPUs via Tinker's managed infrastructure instead of local compute.",
+      "license": "MIT",
+      "references": 10,
+      "scripts": 0,
+      "lines": 468,
+      "domains": {
+        "training": 3
+      },
+      "score": 9
+    },
+    {
+      "path": "coding/shap/SKILL.md",
+      "category": "coding",
+      "name": "shap",
+      "description": "Model interpretability and explainability using SHAP (SHapley Additive exPlanations). Use this skill when explaining machine learning model predictions, computing feature importance, generating SHAP plots (waterfall, beeswarm, bar, scatter, force, heatmap), debugging models, analyzing model bias or fairness, comparing models, or implementing explainable AI. Works with tree-based models (XGBoost, LightGBM, Random Forest), deep learning (TensorFlow, PyTorch), linear models, and any black-box model.",
+      "license": "MIT license",
+      "references": 4,
+      "scripts": 0,
+      "lines": 566,
+      "domains": {
+        "explainability": 5
+      },
+      "score": 9
+    },
+    {
+      "path": "llm-tools/transformers/SKILL.md",
+      "category": "llm-tools",
+      "name": "transformers",
+      "description": "This skill should be used when working with pre-trained transformer models for natural language processing, computer vision, audio, or multimodal tasks. Use for text generation, classification, question answering, translation, summarization, image classification, object detection, speech recognition, and fine-tuning models on custom datasets.",
+      "license": "Apache-2.0 license",
+      "references": 5,
+      "scripts": 0,
+      "lines": 163,
+      "domains": {
+        "dataset": 1,
+        "training": 1,
+        "vision": 2
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-inference/vllm/SKILL.md",
+      "category": "ml-inference",
+      "name": "serving-llms-vllm",
+      "description": "Serves LLMs with high throughput using vLLM's PagedAttention and continuous batching. Use when deploying production LLM APIs, optimizing inference latency/throughput, or serving models with limited GPU memory. Supports OpenAI-compatible endpoints, quantization (GPTQ/AWQ/FP8), and tensor parallelism.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 371,
+      "domains": {
+        "dataset": 1,
+        "inference": 4
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/gptq/SKILL.md",
+      "category": "ml-training",
+      "name": "gptq",
+      "description": "Post-training 4-bit quantization for LLMs with minimal accuracy loss. Use for deploying large models (70B, 405B) on consumer GPUs, when you need 4× memory reduction with <2% perplexity degradation, or for faster inference (3-4× speedup) vs FP16. Integrates with transformers and PEFT for QLoRA fine-tuning.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 457,
+      "domains": {
+        "training": 4,
+        "inference": 2
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/hugging-face-evaluation/SKILL.md",
+      "category": "ml-training",
+      "name": "hugging-face-evaluation",
+      "description": "Add and manage evaluation results in Hugging Face model cards. Supports extracting eval tables from README content, importing scores from Artificial Analysis API, and running custom model evaluations with vLLM/lighteval. Works with the model-index metadata format.",
+      "license": "MIT",
+      "references": 0,
+      "scripts": 7,
+      "lines": 658,
+      "domains": {
+        "training": 1,
+        "evaluation": 1,
+        "inference": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/llama-factory/SKILL.md",
+      "category": "ml-training",
+      "name": "llama-factory",
+      "description": "Expert guidance for fine-tuning LLMs with LLaMA-Factory - WebUI no-code, 100+ models, 2/3/4/5/6/8-bit QLoRA, multimodal support",
+      "license": "MIT",
+      "references": 5,
+      "scripts": 0,
+      "lines": 82,
+      "domains": {
+        "training": 4
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/lm-evaluation-harness/SKILL.md",
+      "category": "ml-training",
+      "name": "evaluating-llms-harness",
+      "description": "Evaluates LLMs across 60+ academic benchmarks (MMLU, HumanEval, GSM8K, TruthfulQA, HellaSwag). Use when benchmarking model quality, comparing models, reporting academic results, or tracking training progress. Industry standard used by EleutherAI, HuggingFace, and major labs. Supports HuggingFace, vLLM, APIs.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 492,
+      "domains": {
+        "dataset": 1,
+        "training": 1,
+        "evaluation": 2,
+        "inference": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/training-data-pipeline/SKILL.md",
+      "category": "ml-training",
+      "name": "training-data-pipeline",
+      "description": "Build training datasets for LLM specialization from production data, frontier model distillation, and synthetic bootstrapping. Use when formatting production logs into SFT data, distilling from frontier APIs, or preparing data for fine-tuning. Covers JSONL formatting, data quality validation, deduplication, and train/eval splitting.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 429,
+      "domains": {
+        "dataset": 3,
+        "training": 2,
+        "evaluation": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "ml-training/unsloth/SKILL.md",
+      "category": "ml-training",
+      "name": "unsloth-fine-tuning",
+      "description": "Fast LLM fine-tuning with Unsloth - 2-5x faster training, 50-80% less VRAM. Use for single-GPU LoRA/QLoRA SFT, GRPO/RL reasoning training, vision/TTS fine-tuning, and GGUF export to Ollama/vLLM/llama.cpp. Supports 300+ models including Llama, Qwen, Gemma, DeepSeek, Mistral, Phi, and gpt-oss.",
+      "license": "MIT",
+      "references": 0,
+      "scripts": 0,
+      "lines": 642,
+      "domains": {
+        "training": 5,
+        "inference": 3,
+        "vision": 1
+      },
+      "score": 9
+    },
+    {
+      "path": "biology/pathml/SKILL.md",
+      "category": "biology",
+      "name": "pathml",
+      "description": "Full-featured computational pathology toolkit. Use for advanced WSI analysis including multiplexed immunofluorescence (CODEX, Vectra), nucleus segmentation, tissue graph construction, and ML model training on pathology data. Supports 160+ slide formats. For simple tile extraction from H&E slides, histolab may be simpler.",
+      "license": "GPL-2.0 license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 166,
+      "domains": {
+        "training": 1,
+        "vision": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "biology/pydicom/SKILL.md",
+      "category": "biology",
+      "name": "pydicom",
+      "description": "Python library for working with DICOM (Digital Imaging and Communications in Medicine) files. Use this skill when reading, writing, or modifying medical imaging data in DICOM format, extracting pixel data from medical images (CT, MRI, X-ray, ultrasound), anonymizing DICOM files, working with DICOM metadata and tags, converting DICOM images to other formats, handling compressed DICOM data, or processing medical imaging datasets. Applies to tasks involving medical image analysis, PACS systems, radiology workflows, and healthcare imaging applications.",
+      "license": "https://github.com/pydicom/pydicom/blob/main/LICENSE",
+      "references": 2,
+      "scripts": 3,
+      "lines": 434,
+      "domains": {
+        "dataset": 1,
+        "vision": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "chemistry/deepchem/SKILL.md",
+      "category": "chemistry",
+      "name": "deepchem",
+      "description": "Molecular ML with diverse featurizers and pre-built datasets. Use for property prediction (ADMET, toxicity) with traditional ML or GNNs when you want extensive featurization options and MoleculeNet benchmarks. Best for quick experiments with pre-trained models, diverse molecular representations. For graph-first PyTorch workflows use torchdrug; for benchmark datasets use pytdc.",
+      "license": "MIT license",
+      "references": 2,
+      "scripts": 3,
+      "lines": 601,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "chemistry/pytdc/SKILL.md",
+      "category": "chemistry",
+      "name": "pytdc",
+      "description": "Therapeutics Data Commons. AI-ready drug discovery datasets (ADME, toxicity, DTI), benchmarks, scaffold splits, molecular oracles, for therapeutic ML and pharmacological prediction.",
+      "license": "MIT license",
+      "references": 3,
+      "scripts": 3,
+      "lines": 460,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "chemistry/torchdrug/SKILL.md",
+      "category": "chemistry",
+      "name": "torchdrug",
+      "description": "PyTorch-native graph neural networks for molecules and proteins. Use when building custom GNN architectures for drug discovery, protein modeling, or knowledge graph reasoning. Best for custom model development, protein property prediction, retrosynthesis. For pre-trained models and diverse featurizers use deepchem; for benchmark datasets use pytdc.",
+      "license": "Apache-2.0 license",
+      "references": 8,
+      "scripts": 0,
+      "lines": 450,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "data-engineering/polars/SKILL.md",
+      "category": "data-engineering",
+      "name": "polars",
+      "description": "Fast in-memory DataFrame library for datasets that fit in RAM. Use when pandas is too slow but data still fits in memory. Lazy evaluation, parallel execution, Apache Arrow backend. Best for 1-100GB datasets, ETL pipelines, faster pandas replacement. For larger-than-RAM data use dask or vaex.",
+      "license": "https://github.com/pola-rs/polars/blob/main/LICENSE",
+      "references": 6,
+      "scripts": 0,
+      "lines": 391,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "data-engineering/vaex/SKILL.md",
+      "category": "data-engineering",
+      "name": "vaex",
+      "description": "Use this skill for processing and analyzing large tabular datasets (billions of rows) that exceed available RAM. Vaex excels at out-of-core DataFrame operations, lazy evaluation, fast aggregations, efficient visualization of big data, and machine learning on large datasets. Apply when users need to work with large CSV/HDF5/Arrow/Parquet files, perform fast statistics on massive datasets, create visualizations of big data, or build ML pipelines that do not fit in memory.",
+      "license": "MIT license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 182,
+      "domains": {
+        "dataset": 1,
+        "evaluation": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "ml-training/axolotl/SKILL.md",
+      "category": "ml-training",
+      "name": "axolotl",
+      "description": "Expert guidance for fine-tuning LLMs with Axolotl - YAML configs, 100+ models, LoRA/QLoRA, DPO/KTO/ORPO/GRPO, multimodal support",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 160,
+      "domains": {
+        "training": 4
+      },
+      "score": 8
+    },
+    {
+      "path": "ml-training/bigcode-evaluation-harness/SKILL.md",
+      "category": "ml-training",
+      "name": "evaluating-code-models",
+      "description": "Evaluates code generation models across HumanEval, MBPP, MultiPL-E, and 15+ benchmarks with pass@k metrics. Use when benchmarking code models, comparing coding abilities, testing multi-language support, or measuring code generation quality. Industry standard from BigCode Project used by HuggingFace leaderboards.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 407,
+      "domains": {
+        "dataset": 1,
+        "training": 1,
+        "evaluation": 3
+      },
+      "score": 8
+    },
+    {
+      "path": "ml-training/deepspeed/SKILL.md",
+      "category": "ml-training",
+      "name": "deepspeed",
+      "description": "Expert guidance for distributed training with DeepSpeed - ZeRO optimization stages, pipeline parallelism, FP16/BF16/FP8, 1-bit Adam, sparse attention",
+      "license": "MIT",
+      "references": 9,
+      "scripts": 0,
+      "lines": 148,
+      "domains": {
+        "training": 2
+      },
+      "score": 8
+    },
+    {
+      "path": "ml-training/litgpt/SKILL.md",
+      "category": "ml-training",
+      "name": "implementing-llms-litgpt",
+      "description": "Implements and trains LLMs using Lightning AI's LitGPT with 20+ pretrained architectures (Llama, Gemma, Phi, Qwen, Mistral). Use when need clean model implementations, educational understanding of architectures, or production fine-tuning with LoRA/QLoRA. Single-file implementations, no abstraction layers.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 471,
+      "domains": {
+        "training": 4
+      },
+      "score": 8
+    },
+    {
+      "path": "ml-training/nemo-evaluator/SKILL.md",
+      "category": "ml-training",
+      "name": "nemo-evaluator-sdk",
+      "description": "Evaluates LLMs across 100+ benchmarks from 18+ harnesses (MMLU, HumanEval, GSM8K, safety, VLM) with multi-backend execution. Use when needing scalable evaluation on local Docker, Slurm HPC, or cloud platforms. NVIDIA's enterprise-grade platform with container-first architecture for reproducible benchmarking.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 496,
+      "domains": {
+        "training": 1,
+        "evaluation": 2,
+        "vision": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "research/scientific-critical-thinking/SKILL.md",
+      "category": "research",
+      "name": "scientific-critical-thinking",
+      "description": "Evaluate research rigor. Assess methodology, experimental design, statistical validity, biases, confounding, evidence quality (GRADE, Cochrane ROB), for critical analysis of scientific claims.",
+      "license": "",
+      "references": 6,
+      "scripts": 0,
+      "lines": 568,
+      "domains": {
+        "dataset": 1,
+        "explainability": 1
+      },
+      "score": 8
+    },
+    {
+      "path": "biology/curated-bio-datasets/SKILL.md",
+      "category": "biology",
+      "name": "curated-bio-datasets",
+      "description": "Guide to accessing curated biological datasets for computational biology. COSMIC cancer data, GTEx expression, GWAS catalog, GeneBass exome variants, BioGRID interactions, MSigDB gene sets, DisGeNET disease-gene associations, and GO ontology. For specific database APIs use individual database skills (cosmic-database, gwas-database, etc.).",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 3,
+      "lines": 570,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/histolab/SKILL.md",
+      "category": "biology",
+      "name": "histolab",
+      "description": "Lightweight WSI tile extraction and preprocessing. Use for basic slide processing tissue detection, tile extraction, stain normalization for H&E images. Best for simple pipelines, dataset preparation, quick tile-based analysis. For advanced spatial proteomics, multiplexed imaging, or deep learning pipelines use pathml.",
+      "license": "Apache-2.0 license",
+      "references": 5,
+      "scripts": 0,
+      "lines": 678,
+      "domains": {
+        "dataset": 1,
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/immunology-assays/SKILL.md",
+      "category": "biology",
+      "name": "immunology-assays",
+      "description": "Computational analysis of immunology experimental data. ATAC-seq differential accessibility, immune cell tracking from microscopy, ELISA data processing with 4-parameter logistic fitting, immunohistochemistry quantification, antibody titer analysis, and cell cycle phase duration estimation. For flow cytometry use flow-cytometry-analysis; for scRNA-seq use scanpy.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 592,
+      "domains": {
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/neurokit2/SKILL.md",
+      "category": "biology",
+      "name": "neurokit2",
+      "description": "Comprehensive biosignal processing toolkit for analyzing physiological data including ECG, EEG, EDA, RSP, PPG, EMG, and EOG signals. Use this skill when processing cardiovascular signals, brain activity, electrodermal responses, respiratory patterns, muscle activity, or eye movements. Applicable for heart rate variability analysis, event-related potentials, complexity measures, autonomic nervous system assessment, psychophysiology research, and multi-modal physiological signal integration.",
+      "license": "MIT license",
+      "references": 12,
+      "scripts": 0,
+      "lines": 356,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/protocolsio-integration/SKILL.md",
+      "category": "biology",
+      "name": "protocolsio-integration",
+      "description": "Integration with protocols.io API for managing scientific protocols. This skill should be used when working with protocols.io to search, create, update, or publish protocols; manage protocol steps and materials; handle discussions and comments; organize workspaces; upload and manage files; or integrate protocols.io functionality into workflows. Applicable for protocol discovery, collaborative protocol development, experiment tracking, lab protocol management, and scientific documentation.",
+      "license": "Unknown",
+      "references": 6,
+      "scripts": 0,
+      "lines": 421,
+      "domains": {
+        "tracking": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/pyhealth/SKILL.md",
+      "category": "biology",
+      "name": "pyhealth",
+      "description": "Comprehensive healthcare AI toolkit for developing, testing, and deploying machine learning models with clinical data. This skill should be used when working with electronic health records (EHR), clinical prediction tasks (mortality, readmission, drug recommendation), medical coding systems (ICD, NDC, ATC), physiological signals (EEG, ECG), healthcare datasets (MIMIC-III/IV, eICU, OMOP), or implementing deep learning models for healthcare applications (RETAIN, SafeDrug, Transformer, GNN).",
+      "license": "MIT license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 491,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/scanpy/SKILL.md",
+      "category": "biology",
+      "name": "scanpy",
+      "description": "Standard single-cell RNA-seq analysis pipeline. Use for QC, normalization, dimensionality reduction (PCA/UMAP/t-SNE), clustering, differential expression, and visualization. Best for exploratory scRNA-seq analysis with established workflows. For deep learning models use scvi-tools; for data format questions use anndata.",
+      "license": "SD-3-Clause license",
+      "references": 3,
+      "scripts": 1,
+      "lines": 390,
+      "domains": {
+        "dataset": 1,
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "chemistry/molecule-visualization/SKILL.md",
+      "category": "chemistry",
+      "name": "molecule-visualization",
+      "description": "Publication-quality molecular visualization. 2D structure drawings (PNG/SVG), molecule grids with property annotations, scaffold highlighting, protein-ligand interaction diagrams, and interactive 3D views.",
+      "license": "MIT",
+      "references": 1,
+      "scripts": 5,
+      "lines": 198,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/matlab/SKILL.md",
+      "category": "coding",
+      "name": "matlab",
+      "description": "MATLAB and GNU Octave numerical computing for matrix operations, data analysis, visualization, and scientific computing. Use when writing MATLAB/Octave scripts for linear algebra, signal processing, image processing, differential equations, optimization, statistics, or creating scientific visualizations. Also use when the user needs help with MATLAB syntax, functions, or wants to convert between MATLAB and Python code. Scripts can be executed with MATLAB or the open-source GNU Octave interpreter.",
+      "license": "For MATLAB (https://www.mathworks.com/pricing-licensing.html) and for Octave (GNU General Public License version 3)",
+      "references": 8,
+      "scripts": 0,
+      "lines": 375,
+      "domains": {
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/pymc/SKILL.md",
+      "category": "coding",
+      "name": "pymc-bayesian-modeling",
+      "description": "Bayesian modeling with PyMC. Build hierarchical models, MCMC (NUTS), variational inference, LOO/WAIC comparison, posterior checks, for probabilistic programming and inference.",
+      "license": "Apache License, Version 2.0",
+      "references": 3,
+      "scripts": 2,
+      "lines": 576,
+      "domains": {
+        "inference": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/pymoo/SKILL.md",
+      "category": "coding",
+      "name": "pymoo",
+      "description": "Multi-objective optimization framework. NSGA-II, NSGA-III, MOEA/D, Pareto fronts, constraint handling, benchmarks (ZDT, DTLZ), for engineering design and optimization problems.",
+      "license": "Apache-2.0 license",
+      "references": 5,
+      "scripts": 5,
+      "lines": 571,
+      "domains": {
+        "evaluation": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/scikit-learn/SKILL.md",
+      "category": "coding",
+      "name": "scikit-learn",
+      "description": "Machine learning in Python with scikit-learn. Use when working with supervised learning (classification, regression), unsupervised learning (clustering, dimensionality reduction), model evaluation, hyperparameter tuning, preprocessing, or building ML pipelines. Provides comprehensive reference documentation for algorithms, preprocessing techniques, pipelines, and best practices.",
+      "license": "BSD-3-Clause license",
+      "references": 6,
+      "scripts": 2,
+      "lines": 525,
+      "domains": {
+        "evaluation": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/statsmodels/SKILL.md",
+      "category": "coding",
+      "name": "statsmodels",
+      "description": "Statistical models library for Python. Use when you need specific model classes (OLS, GLM, mixed models, ARIMA) with detailed diagnostics, residuals, and inference. Best for econometrics, time series, rigorous inference with coefficient tables. For guided statistical test selection with APA reporting use statistical-analysis.",
+      "license": "BSD-3-Clause license",
+      "references": 5,
+      "scripts": 0,
+      "lines": 618,
+      "domains": {
+        "evaluation": 1,
+        "inference": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "coding/torch_geometric/SKILL.md",
+      "category": "coding",
+      "name": "torch-geometric",
+      "description": "Graph Neural Networks (PyG). Node/graph classification, link prediction, GCN, GAT, GraphSAGE, heterogeneous graphs, molecular property prediction, for geometric deep learning.",
+      "license": "MIT license",
+      "references": 3,
+      "scripts": 3,
+      "lines": 680,
+      "domains": {
+        "evaluation": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "data-engineering/aeon/SKILL.md",
+      "category": "data-engineering",
+      "name": "aeon",
+      "description": "This skill should be used for time series machine learning tasks including classification, regression, clustering, forecasting, anomaly detection, segmentation, and similarity search. Use when working with temporal data, sequential patterns, or time-indexed observations requiring specialized algorithms beyond standard ML approaches. Particularly suited for univariate and multivariate time series analysis with scikit-learn compatible APIs.",
+      "license": "BSD-3-Clause license",
+      "references": 11,
+      "scripts": 0,
+      "lines": 374,
+      "domains": {
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "data-engineering/markitdown/SKILL.md",
+      "category": "data-engineering",
+      "name": "markitdown",
+      "description": "Convert files and office documents to Markdown. Supports PDF, DOCX, PPTX, XLSX, images (with OCR), audio (with transcription), HTML, CSV, JSON, XML, ZIP, YouTube URLs, EPubs and more.",
+      "license": "MIT",
+      "references": 2,
+      "scripts": 3,
+      "lines": 488,
+      "domains": {
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "databases/gene-database/SKILL.md",
+      "category": "databases",
+      "name": "gene-database",
+      "description": "Query NCBI Gene via E-utilities/Datasets API. Search by symbol/ID, retrieve gene info (RefSeqs, GO, locations, phenotypes), batch lookups, for gene annotation and functional analysis.",
+      "license": "Unknown",
+      "references": 2,
+      "scripts": 3,
+      "lines": 179,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "databases/openalex-database/SKILL.md",
+      "category": "databases",
+      "name": "openalex-database",
+      "description": "Query and analyze scholarly literature using the OpenAlex database. This skill should be used when searching for academic papers, analyzing research trends, finding works by authors or institutions, tracking citations, discovering open access publications, or conducting bibliometric analysis across 240M+ scholarly works. Use for literature searches, research output analysis, citation analysis, and academic database queries.",
+      "license": "Unknown",
+      "references": 2,
+      "scripts": 2,
+      "lines": 494,
+      "domains": {
+        "evaluation": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-inference/tensorrt-llm/SKILL.md",
+      "category": "ml-inference",
+      "name": "tensorrt-llm",
+      "description": "Optimizes LLM inference with NVIDIA TensorRT for maximum throughput and lowest latency. Use for production deployment on NVIDIA GPUs (A100/H100), when you need 10-100x faster inference than PyTorch, or for serving models with quantization (FP8/INT4), in-flight batching, and multi-GPU scaling.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 189,
+      "domains": {
+        "inference": 4
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/bitsandbytes/SKILL.md",
+      "category": "ml-training",
+      "name": "quantizing-models-bitsandbytes",
+      "description": "Quantizes LLMs to 8-bit or 4-bit for 50-75% memory reduction with minimal accuracy loss. Use when GPU memory is limited, need to fit larger models, or want faster inference. Supports INT8, NF4, FP4 formats, QLoRA training, and 8-bit optimizers. Works with HuggingFace Transformers.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 418,
+      "domains": {
+        "training": 3,
+        "inference": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/colab-finetuning/SKILL.md",
+      "category": "ml-training",
+      "name": "colab-finetuning",
+      "description": "Fine-tune LLMs on Google Colab GPUs directly from openscience. Connects to Colab runtimes via WebSocket bridge for remote training with Unsloth. Supports SFT, GRPO, DPO, vision, and TTS workflows on free T4 to Pro A100 GPUs.",
+      "license": "MIT",
+      "references": 3,
+      "scripts": 0,
+      "lines": 155,
+      "domains": {
+        "training": 3,
+        "vision": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/geniml/SKILL.md",
+      "category": "ml-training",
+      "name": "geniml",
+      "description": "This skill should be used when working with genomic interval data (BED files) for machine learning tasks. Use for training region embeddings (Region2Vec, BEDspace), single-cell ATAC-seq analysis (scEmbed), building consensus peaks (universes), or any ML-based analysis of genomic regions. Applies to BED file collections, scATAC-seq data, chromatin accessibility datasets, and region-based genomic feature learning.",
+      "license": "BSD-2-Clause license",
+      "references": 5,
+      "scripts": 0,
+      "lines": 318,
+      "domains": {
+        "dataset": 1,
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/openrlhf/SKILL.md",
+      "category": "ml-training",
+      "name": "openrlhf-training",
+      "description": "High-performance RLHF framework with Ray+vLLM acceleration. Use for PPO, GRPO, RLOO, DPO training of large models (7B-70B+). Built on Ray, vLLM, ZeRO-3. 2× faster than DeepSpeedChat with distributed architecture and GPU resource sharing.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 251,
+      "domains": {
+        "training": 2,
+        "inference": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/peft/SKILL.md",
+      "category": "ml-training",
+      "name": "peft-fine-tuning",
+      "description": "Parameter-efficient fine-tuning for LLMs using LoRA, QLoRA, and 25+ methods. Use when fine-tuning large models (7B-70B) with limited GPU memory, when you need to train <1% of parameters with minimal accuracy loss, or for multi-adapter serving. HuggingFace's official library integrated with transformers ecosystem.",
+      "license": "MIT",
+      "references": 2,
+      "scripts": 0,
+      "lines": 433,
+      "domains": {
+        "training": 4,
+        "inference": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/pufferlib/SKILL.md",
+      "category": "ml-training",
+      "name": "pufferlib",
+      "description": "High-performance reinforcement learning framework optimized for speed and scale. Use when you need fast parallel training, vectorized environments, multi-agent systems, or integration with game environments (Atari, Procgen, NetHack). Achieves 2-10x speedups over standard implementations. For quick prototyping or standard algorithm implementations with extensive documentation, use stable-baselines3 instead.",
+      "license": "MIT license",
+      "references": 5,
+      "scripts": 2,
+      "lines": 436,
+      "domains": {
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/stable-baselines3/SKILL.md",
+      "category": "ml-training",
+      "name": "stable-baselines3",
+      "description": "Production-ready reinforcement learning algorithms (PPO, SAC, DQN, TD3, DDPG, A2C) with scikit-learn-like API. Use for standard RL experiments, quick prototyping, and well-documented algorithm implementations. Best for single-agent RL with Gymnasium environments. For high-performance parallel training, multi-agent systems, or custom vectorized environments, use pufferlib instead.",
+      "license": "MIT license",
+      "references": 4,
+      "scripts": 3,
+      "lines": 299,
+      "domains": {
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "ml-training/trl-fine-tuning/SKILL.md",
+      "category": "ml-training",
+      "name": "fine-tuning-with-trl",
+      "description": "Fine-tune LLMs using reinforcement learning with TRL - SFT for instruction tuning, DPO for preference alignment, PPO/GRPO for reward optimization, and reward model training. Use when need RLHF, align model with preferences, or train from human feedback. Works with HuggingFace Transformers.",
+      "license": "MIT",
+      "references": 4,
+      "scripts": 0,
+      "lines": 457,
+      "domains": {
+        "training": 3
+      },
+      "score": 7
+    },
+    {
+      "path": "other/iso-13485-certification/SKILL.md",
+      "category": "other",
+      "name": "iso-13485-certification",
+      "description": "Comprehensive toolkit for preparing ISO 13485 certification documentation for medical device Quality Management Systems. Use when users need help with ISO 13485 QMS documentation, including (1) conducting gap analysis of existing documentation, (2) creating Quality Manuals, (3) developing required procedures and work instructions, (4) preparing Medical Device Files, (5) understanding ISO 13485 requirements, or (6) identifying missing documentation for medical device certification. Also use when users mention medical device regulations, QMS certification, FDA QMSR, EU MDR, or need help with quality system documentation.",
+      "license": "MIT license",
+      "references": 4,
+      "scripts": 1,
+      "lines": 680,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "quantum/pennylane/SKILL.md",
+      "category": "quantum",
+      "name": "pennylane",
+      "description": "Hardware-agnostic quantum ML framework with automatic differentiation. Use when training quantum circuits via gradients, building hybrid quantum-classical models, or needing device portability across IBM/Google/Rigetti/IonQ. Best for variational algorithms (VQE, QAOA), quantum neural networks, and integration with PyTorch/JAX/TensorFlow. For hardware-specific optimizations use qiskit (IBM) or cirq (Google); for open quantum systems use qutip.",
+      "license": "Apache-2.0 license",
+      "references": 7,
+      "scripts": 0,
+      "lines": 226,
+      "domains": {
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "visualization/dna-visualization/SKILL.md",
+      "category": "visualization",
+      "name": "dna-visualization",
+      "description": "Publication-quality DNA/RNA visualizations. Plasmid maps (circular/linear), sequence logos, restriction enzyme maps, GC content plots, and gene feature annotation tracks from GenBank/FASTA.",
+      "license": "MIT",
+      "references": 0,
+      "scripts": 5,
+      "lines": 193,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "visualization/infographics/SKILL.md",
+      "category": "visualization",
+      "name": "infographics",
+      "description": "[EXPERIMENTAL] Create professional infographics using Nano Banana Pro AI with smart iterative refinement. Uses Gemini 3 Pro for quality review. Integrates research-lookup and web search for accurate data. Supports 10 infographic types, 8 industry styles, and colorblind-safe palettes.",
+      "license": "",
+      "references": 3,
+      "scripts": 2,
+      "lines": 572,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "visualization/plotly/SKILL.md",
+      "category": "visualization",
+      "name": "plotly",
+      "description": "Interactive visualization library. Use when you need hover info, zoom, pan, or web-embeddable charts. Best for dashboards, exploratory analysis, and presentations. For static publication figures use matplotlib or scientific-visualization.",
+      "license": "MIT license",
+      "references": 5,
+      "scripts": 0,
+      "lines": 271,
+      "domains": {
+        "dataset": 1,
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "visualization/protein-diagram/SKILL.md",
+      "category": "visualization",
+      "name": "protein-diagram",
+      "description": "Publication-quality protein analysis diagrams. Domain architecture maps, secondary structure annotation, Ramachandran plots, contact maps, multiple sequence alignment visualization, and protein feature tracks.",
+      "license": "MIT",
+      "references": 0,
+      "scripts": 6,
+      "lines": 235,
+      "domains": {
+        "dataset": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "visualization/scientific-visualization/SKILL.md",
+      "category": "visualization",
+      "name": "scientific-visualization",
+      "description": "Meta-skill for publication-ready figures. Use when creating journal submission figures requiring multi-panel layouts, significance annotations, error bars, colorblind-safe palettes, and specific journal formatting (Nature, Science, Cell). Orchestrates matplotlib/seaborn/plotly with publication styles. For quick exploration use seaborn or plotly directly.",
+      "license": "MIT license",
+      "references": 4,
+      "scripts": 2,
+      "lines": 779,
+      "domains": {
+        "training": 1
+      },
+      "score": 7
+    },
+    {
+      "path": "biology/biopython/SKILL.md",
+      "category": "biology",
+      "name": "biopython",
+      "description": "Comprehensive molecular biology toolkit. Use for sequence manipulation, file parsing (FASTA/GenBank/PDB), phylogenetics, and programmatic NCBI/PubMed access (Bio.Entrez). Best for batch processing, custom bioinformatics pipelines, BLAST automation. For quick lookups use gget; for multi-service integration use bioservices.",
+      "license": "Unknown",
+      "references": 7,
+      "scripts": 0,
+      "lines": 447,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/bioservices/SKILL.md",
+      "category": "biology",
+      "name": "bioservices",
+      "description": "Unified Python interface to 40+ bioinformatics services. Use when querying multiple databases (UniProt, KEGG, ChEMBL, Reactome) in a single workflow with consistent API. Best for cross-database analysis, ID mapping across services. For quick single-database lookups use gget; for sequence/file manipulation use biopython.",
+      "license": "GPLv3 license",
+      "references": 3,
+      "scripts": 4,
+      "lines": 361,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/cancer-genomics-analysis/SKILL.md",
+      "category": "biology",
+      "name": "cancer-genomics-analysis",
+      "description": "Computational cancer genomics workflows. Somatic mutation detection and annotation, structural variation characterization, copy number analysis, tumor purity/ploidy estimation, NMF metagene extraction, and DNA damage response network analysis. For cancer mutation databases use cosmic-database; for variant clinical significance use clinvar-database.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 4,
+      "lines": 543,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/clinical-decision-support/SKILL.md",
+      "category": "biology",
+      "name": "clinical-decision-support",
+      "description": "Generate professional clinical decision support (CDS) documents for pharmaceutical and clinical research settings, including patient cohort analyses (biomarker-stratified with outcomes) and treatment recommendation reports (evidence-based guidelines with decision algorithms). Supports GRADE evidence grading, statistical analysis (hazard ratios, survival curves, waterfall plots), biomarker integration, and regulatory compliance. Outputs publication-ready LaTeX/PDF format optimized for drug development, clinical research, and evidence synthesis.",
+      "license": "",
+      "references": 6,
+      "scripts": 5,
+      "lines": 508,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/clinical-imaging/SKILL.md",
+      "category": "biology",
+      "name": "clinical-imaging",
+      "description": "Clinical and physiological imaging analysis. Diffusion MRI ADC maps, micro-CT bone morphometry, hemodynamic parameter analysis, circadian rhythm cosinor analysis, ciliary beat frequency (FFT), and tissue deformation optical flow. For DICOM file handling use pydicom; for biosignals use neurokit2.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 610,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/clinical-reports/SKILL.md",
+      "category": "biology",
+      "name": "clinical-reports",
+      "description": "Write comprehensive clinical reports including case reports (CARE guidelines), diagnostic reports (radiology/pathology/lab), clinical trial reports (ICH-E3, SAE, CSR), and patient documentation (SOAP, H&P, discharge summaries). Full support with templates, regulatory compliance (HIPAA, FDA, ICH-GCP), and validation tools.",
+      "license": "",
+      "references": 8,
+      "scripts": 8,
+      "lines": 1129,
+      "domains": {
+        "evaluation": 1
+      },
+      "score": 6
+    },
+    {
+      "path": "biology/deeptools/SKILL.md",
+      "category": "biology",
+      "name": "deeptools",
+      "description": "NGS analysis toolkit. BAM to bigWig conversion, QC (correlation, PCA, fingerprints), heatmaps/profiles (TSS, peaks), for ChIP-seq, RNA-seq, ATAC-seq visualization.",
+      "license": "BSD license",
+      "references": 4,
+      "scripts": 2,
+      "lines": 531,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/etetoolkit/SKILL.md",
+      "category": "biology",
+      "name": "etetoolkit",
+      "description": "Phylogenetic tree toolkit (ETE). Tree manipulation (Newick/NHX), evolutionary event detection, orthology/paralogy, NCBI taxonomy, visualization (PDF/SVG), for phylogenomics.",
+      "license": "GPL-3.0 license",
+      "references": 3,
+      "scripts": 2,
+      "lines": 623,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/flow-cytometry-analysis/SKILL.md",
+      "category": "biology",
+      "name": "flow-cytometry-analysis",
+      "description": "Complete flow cytometry analysis pipeline. FCS file handling, compensation, manual/automated gating, immunophenotyping, CFSE proliferation analysis, cell cycle analysis (Dean-Jett-Fox), and apoptosis assays. Extends flowio with analytical workflows. For raw FCS parsing only use flowio.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 4,
+      "lines": 540,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/gget/SKILL.md",
+      "category": "biology",
+      "name": "gget",
+      "description": "Fast CLI/Python queries to 20+ bioinformatics databases. Use for quick lookups: gene info, BLAST searches, AlphaFold structures, enrichment analysis. Best for interactive exploration, simple queries. For batch processing or advanced BLAST use biopython; for multi-database Python workflows use bioservices.",
+      "license": "BSD-2-Clause license",
+      "references": 3,
+      "scripts": 3,
+      "lines": 871,
+      "domains": {
+        "training": 1
+      },
+      "score": 6
+    },
+    {
+      "path": "biology/microbial-dynamics/SKILL.md",
+      "category": "biology",
+      "name": "microbial-dynamics",
+      "description": "Microbial population dynamics modeling and analysis. Bacterial growth curve fitting (logistic, Gompertz, Baranyi), Lotka-Volterra community dynamics, Gillespie stochastic simulation, biofilm quantification, CFU enumeration, and genome annotation. For metabolic modeling use cobrapy; for sequence analysis use biopython.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 537,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/molecular-cloning/SKILL.md",
+      "category": "biology",
+      "name": "molecular-cloning",
+      "description": "Molecular cloning simulation and design. PCR amplicon prediction, restriction enzyme digestion, Golden Gate and Gibson assembly simulation, primer design, CRISPR sgRNA design, and plasmid annotation. For protein-level sequence analysis use biopython or esm; for database lookups use gene-database or ensembl-database.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 666,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/opentrons-integration/SKILL.md",
+      "category": "biology",
+      "name": "opentrons-integration",
+      "description": "Official Opentrons Protocol API for OT-2 and Flex robots. Use when writing protocols specifically for Opentrons hardware with full access to Protocol API v2 features. Best for production Opentrons protocols, official API compatibility. For multi-vendor automation or broader equipment control use pylabrobot.",
+      "license": "Unknown",
+      "references": 1,
+      "scripts": 3,
+      "lines": 573,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/pharmacology-wetlab/SKILL.md",
+      "category": "biology",
+      "name": "pharmacology-wetlab",
+      "description": "Computational analysis of pharmacology wet-lab experiments. Western blot densitometry, xenograft tumor growth inhibition, pharmaceutical stability modeling (Arrhenius), radiolabeled antibody biodistribution, MIRD dosimetry, and adverse event grading. For drug databases use chembl-database or fda-database; for molecular docking use diffdock.",
+      "license": "MIT license",
+      "references": 0,
+      "scripts": 5,
+      "lines": 605,
+      "domains": {},
+      "score": 6
+    },
+    {
+      "path": "biology/pylabrobot/SKILL.md",
+      "category": "biology",
+      "name": "pylabrobot",
+      "description": "Vendor-agnostic lab automation framework. Use when controlling multiple equipment types (Hamilton, Tecan, Opentrons, plate readers, pumps) or needing unified programming across different vendors. Best for complex workflows, multi-vendor setups, simulation. For Opentrons-only protocols with official API, opentrons-integration may be simpler.",
+      "license": "MIT license",
+      "references": 6,
+      "scripts": 0,
+      "lines": 185,
+      "domains": {},
+      "score": 6
+    }
+  ]
+}

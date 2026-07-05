@@ -1,8 +1,8 @@
 {
   "lockfile_version": 1,
-  "generated_at": "2026-07-04T10:54:05+00:00",
-  "skill_count": 32,
-  "aggregate_hash": "sha256:931183512e18e1b252a3de69402400b0e6169bc3c13e96db6d86eb87ea051512",
+  "generated_at": "2026-07-05T23:26:35+00:00",
+  "skill_count": 33,
+  "aggregate_hash": "sha256:b768a164eb27c7d13e90ceb56c7cb46142a5a715d1c0d55d7f5d0c1537ccb8ec",
   "skills": {
     "agent-harness-design": {
       "content_hash": "sha256:a879689d822371c0ea4978b25636ca6371eb06316fde0a13411f2ff8e72e627b",
@@ -64,6 +64,15 @@
         "SKILL.md"
       ],
       "last_modified": "2026-07-03T11:58:06.275780+00:00"
+    },
+    "ai-ml/ml-research-lab": {
+      "content_hash": "sha256:a8c2b5db7d46ee21285b1cae962b29f88c375c3434126801e81fa655e0e91f8a",
+      "size_bytes": 3173,
+      "file_count": 1,
+      "files": [
+        "SKILL.md"
+      ],
+      "last_modified": "2026-07-05T23:24:45.849134+00:00"
     },
     "ai-ml/vlm-segmentation": {
       "content_hash": "sha256:37e07c60ec0765d5d60d50e01755ee2dd72ef6ae58604333e5378afb0586147e",
