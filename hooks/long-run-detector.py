@@ -61,6 +61,14 @@ def _git(cwd: Path, *args: str, count_lines: bool = False) -> int:
         return -1
 
 
+def has_agent_docs(cwd: Path) -> bool:
+    """Any curated agent-facing docs tree present (kb-skeleton or equivalents)."""
+    return any(
+        (cwd / p).exists()
+        for p in ("docs/kb", "docs/layers", "kb/docs", "openwiki", "scripts/validate_kb.py")
+    )
+
+
 def detect(cwd: Path) -> list[str] | None:
     """Return list of signal strings if a nudge should fire, else None."""
     home = Path.home().resolve()
@@ -138,17 +146,34 @@ def main() -> int:
     if not signals:
         return 0
 
+    docs_missing = not has_agent_docs(cwd)
     lines = [
         "=" * 60,
         "LONG-RUN candidate: this project shows long-running signals but is",
         "NOT tracked as [LONG-RUN] (no feature_list.json / init.sh).",
         "  signals: " + "; ".join(signals),
+    ]
+    if docs_missing:
+        lines += [
+            "  ALSO: no agent-docs tree (docs/kb, docs/layers, kb/docs all absent).",
+        ]
+    lines += [
         "=" * 60,
         "INSTRUCTION: Consider the long-run harness (rules/long-run-harness.md):",
         "run the 15-point First Release Checklist; if it passes, mark the project",
         "[LONG-RUN] in MEMORY.md and add feature_list.json + init.sh.",
-        "Detection is automatic; the [LONG-RUN] mark stays a human decision by",
-        "design (premature marks are an anti-pattern). Surface this to the user.",
+    ]
+    if docs_missing:
+        lines += [
+            "ALSO PROPOSE to the user adopting the agent-docs KB now (kb-skeleton:",
+            "docs/kb + scripts/validate_kb.py, rules/agent-docs-freshness.md) --",
+            "a complex project without docs is the exact gap the freshness tiers",
+            "close; once adopted, the Stop-gate + CI keep it current mechanically.",
+        ]
+    lines += [
+        "Detection is automatic; the [LONG-RUN] mark and KB adoption stay a human",
+        "decision by design (premature marks are an anti-pattern). Surface this to",
+        "the user as an explicit proposal.",
         "=" * 60,
         "",
     ]

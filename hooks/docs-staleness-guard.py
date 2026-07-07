@@ -46,8 +46,29 @@ from pathlib import Path
 COOLDOWN_DAYS = 7
 DEFAULT_STALE_COMMITS = 20
 ANCHORS = ("openwiki", "docs/layers")
+ANCHORS_FILE = ".docs-anchors"  # .claude/.docs-anchors: extra per-project anchors, one rel path per line
 STAMP_NAME = ".docs-staleness-nudged"
 SKIP_NAME = ".skip-docs-staleness"
+
+
+def _project_anchors(cwd: Path) -> tuple[str, ...]:
+    """Default anchors + optional per-project extras from .claude/.docs-anchors.
+
+    Lets a repo whose agent-KB lives elsewhere (e.g. retouch-app's kb/docs
+    MkDocs tree) opt its real docs root into freshness tracking. Lines starting
+    with '#' are comments; paths are repo-relative.
+    """
+    extra: list[str] = []
+    f = cwd / ".claude" / ANCHORS_FILE
+    if f.exists():
+        try:
+            for line in f.read_text(encoding="utf-8").splitlines():
+                line = line.strip().replace("\\", "/").strip("/")
+                if line and not line.startswith("#"):
+                    extra.append(line)
+        except Exception:
+            pass
+    return ANCHORS + tuple(x for x in extra if x not in ANCHORS)
 
 
 def _git_out(cwd: Path, *args: str) -> str | None:
@@ -92,7 +113,7 @@ def detect(cwd: Path, stale_commits: int) -> list[str] | None:
     anchor_present = False
     findings: list[str] = []
 
-    for anchor in ANCHORS:
+    for anchor in _project_anchors(cwd):
         if not (cwd / anchor).exists():
             continue
         anchor_present = True
@@ -238,6 +259,28 @@ def _self_test() -> int:
         run(bare, "init", "-q")
         if detect(bare, 20) is not None:
             print("SELF-TEST FAIL: repo without anchor should be silent")
+            ok = False
+
+        # custom anchor via .claude/.docs-anchors -> staleness tracked for kb/docs
+        cust = Path(td) / "custom"
+        cust.mkdir()
+        run(cust, "init", "-q")
+        run(cust, "config", "user.email", "t@t")
+        run(cust, "config", "user.name", "t")
+        run(cust, "config", "commit.gpgsign", "false")
+        (cust / "kb" / "docs").mkdir(parents=True)
+        (cust / "kb" / "docs" / "index.md").write_text("kb", encoding="utf-8")
+        (cust / ".claude").mkdir()
+        (cust / ".claude" / ANCHORS_FILE).write_text("# agent-KB\nkb/docs\n", encoding="utf-8")
+        run(cust, "add", "-A")
+        run(cust, "commit", "-q", "-m", "kb")
+        for i in range(4):
+            (cust / f"s{i}.py").write_text(str(i), encoding="utf-8")
+            run(cust, "add", "-A")
+            run(cust, "commit", "-q", "-m", f"c{i}")
+        f = detect(cust, 3)
+        if not f or not any("kb/docs" in x for x in f):
+            print("SELF-TEST FAIL: custom anchor kb/docs staleness not detected")
             ok = False
 
     print("SELF-TEST: PASS" if ok else "SELF-TEST: FAIL")

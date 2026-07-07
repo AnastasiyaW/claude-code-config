@@ -70,10 +70,16 @@ quality + cost are seen on a couple of manual runs. Note: OpenWiki is fresh
 — which doubles as supply-chain buffer.
 
 ## Adoption (who turns tier 2/3 on)
-Adoption stays a human/harness decision, not auto-forced on every repo. Triggers:
-`long-run-detector.py` nudge, `/harness-audit`, or scaffolding kb-skeleton
-(`templates/kb-skeleton/`). Once `scripts/validate_kb.py` + `docs/kb/` exist, tiers
-2+3 enforce automatically. A repo with no KB pays nothing (one `Path.exists()`).
+Adoption stays a human decision, but the PROPOSAL is automatic (user directive
+2026-07-07): when a project **looks complex** (long-run signals: ≥3 handoffs /
+≥40 commits / ≥200 tracked files / PROBLEMS.md) and has **no agent-docs tree**,
+`long-run-detector.py` (SessionStart) explicitly proposes adopting the KB
+(kb-skeleton: `docs/kb` + `scripts/validate_kb.py`) alongside the long-run
+harness — surface it to the user as a concrete offer, not silence. Other
+triggers: `/harness-audit`, scaffolding `templates/kb-skeleton/`. Once
+`scripts/validate_kb.py` + docs exist, tiers 2+3 enforce automatically. A repo
+with no KB pays nothing (one `Path.exists()`); already-adopted `[LONG-RUN]`
+repos without docs are caught by tier 2b instead.
 
 ## Anti-patterns
 - ❌ Relying on CI alone → drift caught only after push, or never if CI unwired.
