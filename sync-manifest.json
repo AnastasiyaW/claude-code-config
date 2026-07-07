@@ -18,7 +18,7 @@
         "file-organization-cohesion.md",
         "activity-journal-and-state-registry.md"
       ],
-      "add": ["rlm-context-as-program.md", "learn-from-corrections.md"]
+      "add": ["rlm-context-as-program.md", "learn-from-corrections.md", "agent-docs-freshness.md"]
     },
     { "from": "principles", "to": "principles", "deny": ["25-coordination-primitives-mapping.md"], "add": [] },
     { "from": "templates", "to": "templates", "deny": [], "add": [] },
@@ -28,7 +28,7 @@
       "from": "claude-code-config/hooks",
       "to": "hooks",
       "deny": ["mashinki-journal-reminder.py", "ssh-connection-guard.py"],
-      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py", "cyrillic-bash-guard.py", "handoff-resume-gate.py", "session-feedback-capture.py", "feedback-pending-show.py"]
+      "add": ["long-run-detector.py", "feature-list-validator.py", "coord-claim-guard.py", "cyrillic-bash-guard.py", "handoff-resume-gate.py", "session-feedback-capture.py", "feedback-pending-show.py", "docs-staleness-guard.py", "kb-validate-gate.py"]
     },
     {
       "from": "workflows",
