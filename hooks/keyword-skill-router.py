@@ -30,6 +30,22 @@ import sys
 # Each entry: pattern (regex, case-insensitive) → skill name + description
 # Patterns should be specific enough to avoid false positives on normal conversation
 ROUTES = [
+    # Clean architecture guardrails — auto-attach to any coding process
+    {
+        "patterns": [
+            r"\b(напиши|запили|добавь|сделай|создай|почини|исправь|перепиши|спроектируй|отрефактор\w*|refactor\w*|implement|write|add|create|fix|build|design|rewrite)\b.{0,80}\b(код|функци\w*|класс\w*|модул\w*|сервис\w*|фич\w*|скрипт\w*|приложени\w*|проект\w*|endpoint|api|бэкенд|backend|frontend|парсер\w*|бот\w*|code|function|class|module|service|feature|script|app\b|application|component|library|parser|bot)\b",
+            r"\b(код|функци\w*|класс\w*|модул\w*|сервис\w*|фич\w*|скрипт\w*|code|function|class|module|service|feature)\b.{0,80}\b(напиши|добавь|сделай|создай|почини|исправь|refactor\w*|implement|write|add|create|fix)\b",
+            r"\b(архитектур\w*|architecture|структур\w* проект\w*|project structure|clean architecture|чист\w* архитектур\w*|solid|dependency rule|слои|layers?)\b",
+            r"\b(новый проект|new project|с нуля|from scratch|scaffold|каркас)\b",
+        ],
+        "skill": "clean-architecture",
+        "description": "Clean-architecture guardrails (dependency rule, SOLID, boundaries, Python patterns) — apply to any coding task",
+        "refs": [
+            "references/solid-and-components.md",
+            "references/boundaries-and-layers.md",
+            "references/python-implementation.md",
+        ],
+    },
     # Planning & Architecture
     {
         "patterns": [
