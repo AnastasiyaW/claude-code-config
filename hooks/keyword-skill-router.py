@@ -46,14 +46,13 @@ ROUTES = [
             "references/python-implementation.md",
         ],
     },
-    # Planning & Architecture
+    # Planning & Architecture (plan mode is built-in, not a skill)
     {
         "patterns": [
             r"\b(спланируй|составь план|plan this|make a plan|design the approach)\b",
             r"\b(архитектур|architect)\b.*\b(реши|спроектируй|design|plan)\b",
         ],
-        "skill": "plan",
-        "description": "Structured planning with acceptance criteria",
+        "suggest": "Enter plan mode (built-in) - structured planning with acceptance criteria",
     },
     # Code Review
     {
@@ -73,15 +72,14 @@ ROUTES = [
         "skill": "security-review",
         "description": "Security vulnerability analysis",
     },
-    # Handoff
+    # Handoff (handled by rules/session-handoff.md, not a skill)
     {
         "patterns": [
             r"\b(подготовь handoff|prepare handoff|save context|write handoff)\b",
             r"\b(сохрани контекст|перенеси контекст|закрываем сессию)\b",
             r"\b(подбей.*беседу.*для.*чат|сделай передачу)\b",
         ],
-        "skill": "handoff",
-        "description": "Write structured handoff for session transition",
+        "suggest": "Write .claude/handoffs/YYYY-MM-DD_HH-MM.md per rules/session-handoff.md, then stop",
     },
     # Research
     {
@@ -128,6 +126,10 @@ def detect_keywords(user_message: str) -> list[dict]:
     for route in ROUTES:
         for pattern in route["patterns"]:
             if re.search(pattern, user_message, re.IGNORECASE):
+                if "suggest" in route:
+                    # Advisory route (built-in feature or rule, not a skill)
+                    matches.append({"suggest": route["suggest"]})
+                    break
                 item = {
                     "skill": route["skill"],
                     "description": route["description"],
@@ -179,11 +181,13 @@ def main() -> int:
     # Output suggestions (agent sees this in context)
     suggestions = []
     for m in matches:
-        prefix = "  REQUIRED" if m.get("required") else "  /"
+        if "suggest" in m:
+            suggestions.append(f"  {m['suggest']}")
+            continue
         if m.get("required"):
-            suggestions.append(f"{prefix}: Use skill {m['skill']} - {m['description']}")
+            suggestions.append(f"  REQUIRED: Use skill {m['skill']} - {m['description']}")
         else:
-            suggestions.append(f"{prefix}{m['skill']} - {m['description']}")
+            suggestions.append(f"  /{m['skill']} - {m['description']}")
         if m.get("refs"):
             suggestions.append(f"    refs: {', '.join(m['refs'])}")
 
