@@ -318,8 +318,7 @@ def check_memory(memory_base: Path, root: Path, findings: list[Finding]) -> dict
     return result
 
 
-def write_report(root: Path, payload: dict) -> Path:
-    reports_dir = root / "reports" / "handoff-memory-loop"
+def write_report(reports_dir: Path, payload: dict) -> Path:
     reports_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     report_path = reports_dir / f"{stamp}.json"
@@ -335,6 +334,12 @@ def main() -> int:
     parser.add_argument("--memory-base", default=str(Path.home() / ".codex" / "memories"))
     parser.add_argument("--hooks", default=str(Path.home() / ".codex" / "hooks.json"))
     parser.add_argument("--write-report", action="store_true")
+    parser.add_argument(
+        "--report-dir",
+        type=Path,
+        default=None,
+        help="Runtime report directory (default: <root>/reports/handoff-memory-loop).",
+    )
     parser.add_argument(
         "--strict-legacy",
         action="store_true",
@@ -362,7 +367,8 @@ def main() -> int:
     }
 
     if args.write_report:
-        payload["report_path"] = str(write_report(root, payload))
+        reports_dir = args.report_dir or (root / "reports" / "handoff-memory-loop")
+        payload["report_path"] = str(write_report(reports_dir, payload))
 
     print(json.dumps(payload["summary"], ensure_ascii=False, indent=2))
     if findings:

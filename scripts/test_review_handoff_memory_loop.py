@@ -256,6 +256,21 @@ class HandoffMemoryLoopTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn('"pass": true', result.stdout)
 
+    def test_explicit_runtime_report_dir_does_not_dirty_project_root(self) -> None:
+        root, hooks, memory = self.make_fixture(GOOD_HANDOFF)
+        runtime_reports = root.parent / "runtime-reports"
+        result = self.run_validator(
+            root,
+            hooks,
+            memory,
+            "--write-report",
+            "--report-dir",
+            str(runtime_reports),
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertTrue((runtime_reports / "latest.json").exists())
+        self.assertFalse((root / "reports" / "handoff-memory-loop").exists())
+
     def test_missing_memory_note_fails(self) -> None:
         root, hooks, memory = self.make_fixture(GOOD_HANDOFF, include_memory_notes=False)
         result = self.run_validator(root, hooks, memory)

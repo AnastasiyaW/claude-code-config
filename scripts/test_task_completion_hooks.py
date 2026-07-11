@@ -125,6 +125,16 @@ class TaskCompletionHookTests(unittest.TestCase):
         for required in REQUIRED_SESSIONSTART_HOOKS:
             self.assertIn(required, commands)
 
+    def test_handoff_reports_use_runtime_directory(self) -> None:
+        for config_path in (HOOKS_JSON, CLAUDE_SETTINGS):
+            commands = [
+                command
+                for command in hook_commands_from(config_path, "SessionStart")
+                if "review_handoff_memory_loop.py" in command
+            ]
+            self.assertEqual(len(commands), 1, f"{config_path}: expected one handoff-memory reviewer")
+            self.assertIn("--report-dir", commands[0], f"{config_path}: report writes must stay outside project roots")
+
     def test_pretooluse_hooks_guard_handoff_writes(self) -> None:
         commands = "\n".join(hook_commands("PreToolUse"))
         for required in REQUIRED_PRETOOLUSE_HOOKS:
