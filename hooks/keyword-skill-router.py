@@ -30,6 +30,53 @@ import sys
 # Each entry: pattern (regex, case-insensitive) → skill name + description
 # Patterns should be specific enough to avoid false positives on normal conversation
 ROUTES = [
+    # Retouch native variant experiments / measured implementation selection
+    {
+        "patterns": [
+            r"\b(retouch|ретуш|photoshop|uxp|plugin|плагин|native|c\+\+)\b.*\b(вариант|variants?|scorecard|benchmark|бенчмарк|сравн|лучший|winner|experiment|эксперимент)\b",
+            r"\b(вариант|variants?|scorecard|benchmark|бенчмарк|сравн|лучший|winner|experiment|эксперимент)\b.*\b(retouch|ретуш|photoshop|uxp|plugin|плагин|native|c\+\+)\b",
+        ],
+        "skill": "native-cpp-memory",
+        "description": "REQUIRED for measured C++ implementation-variant experiments and retouch plugin scorecards",
+        "refs": [
+            "references/variant-experiments.md",
+            "references/retouch-native.md",
+        ],
+        "required": True,
+    },
+    # Retouch security / ethical hacking / release hardening
+    {
+        "patterns": [
+            r"\b(ретуш|retouch|photoshop|uxp|плагин|plugin|нейро\w*|trustmark|watermark)\b.*\b(взлом|хак|этичн\w*.*хак|pentest|penetration|уязвим|exploit|security audit|security review|безопасн|crack|license bypass|tamper|reverse)\b",
+            r"\b(взлом|хак|pentest|penetration|уязвим|exploit|security|безопасн|crack|tamper|reverse)\b.*\b(retouch|ретуш|photoshop|uxp|plugin|плагин|native addon|trustmark|watermark)\b",
+            r"\b(test|тест|qa|smoke|ctest|build)\b.*\b(retouch|ретуш|photoshop|uxp|plugin|плагин)\b.*\b(security|безопасн|уязвим|взлом)\b",
+        ],
+        "skill": "retouch-security-audit",
+        "description": "REQUIRED for defensive ethical hacking, vulnerability testing, and release hardening of the retouch plugin",
+        "refs": [
+            "references/release-checklist.md",
+            "references/sources.md",
+        ],
+        "required": True,
+    },
+    # Retouch native / low-level memory
+    {
+        "patterns": [
+            r"\b(retouch-app|retouch plugin|photoshop plugin|uxp hybrid|uxp.*native|native addon|neural plugin|нейро\w*.*плагин|плагин.*нейро\w*)\b",
+            r"\b(плагин|plugin)\b.*\b(ретуш|retouch|photoshop|uxp)\b.*\b(c\+\+|native|натив|memory|памят|abi|onnx|directml|coreml|metal|gpu|buffer|tensor)\b",
+            r"\b(ретуш|retouch)\b.*\b(плагин|plugin|нейро\w*|onnx|directml|coreml|metal)\b.*\b(memory|памят|c\+\+|native|натив|buffer|tensor)\b",
+        ],
+        "skill": "native-cpp-memory",
+        "description": "REQUIRED for retouch/native/neural plugin memory, ABI, tensor, GPU, and C++ ownership work",
+        "refs": [
+            "references/retouch-native.md",
+            "references/low-level-retouch-memory.md",
+            "references/windows-memory-abi.md",
+            "references/macos-memory-abi.md",
+            "references/advanced-cpp.md",
+        ],
+        "required": True,
+    },
     # Clean architecture guardrails — auto-attach to any coding process
     {
         "patterns": [
@@ -69,8 +116,8 @@ ROUTES = [
             r"\b(проверь безопасность|security review|security audit|check security)\b",
             r"\b(найди уязвимост|find vulnerabilit|pentest)\b",
         ],
-        "skill": "security-review",
-        "description": "Security vulnerability analysis",
+        "skill": "deep-review",
+        "description": "Security vulnerability analysis via available deep-review skill",
     },
     # Handoff (handled by rules/session-handoff.md, not a skill)
     {
