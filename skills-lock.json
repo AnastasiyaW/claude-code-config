@@ -1,12 +1,12 @@
 {
-  "lockfile_version": 1,
-  "generated_at": "2026-07-11T10:58:29+00:00",
+  "lockfile_version": 2,
+  "generated_at": "2026-07-11T11:05:28+00:00",
   "skill_count": 33,
-  "aggregate_hash": "sha256:2fb445e92c0187163572d1454f652dbf6270e641df17ad3ad8ef0e95aeed70ab",
+  "aggregate_hash": "sha256:388b996c8ae3fa0ca6633f6621418fed8b4a994759ead3c1022f490dcb329a11",
   "skills": {
     "agent-harness-design": {
-      "content_hash": "sha256:a879689d822371c0ea4978b25636ca6371eb06316fde0a13411f2ff8e72e627b",
-      "size_bytes": 89895,
+      "content_hash": "sha256:1fc2dbd822d2ca82cfc698eab73296b19fa3be9ef3783354254f136d778467b9",
+      "size_bytes": 88430,
       "file_count": 11,
       "files": [
         "SKILL.md",
@@ -20,12 +20,11 @@
         "references/agent-streaming.md",
         "references/agent-tool-design.md",
         "references/context-trust-labels.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.385701+00:00"
+      ]
     },
     "ai-ml/diffusion-engineering": {
-      "content_hash": "sha256:7910adf7cf26e110113133b3bfe9e66abfb4aac5fe22a2a8bf723034cd091eeb",
-      "size_bytes": 64380,
+      "content_hash": "sha256:04eeac8360a9855d3ebdf690db24f1de6bcf00a2d1f00e111f99387e30f9a369",
+      "size_bytes": 62897,
       "file_count": 7,
       "files": [
         "SKILL.md",
@@ -35,97 +34,87 @@
         "references/memory.md",
         "references/samplers.md",
         "references/training.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.389214+00:00"
+      ]
     },
     "ai-ml/flux2-klein-prompting": {
-      "content_hash": "sha256:3bd591dfddf12c8208a5733bbca09d41d8f5aaa376dac36d3a1afed793a635b6",
-      "size_bytes": 11945,
+      "content_hash": "sha256:4590b466e6978ab2b94490744918bd71cc89c4dae651a12db837a804ab81fb81",
+      "size_bytes": 11687,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.390213+00:00"
+      ]
     },
     "ai-ml/flux2-lora-training": {
-      "content_hash": "sha256:964bc5d813022ba31caba84bdcac71c1c9249df0308a34f7352133a4633da91d",
-      "size_bytes": 23350,
+      "content_hash": "sha256:1741a55f60dfe78f23d71847ef3ee7faa7c57a5db397f83ccc9288c7ef6f3065",
+      "size_bytes": 22942,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.391212+00:00"
+      ]
     },
     "ai-ml/forensic-prompt-compiler": {
-      "content_hash": "sha256:df9b20c2718034336a8ed6e8fe546b8a23f4aa37be60137240e2f8a5db6064b3",
-      "size_bytes": 12159,
+      "content_hash": "sha256:59bf6c26187650255de2779ea485ab342c0cffe406414c57f35ad1e26f040971",
+      "size_bytes": 11879,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.391212+00:00"
+      ]
     },
     "ai-ml/ml-research-lab": {
-      "content_hash": "sha256:41f0ae71c8f9e4c9adc04cd1adcff11c3ccb6a09152989ce5601d8cb65b86e06",
-      "size_bytes": 3232,
+      "content_hash": "sha256:a8c2b5db7d46ee21285b1cae962b29f88c375c3434126801e81fa655e0e91f8a",
+      "size_bytes": 3173,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.391212+00:00"
+      ]
     },
     "ai-ml/vlm-segmentation": {
-      "content_hash": "sha256:37e07c60ec0765d5d60d50e01755ee2dd72ef6ae58604333e5378afb0586147e",
-      "size_bytes": 36025,
+      "content_hash": "sha256:19b4a662cd54901f9bcfbec03c975e333a63ccf679d63cfd8fbb2ea1a71af1c2",
+      "size_bytes": 35254,
       "file_count": 4,
       "files": [
         "SKILL.md",
         "references/diffusion-engineering.md",
         "references/gpu-deployment.md",
         "references/vlm-segmentation.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.394382+00:00"
+      ]
     },
     "architecture/feature-new": {
-      "content_hash": "sha256:f8935d4b28c64fa8b4ad8f01aad2bbced591633f02634ac534c77b9cf14c2164",
-      "size_bytes": 10418,
+      "content_hash": "sha256:1334abdc9fd58fcd5f495c01742ef780614b620a7837dc898d41523e534e7f50",
+      "size_bytes": 10149,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.395381+00:00"
+      ]
     },
     "architecture/harness-design": {
-      "content_hash": "sha256:463b43b1c4e42f10e875e2d769c536b6cd36f4ad0b3d15cd33b14ff1d42c23cd",
-      "size_bytes": 12187,
+      "content_hash": "sha256:f6b193365f611404faa13b989d1319f95566f34e137000781ceaa6fc1442c451",
+      "size_bytes": 11945,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.396381+00:00"
+      ]
     },
     "architecture/layer-new": {
-      "content_hash": "sha256:c9dcdcb9ea8072da864f35c6e67575bfcd93072e8d895ae31c8bb47be44c0de1",
-      "size_bytes": 7492,
+      "content_hash": "sha256:227fb53d7cd587e379a8d61d8e2d5155e815b76943156e6f9447456a09c7b3e1",
+      "size_bytes": 7300,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.397382+00:00"
+      ]
     },
     "architecture/plan-swarm-review": {
-      "content_hash": "sha256:324242362cf406b6cd1567a7938b44a9f34110e01579effd49014f5203796e3a",
-      "size_bytes": 23714,
+      "content_hash": "sha256:75c511b4e06fb2f1b39526edb1edae16a0ee34085c60d6a492cf68f3ac05b88a",
+      "size_bytes": 23156,
       "file_count": 2,
       "files": [
         "SKILL.md",
         "references/vulnerability-kb.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.399382+00:00"
+      ]
     },
     "creative/pixel-art-storyboard": {
-      "content_hash": "sha256:ea7eac7074bc10e7d3e99de89528b6508e87b479291ea3f9ab65a608d6966963",
-      "size_bytes": 150304,
+      "content_hash": "sha256:e59e74f16a90aae4ebca5701d153ae22744747b4fadcd6fc642e55268470d8e2",
+      "size_bytes": 146952,
       "file_count": 11,
       "files": [
         "SKILL.md",
@@ -139,12 +128,11 @@
         "references/scene-description-framework.md",
         "references/smoother-animation-baking.md",
         "references/three-registers.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.404603+00:00"
+      ]
     },
     "creative/pixel-art-studio": {
-      "content_hash": "sha256:17920e14f745732318b67b5a32996055ca861e4ebcba13c7a6de72770358347e",
-      "size_bytes": 264546,
+      "content_hash": "sha256:5f7ccca3d7b79f421901c1da7b757e818acc476058eee3cd9b673ea5e39c2ac9",
+      "size_bytes": 257660,
       "file_count": 47,
       "files": [
         "SKILL.md",
@@ -194,51 +182,46 @@
         "scripts/preprocess.py",
         "scripts/quality_check.py",
         "scripts/render.py"
-      ],
-      "last_modified": "2026-07-11T10:51:35.434387+00:00"
+      ]
     },
     "development/deep-review": {
-      "content_hash": "sha256:777b511abf70ecd6f3d99b3c384c33aa5d5db77084a1442048edf7b2d01b5489",
-      "size_bytes": 13393,
+      "content_hash": "sha256:c7ed6cb83d9315bc213e4fd0376425e2c58057c8e4466fbc24d7f41d0a2696f4",
+      "size_bytes": 13068,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.435387+00:00"
+      ]
     },
     "development/distill-feedback": {
-      "content_hash": "sha256:ed9aae9305c441936b70ea09bb8aec38988fbf58029e0a9f4f571573501ac234",
-      "size_bytes": 13778,
+      "content_hash": "sha256:9eeaf50a6b1cbf71f91e5ba3b408e49d1adfe7c83672294a36e0ea69d2478d0e",
+      "size_bytes": 13498,
       "file_count": 2,
       "files": [
         "SKILL.md",
         "scripts/extract_feedback_queue.py"
-      ],
-      "last_modified": "2026-07-11T10:51:35.435387+00:00"
+      ]
     },
     "development/proof-verify": {
-      "content_hash": "sha256:321fbe0af951bf0e1d2b227c927f71e2c46d5c40aeb3d9bc96383c4d44e7264c",
-      "size_bytes": 10647,
+      "content_hash": "sha256:fd384377ef1373a4cdeaeb678e82a3d86d4916081c733f0cc20fd39e18d5c69a",
+      "size_bytes": 10315,
       "file_count": 2,
       "files": [
         "SKILL.md",
         "references/kb-aware-verification.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.436893+00:00"
+      ]
     },
     "development/repo-map": {
-      "content_hash": "sha256:fae3e47aeb4659528ec210bc00e03472a23b08fd2766bc9ac8155410044243ca",
-      "size_bytes": 19545,
+      "content_hash": "sha256:9a811ca65408e792035cc6794b07a9a55de6dd8eee1d974d9a44d9861753bb1d",
+      "size_bytes": 19104,
       "file_count": 2,
       "files": [
         "SKILL.md",
         "scripts/repo_map.py"
-      ],
-      "last_modified": "2026-07-11T10:51:35.438901+00:00"
+      ]
     },
     "development/workflow-orchestration": {
-      "content_hash": "sha256:fcf1ff1bf919a1f950551d10dde87cde1166b81ed875d5d051285703136ecb6e",
-      "size_bytes": 61111,
+      "content_hash": "sha256:70c25e976b628aface7d590333df864b312aca27ee1e0b310cdf77899a02a916",
+      "size_bytes": 60308,
       "file_count": 6,
       "files": [
         "SKILL.md",
@@ -247,12 +230,11 @@
         "references/research-findings-2026-05-30.md",
         "references/workflow-template.js",
         "scripts/validate.mjs"
-      ],
-      "last_modified": "2026-07-11T10:51:35.441725+00:00"
+      ]
     },
     "frontend/frontend-design": {
-      "content_hash": "sha256:457f09be24bb7a7b7de4981220f521a471db39e48de795468ddc49123c7255fb",
-      "size_bytes": 44381,
+      "content_hash": "sha256:7e1d8e8ac3c7b485d5d0f1bf2c5cae0a3c5d28ced49bcb9847f6d9a9473fc23f",
+      "size_bytes": 42906,
       "file_count": 5,
       "files": [
         "SKILL.md",
@@ -260,12 +242,11 @@
         "references/layout-css.md",
         "references/performance-a11y.md",
         "references/visual-styles.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.444736+00:00"
+      ]
     },
     "ios/ios-development": {
-      "content_hash": "sha256:2a4a32b7eaec3502bee70c72ec88f041b194e33857b422863e9c44a18f0c2d70",
-      "size_bytes": 113207,
+      "content_hash": "sha256:3c72ec30722b352e10e0e91b21e0bc32a47fa5a55c797bdf8794dcd45a19731a",
+      "size_bytes": 109644,
       "file_count": 9,
       "files": [
         "SKILL.md",
@@ -277,21 +258,19 @@
         "references/performance.md",
         "references/swiftui.md",
         "references/uikit.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.450519+00:00"
+      ]
     },
     "lean-code": {
-      "content_hash": "sha256:ebc362f5251ceb7f2ca298d544135a2d452f985d2e8ae2d5d0727819659f6691",
-      "size_bytes": 3680,
+      "content_hash": "sha256:87e94f114a4ef9eb06169d1b317343391f029254a828007d59b6f6beff7fe8a1",
+      "size_bytes": 3645,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.450519+00:00"
+      ]
     },
     "operational/desktop-sessions-discovery": {
-      "content_hash": "sha256:45bc5a788a7e6e83d516a2962c9980747d817a6459f2adb496c6b8c4c8c5d83b",
-      "size_bytes": 48218,
+      "content_hash": "sha256:9bce354da0ba04cc7777b64563ed4eba33eb5cc30636a94bb03ce5eb6fd1e1d8",
+      "size_bytes": 47030,
       "file_count": 5,
       "files": [
         "SKILL.md",
@@ -299,109 +278,97 @@
         "scripts/sessions_inventory.py",
         "scripts/sessions_registry.py",
         "scripts/sessions_restore.py"
-      ],
-      "last_modified": "2026-07-11T10:51:35.453557+00:00"
+      ]
     },
     "operational/gemini-delegate": {
-      "content_hash": "sha256:bb4d04ac29c8d85c65a39e8ef7aa1ea915282c75be55b03adb093cc52166bf30",
-      "size_bytes": 9621,
+      "content_hash": "sha256:1521879d4ea159733a697eb6ec7c49a3499485c6eec123e8aa46c212b3b06f25",
+      "size_bytes": 9511,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.454063+00:00"
+      ]
     },
     "operational/harness-audit": {
-      "content_hash": "sha256:73197ee3304b4b4baca5a6cbc26069258d2ff4c928d337c454bcdfe3031b6786",
-      "size_bytes": 23542,
+      "content_hash": "sha256:3435c306f563ca6c035616f572f9fb2fb7f96e633424ade83475f45edae84ed8",
+      "size_bytes": 23048,
       "file_count": 3,
       "files": [
         "SKILL.md",
         "references/checklist-per-subsystem.md",
         "references/scoring-rubric.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.456071+00:00"
+      ]
     },
     "plan-to-tickets": {
-      "content_hash": "sha256:467ed638e6b4c6f25db47aca027fcf54ddebc990ee2626a928073994ec7ae432",
-      "size_bytes": 2794,
+      "content_hash": "sha256:aece46bf5026e97df0e8fb2d687e8384518b6466dbc8c5bf5dc4b54276f214c2",
+      "size_bytes": 2729,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.456071+00:00"
+      ]
     },
     "video-production/product-meaning-extractor": {
-      "content_hash": "sha256:ae4d982220cf68d07afa515bd68189b4f0fa32ce8c21c3367c8c774961f8b3dd",
-      "size_bytes": 9218,
+      "content_hash": "sha256:2b50a9660db0c0ff555b79a1caa3910094ca9a73a713b299a0346db95194a49e",
+      "size_bytes": 9022,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.457070+00:00"
+      ]
     },
     "video-production/remotion-production-guide": {
-      "content_hash": "sha256:fb8eccaa7ed7158b0dae4a9a391cccdfd174859eb5dbc892764bf62d9b7504d8",
-      "size_bytes": 8235,
+      "content_hash": "sha256:c19cc66d24c6e404ba1e9ce001569977ddf92a350363961c0f3d9b980dc8ea22",
+      "size_bytes": 8003,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.457070+00:00"
+      ]
     },
     "video-production/script-evaluator": {
-      "content_hash": "sha256:0a3b6a5528fa252f4f208992ad6af3395bc1114198e66ccbe6adc27e6ece02da",
-      "size_bytes": 6611,
+      "content_hash": "sha256:b26e8f716a6254a08fac314aec454ce7b0cde1fa7ceb13268e389916d251b33a",
+      "size_bytes": 6472,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.458070+00:00"
+      ]
     },
     "video-production/video-narrative-arc": {
-      "content_hash": "sha256:4d79e1c373f0dac309930d87218a1f9712cf25f79cd94cb7b1a2db2cd70953cd",
-      "size_bytes": 9417,
+      "content_hash": "sha256:6faba576c45ed7671a53bb34820661ab0bfca8ee87ed11fd38865773716cc0c2",
+      "size_bytes": 9177,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.459094+00:00"
+      ]
     },
     "video-production/video-post-production": {
-      "content_hash": "sha256:14bfe94825bb860c2dcf35c53c0332f4ecd3174cdb1af85699fa84b3827ad467",
-      "size_bytes": 6862,
+      "content_hash": "sha256:5727768fe6bc59a949eccb10a86786e3fb42e1448349306b611fe4f44eeb2c0b",
+      "size_bytes": 6660,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.467917+00:00"
+      ]
     },
     "writing/article-structure-review": {
-      "content_hash": "sha256:d36f05ee4e5e845b40140a14473b2a018253397dd6311fb6f7b81e83badc583d",
-      "size_bytes": 12867,
+      "content_hash": "sha256:ffa43478e8eba809395eaee12b080e75417a6a5844ee51257685c3ce6300db3b",
+      "size_bytes": 12695,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.469422+00:00"
+      ]
     },
     "writing/humanize-english": {
-      "content_hash": "sha256:d754b609da80e147c404a009a99f4890cad826144cf6da2a7173fee5361392a5",
-      "size_bytes": 12282,
+      "content_hash": "sha256:09e5e810889c17ab4a0f67054341802fd62d130d9cf78e2be195be099c310624",
+      "size_bytes": 11997,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.470430+00:00"
+      ]
     },
     "writing/humanize-russian": {
-      "content_hash": "sha256:beeaac07a5630070e306d3a7f7d4ebf6dbe2a82a19cc8077eb043e6f342479f3",
-      "size_bytes": 15632,
+      "content_hash": "sha256:c23e69e3a7af5fa17e62cd30cae0dd3da7e21f136da0d2e571cf987ea9dfe7af",
+      "size_bytes": 15426,
       "file_count": 1,
       "files": [
         "SKILL.md"
-      ],
-      "last_modified": "2026-07-11T10:51:35.471429+00:00"
+      ]
     }
   }
 }

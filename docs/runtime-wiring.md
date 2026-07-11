@@ -69,8 +69,9 @@ and available tool names differ.
 
 ## What The Evidence Means
 
-Skill linting, the lockfile, and synchronization prove that a skill is valid,
-versioned, and available to the client. Router evals prove selected automatic
+Skill linting, the portable lockfile, and synchronization prove that a skill is
+valid, versioned, and available to the client. The lock normalizes UTF-8 text
+newlines, so the same checkout verifies on Windows and Linux. Router evals prove selected automatic
 triggers. They do **not** prove that every piece of advisory knowledge improves
 every task. Promote a skill to a mandatory route only after a task-specific
 before/after evaluation with a measurable acceptance criterion.

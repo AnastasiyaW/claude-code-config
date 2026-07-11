@@ -4,9 +4,9 @@ Inspired by Multica's skills-lock.json pattern (multica-ai/multica).
 
 Each skill is identified by:
   - path (relative to skills/)
-  - content_hash (sha256 of SKILL.md + all files under references/ and scripts/)
-  - size (total bytes of tracked files)
-  - last_modified (most recent mtime among tracked files)
+  - content_hash (sha256 of canonical SKILL.md + all files under references/
+    and scripts/)
+  - size (total canonical bytes of tracked files)
 
 Purpose:
   - Detect unintentional skill drift (someone edits SKILL.md and forgets to
@@ -51,6 +51,19 @@ def _walk_skill(skill_dir: Path) -> list[Path]:
     return files
 
 
+def canonical_bytes(content: bytes) -> bytes:
+    """Normalize text newlines so a checkout hashes identically on Windows/Linux.
+
+    Skill bundles are predominantly text. Binary files retain their exact bytes,
+    while UTF-8 text is normalized before it contributes to the portable lock.
+    """
+    try:
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        return content
+    return text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
+
+
 def hash_skill(skill_dir: Path) -> dict:
     """Compute content hash + metadata for one skill."""
     files = _walk_skill(skill_dir)
@@ -60,28 +73,23 @@ def hash_skill(skill_dir: Path) -> dict:
     # Deterministic hash: sort by relative path, hash (path, content) pairs.
     hasher = hashlib.sha256()
     total_size = 0
-    latest_mtime = 0.0
     file_list = []
 
     for fp in sorted(files, key=lambda p: p.relative_to(skill_dir).as_posix()):
         rel = fp.relative_to(skill_dir).as_posix()
-        content = fp.read_bytes()
+        content = canonical_bytes(fp.read_bytes())
         hasher.update(rel.encode("utf-8"))
         hasher.update(b"\0")
         hasher.update(content)
         hasher.update(b"\0")
         total_size += len(content)
-        latest_mtime = max(latest_mtime, fp.stat().st_mtime)
         file_list.append(rel)
-
-    iso_mtime = datetime.fromtimestamp(latest_mtime, tz=timezone.utc).isoformat()
 
     return {
         "content_hash": f"sha256:{hasher.hexdigest()}",
         "size_bytes": total_size,
         "file_count": len(files),
         "files": file_list,
-        "last_modified": iso_mtime,
     }
 
 
@@ -108,7 +116,7 @@ def build_lock(root: Path) -> dict:
         agg.update(entries[key]["content_hash"].encode("ascii"))
         agg.update(b"\0")
     return {
-        "lockfile_version": 1,
+        "lockfile_version": 2,
         "generated_at": datetime.now(tz=timezone.utc).isoformat(timespec="seconds"),
         "skill_count": len(entries),
         "aggregate_hash": f"sha256:{agg.hexdigest()}",
