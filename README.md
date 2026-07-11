@@ -2,7 +2,7 @@
 
 [![OKF v0.1 compliant](https://img.shields.io/badge/OKF-v0.1%20compliant-4285F4)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md)
 
-A practical configuration kit for Claude Code, Codex, and other coding agents. 29 architectural principles, 36 enforcement hooks, 31 skills, 26 drop-in rules, starter templates, and ready-made dynamic-workflow commands. Drop it into your project and your agent immediately gets battle-tested patterns - instead of figuring them out from scratch every session.
+A practical configuration kit for Claude Code, Codex, and other coding agents. It contains architectural principles, enforcement hooks, skills, drop-in rules, starter templates, and dynamic-workflow commands. Drop the relevant parts into a project so the agent starts from verified working patterns instead of rediscovering them every session.
 
 This is not a collection of tips. It is a **system** that teaches your agent *how to work* - when to use one agent vs many, how to verify its own output, how to manage context across long sessions, how to not get poisoned by malicious packages.
 
@@ -32,9 +32,12 @@ git clone https://github.com/AnastasiyaW/claude-code-config ~/claude-code-config
 # Copy the always-on safety hooks to your global config
 python ~/claude-code-config/scripts/install_hooks.py --global
 
-# Copy skills you want (or all)
+# Claude Code: copy a selected skill directory, not its parent category
 mkdir -p ~/.claude/skills
-cp -r ~/claude-code-config/skills/* ~/.claude/skills/
+cp -r ~/claude-code-config/skills/ai-ml/ml-research-lab ~/.claude/skills/
+
+# Codex desktop: sync all public skills with backups for changed local copies
+python ~/claude-code-config/scripts/sync_skills_to_codex.py --apply
 ```
 
 `~/.claude/hooks/` stores the hook scripts; `~/.claude/settings.json` is where they are registered. The install script merges safe defaults into your existing settings.
@@ -61,13 +64,15 @@ This keeps everything under `.claude/` in your repo, nothing global.
 | **Library / package** | above + Principles 08 (Skills Best Practices), 17 (DBS Skill Creation) |
 | **More than one CLI agent (Claude + Gemini / Codex)** | above + [rules/cross-harness-agents-md.md](rules/cross-harness-agents-md.md) (one `AGENTS.md` per project, no symlinks) + `gemini-delegate` skill |
 
-See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install, and [HOW-IT-WORKS.md](HOW-IT-WORKS.md) for the mechanics of each layer.
+See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install,
+[HOW-IT-WORKS.md](HOW-IT-WORKS.md) for the mechanics of each layer, and
+[docs/runtime-wiring.md](docs/runtime-wiring.md) for the live verification contract.
 
 ---
 
 ## What This Gives You
 
-**29 Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
+**Architectural Principles** - each one prevents a specific failure mode observed in real agent workflows:
 
 - **Self-evaluation bias?** Separate Generator and Evaluator agents ([Harness Design](principles/01-harness-design.md))
 - **Agent claims "done" but it's broken?** Require durable proof artifacts ([Proof Loop](principles/02-proof-loop.md))
@@ -172,6 +177,7 @@ Hard rules attached to this pack:
 - **WIP=1**: at most one feature in `status: "in-progress"` at any time
 - **L1+L2+L3 evidence**: `status: "done"` requires `evidence` field referencing Syntax/Static + Runtime + System artifacts (durable files, not "tests pass" claims)
 - **`done` is one-way**: regression becomes a new feature, never roll back
+- **Durable source and docs**: creating `feature_list.json` opts the project into the Stop gates for a Git worktree with `origin` plus an agent-facing KB that stays current. Scratch folders remain outside this boundary.
 
 **To audit whether your project needs this pack — and which subsystem to fix first — invoke the new [`harness-audit`](skills/operational/harness-audit/) skill:**
 
@@ -192,13 +198,13 @@ See [principle 27 - Feature Tracking](principles/27-feature-tracking.md) for the
 **New:** [HOW-IT-WORKS.md](HOW-IT-WORKS.md) - technical deep dive into how each technology actually works, with real measurements.
 
 **Structure:**
-- `principles/` - 29 standalone architectural principles. Read the one that matches your current problem.
-- `rules/` - 25 drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
+- `principles/` - standalone architectural principles. Read the one that matches your current problem.
+- `rules/` - drop-in `.claude/rules/` files: always-on working discipline (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code) plus a consolidated safety-hooks reference. Agent-harness design rules (tool risk taxonomy, budgets, evals, observability, trust labels) now live on-demand in the `agent-harness-design` skill.
 - `alternatives/` - side-by-side comparisons of 2-5 approaches per problem. Pick the approach that fits.
-- `hooks/` - 34 ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
+- `hooks/` - ready-to-use Python hook scripts for safety guards, session management, and discipline enforcement. Wire them with `scripts/install_hooks.py`.
 - `workflows/` - drop-in dynamic-workflow commands (`/deep-review-flow`, `/research-cn-ru`) + measured cost lessons.
 - `templates/` - starter CLAUDE.md and REVIEW.md files for different project types, plus the kb-skeleton and long-run-project scaffolding packs.
-- `skills/` - 30 domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand.
+- `skills/` - domain skills (AI/ML, frontend, iOS, code review, video, writing, operational tooling). Loaded on demand; the generated list is in [skills/README.md](skills/README.md).
 - `scripts/` - utilities: hook installer, config validator, cross-reference checker, KV-cache stats, skills-lock generator, public-repo sync with privacy scanner, Gemini account switcher.
 - `skills-lock.json` - reproducible lockfile with content hashes of every skill (regenerate via `scripts/generate_skills_lock.py`).
 - `CLAUDE.md` - compact summary of all principles for global config.
@@ -289,37 +295,14 @@ Multi-turn reply chain                      → mailbox with in_reply_to threadi
 
 ## Skills Catalog
 
-Skills are practical tools for specific domains. They are secondary to the principles - think of them as reference implementations.
+Skills are practical tools for specific domains. The complete list is generated
+from live `SKILL.md` frontmatter, so it cannot silently fall behind the source:
+[skills/README.md](skills/README.md). Verify it with:
 
-| Category | Skill | What It Does |
-|---|---|---|
-| Development | `deep-review` | 8 parallel specialist reviewers (security, perf, arch, DB, concurrency, errors, frontend, tests) |
-| AI/ML | `diffusion-engineering` | UNet, DiT, Flow Matching, Flux architectures, LoRA, schedulers, memory optimization |
-| AI/ML | `flux2-lora-training` | LoRA training for FLUX.2 Klein 9B and Qwen Image Edit |
-| AI/ML | `flux2-klein-prompting` | Prompt engineering for FLUX.2 Klein |
-| AI/ML | `vlm-segmentation` | VLM + segmentation: SAM2/3, Florence-2, YOLO-World |
-| AI/ML | `forensic-prompt-compiler` | Reverse-engineer images into reproducible prompts |
-| Frontend | `frontend-design` | Production-grade interfaces, not template defaults |
-| Architecture | `harness-design` | Multi-agent patterns: Generator-Evaluator, Sprint Contracts |
-| Architecture | `agent-harness-design` | Ten on-demand reference sheets for building a safe agent harness: tool risk taxonomy, permissions, budgets, evals, observability, plan/approval artifacts, context trust labels, 3rd-party-skill checklist |
-| Architecture | `lean-code` | On-demand minimalism intensifier (YAGNI ladder) — write the leanest correct code, kill over-engineering before it starts; lite/full/ultra. Pairs with the quality-code rule + over-engineering-advisor hook |
-| Architecture | `layer-new` | Scaffold a project layer (security, data, ui, etc.) under `docs/layers/` per Principle 28. Idempotent, falls back to GitHub fetch if template missing. |
-| Architecture | `feature-new` | Scaffold an ULTRAPACK-style feature narrative inside a layer with auto-allocated F-NNN ID, layer README updates, feature_list.json sync. |
-| iOS | `ios-development` | Swift, SwiftUI, UIKit, MVVM/TCA, Metal/GPU |
-| Video | `product-meaning-extractor` | Deep product analysis: JTBD, StoryBrand, positioning, customer voice bank |
-| Video | `video-narrative-arc` | 5 narrative templates (10s-90s) with beat-by-beat timing and emotional arcs |
-| Video | `script-evaluator` | Score scripts on 6 dimensions, detect flatness patterns |
-| Video | `remotion-production-guide` | Complete Remotion reference: animations, springs, typography, 3D, export |
-| Video | `video-post-production` | FFmpeg patterns for audio, captions, color, platform export |
-| Development | `proof-verify` | Plan-based verification: freeze ACs, build, verify with independent agent, KB conformance |
-| Architecture | `plan-swarm-review` | Multi-agent plan review with parallel independent reviewers |
-| Writing | `humanize-english` | Transform AI text into natural English prose |
-| Writing | `humanize-russian` | Transform AI text into natural Russian prose |
-| Writing | `article-structure-review` | Audit article structure: hook strength, narrative arc, conclusion clarity |
-| Operational | `desktop-sessions-discovery` | Find/restore Claude desktop app sessions hidden after account switch (issue #48511) — 4 scripts (inventory/find/restore/HTML registry) for Mac/Win/Linux |
-| Operational | `harness-audit` | Score a project's agent harness across 5 subsystems (Instructions / State / Verification / Scope / Lifecycle), identify the bottleneck, produce a prioritized 3-step improvement plan with effort estimates. Read-only query skill — no changes applied without explicit user approval. |
-| Operational | `gemini-delegate` | Delegate bulk/long-context/second-opinion tasks to Gemini CLI: multi-account OAuth switcher, daily quota recovery ladder, non-interactive invocation, trust boundaries for cross-vendor output |
-| Development | `workflow-orchestration` | Write and run Claude Code dynamic workflows (deterministic JS orchestrator): pipeline vs parallel, schemas, budgets, resume, adversarial-verify patterns, billing discipline |
+```bash
+python scripts/generate_skills_catalog.py --check
+python scripts/generate_skills_lock.py --check
+```
 
 ---
 
@@ -355,13 +338,13 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## 中文简介
 
-面向 Claude Code 智能体的实战配置系统。包含 29 个架构原则、18 对比方案、30 个技能、33 个即用型 Hook 脚本、25 条 drop-in 规则和项目模板。
+面向 Claude Code 智能体的实战配置系统，包含架构原则、方案对比、技能、Hook 脚本、drop-in 规则和项目模板。
 
 **核心功能:**
-- `principles/` - 29 个独立架构原则，每个解决一个具体失败模式
-- `rules/` - 25 条 drop-in 规则（工作纪律、安全 Hook 配套文档；Agent 设计规则已移至 `agent-harness-design` 技能）
+- `principles/` - 独立架构原则，每个解决一个具体失败模式
+- `rules/` - drop-in 规则（工作纪律、安全 Hook 配套文档；Agent 设计规则已移至 `agent-harness-design` 技能）
 - `alternatives/` - 每个问题 2-5 种方案对比，附决策表
-- `hooks/` - 34 个即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
+- `hooks/` - 即用型 Hook 脚本（安全防护、会话管理、技能路由），用 `scripts/install_hooks.py` 一键注册
 - `workflows/` - 动态工作流命令（`/deep-review-flow`、`/research-cn-ru`）+ 实测成本经验
 - `templates/` - 适用于不同项目类型的 CLAUDE.md 起始模板 + 验证计划、记忆、项目编年史和长期项目脚手架（feature_list.json + init.sh）
 - `skills/` - 领域技能（AI/ML、视频制作、前端、iOS、写作、代码审查、验证、运维工具，包括 `harness-audit` 五子系统评估、`workflow-orchestration` 和 `gemini-delegate` 跨 CLI 委派）
@@ -375,13 +358,13 @@ Freshness is mechanical, not aspirational: [scripts/sync_public_config.py](scrip
 
 ## Описание на русском
 
-Система конфигурации для Claude Code агентов. 29 архитектурных принципов, 18 сравнений подходов, 30 навыков, 33 hook-скриптов, 25 drop-in правил и шаблоны проектов.
+Система конфигурации для Claude Code агентов: архитектурные принципы, сравнения подходов, навыки, hook-скрипты, drop-in правила и шаблоны проектов.
 
 **Что внутри:**
-- `principles/` - 29 принципов, каждый предотвращает конкретный тип отказа
-- `rules/` - 25 drop-in правил: рабочая дисциплина (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code), консолидированный safety-hooks reference; правила проектирования агентов (risk taxonomy, budgets, evals, observability) теперь в скилле `agent-harness-design`
+- `principles/` - принципы, каждый предотвращает конкретный тип отказа
+- `rules/` - drop-in правила: рабочая дисциплина (no-guessing, finish-the-task, deletion-confirm, autonomy-risk-tiers, quality-code), консолидированный safety-hooks reference; правила проектирования агентов (risk taxonomy, budgets, evals, observability) теперь в скилле `agent-harness-design`
 - `alternatives/` - сравнение 2-5 подходов для каждой проблемы с таблицей решений
-- `hooks/` - 34 готовых скриптов (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
+- `hooks/` - готовые скрипты (safety guards, handoff, drift validator, keyword router, secret leak detection, backup retention, test/problems gates и др.), регистрация одной командой `scripts/install_hooks.py`
 - `workflows/` - готовые dynamic-workflow команды (`/deep-review-flow`, `/research-cn-ru`) + замеры стоимости агентов
 - `templates/` - стартовые CLAUDE.md + план верификации + шаблоны memory и хроник + **long-run harness pack** (drop-in `feature_list.json` + `init.sh` для проектов с 5+ фичами)
 - `skills/` - доменные навыки (AI/ML, видео, фронтенд, iOS, письмо, код-ревью, верификация, операционные инструменты, включая `harness-audit`, `workflow-orchestration` и `gemini-delegate` — делегирование в Gemini CLI с мульти-аккаунтом)

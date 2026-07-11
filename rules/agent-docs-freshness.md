@@ -12,7 +12,7 @@ a whole session could drift with a stale KB and get caught late or never.
 
 This rule closes that: keep the human-curated KB, add **mechanical, tested,
 defence-in-depth enforcement** that a repo which *adopted* the KB cannot silently
-let it rot. Adapted from OpenWiki (`langchain-ai/openwiki`, MIT — auto-generates a
+let it rot. Adapted from [OpenWiki](https://github.com/langchain-ai/openwiki) (MIT — auto-generates a
 repo wiki and refreshes it so agents read current context). We take the
 **mechanical half** (freshness + pointer detection) natively; generation stays a
 token-costed opt-in (see below), not a hook.
@@ -93,7 +93,7 @@ repos without docs are caught by tier 2b instead.
 ## Mechanically (wired, tested)
 - `docs-staleness-guard.py` — SessionStart, advisory, `--self-test` (real temp git repo).
 - `kb-validate-gate.py` — Stop, blocking, `--self-test` (spawns real pass/fail validators).
-- Both registered in `~/.claude/settings.json`; both fail-open; both escape-hatched.
+- Registered in the active Claude Code and Codex hook configuration; both fail-open and have an escape hatch.
 - Reuses `templates/kb-skeleton/scripts/validate_kb.py` + `.github/workflows/kb.yml`.
 
 ## Related

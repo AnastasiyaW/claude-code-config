@@ -1,8 +1,8 @@
 {
   "lockfile_version": 1,
-  "generated_at": "2026-07-05T23:26:35+00:00",
+  "generated_at": "2026-07-11T10:58:29+00:00",
   "skill_count": 33,
-  "aggregate_hash": "sha256:b768a164eb27c7d13e90ceb56c7cb46142a5a715d1c0d55d7f5d0c1537ccb8ec",
+  "aggregate_hash": "sha256:2fb445e92c0187163572d1454f652dbf6270e641df17ad3ad8ef0e95aeed70ab",
   "skills": {
     "agent-harness-design": {
       "content_hash": "sha256:a879689d822371c0ea4978b25636ca6371eb06316fde0a13411f2ff8e72e627b",
@@ -21,7 +21,7 @@
         "references/agent-tool-design.md",
         "references/context-trust-labels.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.265719+00:00"
+      "last_modified": "2026-07-11T10:51:35.385701+00:00"
     },
     "ai-ml/diffusion-engineering": {
       "content_hash": "sha256:7910adf7cf26e110113133b3bfe9e66abfb4aac5fe22a2a8bf723034cd091eeb",
@@ -36,7 +36,7 @@
         "references/samplers.md",
         "references/training.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.271241+00:00"
+      "last_modified": "2026-07-11T10:51:35.389214+00:00"
     },
     "ai-ml/flux2-klein-prompting": {
       "content_hash": "sha256:3bd591dfddf12c8208a5733bbca09d41d8f5aaa376dac36d3a1afed793a635b6",
@@ -45,7 +45,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.272746+00:00"
+      "last_modified": "2026-07-11T10:51:35.390213+00:00"
     },
     "ai-ml/flux2-lora-training": {
       "content_hash": "sha256:964bc5d813022ba31caba84bdcac71c1c9249df0308a34f7352133a4633da91d",
@@ -54,7 +54,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.274269+00:00"
+      "last_modified": "2026-07-11T10:51:35.391212+00:00"
     },
     "ai-ml/forensic-prompt-compiler": {
       "content_hash": "sha256:df9b20c2718034336a8ed6e8fe546b8a23f4aa37be60137240e2f8a5db6064b3",
@@ -63,16 +63,16 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.275780+00:00"
+      "last_modified": "2026-07-11T10:51:35.391212+00:00"
     },
     "ai-ml/ml-research-lab": {
-      "content_hash": "sha256:a8c2b5db7d46ee21285b1cae962b29f88c375c3434126801e81fa655e0e91f8a",
-      "size_bytes": 3173,
+      "content_hash": "sha256:41f0ae71c8f9e4c9adc04cd1adcff11c3ccb6a09152989ce5601d8cb65b86e06",
+      "size_bytes": 3232,
       "file_count": 1,
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-05T23:24:45.849134+00:00"
+      "last_modified": "2026-07-11T10:51:35.391212+00:00"
     },
     "ai-ml/vlm-segmentation": {
       "content_hash": "sha256:37e07c60ec0765d5d60d50e01755ee2dd72ef6ae58604333e5378afb0586147e",
@@ -84,7 +84,7 @@
         "references/gpu-deployment.md",
         "references/vlm-segmentation.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.279301+00:00"
+      "last_modified": "2026-07-11T10:51:35.394382+00:00"
     },
     "architecture/feature-new": {
       "content_hash": "sha256:f8935d4b28c64fa8b4ad8f01aad2bbced591633f02634ac534c77b9cf14c2164",
@@ -93,7 +93,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.281807+00:00"
+      "last_modified": "2026-07-11T10:51:35.395381+00:00"
     },
     "architecture/harness-design": {
       "content_hash": "sha256:463b43b1c4e42f10e875e2d769c536b6cd36f4ad0b3d15cd33b14ff1d42c23cd",
@@ -102,7 +102,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.282813+00:00"
+      "last_modified": "2026-07-11T10:51:35.396381+00:00"
     },
     "architecture/layer-new": {
       "content_hash": "sha256:c9dcdcb9ea8072da864f35c6e67575bfcd93072e8d895ae31c8bb47be44c0de1",
@@ -111,7 +111,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.282813+00:00"
+      "last_modified": "2026-07-11T10:51:35.397382+00:00"
     },
     "architecture/plan-swarm-review": {
       "content_hash": "sha256:324242362cf406b6cd1567a7938b44a9f34110e01579effd49014f5203796e3a",
@@ -121,7 +121,7 @@
         "SKILL.md",
         "references/vulnerability-kb.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.284836+00:00"
+      "last_modified": "2026-07-11T10:51:35.399382+00:00"
     },
     "creative/pixel-art-storyboard": {
       "content_hash": "sha256:ea7eac7074bc10e7d3e99de89528b6508e87b479291ea3f9ab65a608d6966963",
@@ -140,7 +140,7 @@
         "references/smoother-animation-baking.md",
         "references/three-registers.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.294858+00:00"
+      "last_modified": "2026-07-11T10:51:35.404603+00:00"
     },
     "creative/pixel-art-studio": {
       "content_hash": "sha256:17920e14f745732318b67b5a32996055ca861e4ebcba13c7a6de72770358347e",
@@ -195,7 +195,7 @@
         "scripts/quality_check.py",
         "scripts/render.py"
       ],
-      "last_modified": "2026-07-03T11:58:06.335149+00:00"
+      "last_modified": "2026-07-11T10:51:35.434387+00:00"
     },
     "development/deep-review": {
       "content_hash": "sha256:777b511abf70ecd6f3d99b3c384c33aa5d5db77084a1442048edf7b2d01b5489",
@@ -204,7 +204,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.336155+00:00"
+      "last_modified": "2026-07-11T10:51:35.435387+00:00"
     },
     "development/distill-feedback": {
       "content_hash": "sha256:ed9aae9305c441936b70ea09bb8aec38988fbf58029e0a9f4f571573501ac234",
@@ -214,7 +214,7 @@
         "SKILL.md",
         "scripts/extract_feedback_queue.py"
       ],
-      "last_modified": "2026-07-03T11:58:06.336155+00:00"
+      "last_modified": "2026-07-11T10:51:35.435387+00:00"
     },
     "development/proof-verify": {
       "content_hash": "sha256:321fbe0af951bf0e1d2b227c927f71e2c46d5c40aeb3d9bc96383c4d44e7264c",
@@ -224,7 +224,7 @@
         "SKILL.md",
         "references/kb-aware-verification.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.338669+00:00"
+      "last_modified": "2026-07-11T10:51:35.436893+00:00"
     },
     "development/repo-map": {
       "content_hash": "sha256:fae3e47aeb4659528ec210bc00e03472a23b08fd2766bc9ac8155410044243ca",
@@ -234,7 +234,7 @@
         "SKILL.md",
         "scripts/repo_map.py"
       ],
-      "last_modified": "2026-07-03T11:58:06.340668+00:00"
+      "last_modified": "2026-07-11T10:51:35.438901+00:00"
     },
     "development/workflow-orchestration": {
       "content_hash": "sha256:fcf1ff1bf919a1f950551d10dde87cde1166b81ed875d5d051285703136ecb6e",
@@ -248,7 +248,7 @@
         "references/workflow-template.js",
         "scripts/validate.mjs"
       ],
-      "last_modified": "2026-07-03T11:58:06.343176+00:00"
+      "last_modified": "2026-07-11T10:51:35.441725+00:00"
     },
     "frontend/frontend-design": {
       "content_hash": "sha256:457f09be24bb7a7b7de4981220f521a471db39e48de795468ddc49123c7255fb",
@@ -261,7 +261,7 @@
         "references/performance-a11y.md",
         "references/visual-styles.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.346198+00:00"
+      "last_modified": "2026-07-11T10:51:35.444736+00:00"
     },
     "ios/ios-development": {
       "content_hash": "sha256:2a4a32b7eaec3502bee70c72ec88f041b194e33857b422863e9c44a18f0c2d70",
@@ -278,7 +278,7 @@
         "references/swiftui.md",
         "references/uikit.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.350710+00:00"
+      "last_modified": "2026-07-11T10:51:35.450519+00:00"
     },
     "lean-code": {
       "content_hash": "sha256:ebc362f5251ceb7f2ca298d544135a2d452f985d2e8ae2d5d0727819659f6691",
@@ -287,7 +287,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.350710+00:00"
+      "last_modified": "2026-07-11T10:51:35.450519+00:00"
     },
     "operational/desktop-sessions-discovery": {
       "content_hash": "sha256:45bc5a788a7e6e83d516a2962c9980747d817a6459f2adb496c6b8c4c8c5d83b",
@@ -300,7 +300,7 @@
         "scripts/sessions_registry.py",
         "scripts/sessions_restore.py"
       ],
-      "last_modified": "2026-07-03T11:58:06.353222+00:00"
+      "last_modified": "2026-07-11T10:51:35.453557+00:00"
     },
     "operational/gemini-delegate": {
       "content_hash": "sha256:bb4d04ac29c8d85c65a39e8ef7aa1ea915282c75be55b03adb093cc52166bf30",
@@ -309,7 +309,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.354223+00:00"
+      "last_modified": "2026-07-11T10:51:35.454063+00:00"
     },
     "operational/harness-audit": {
       "content_hash": "sha256:73197ee3304b4b4baca5a6cbc26069258d2ff4c928d337c454bcdfe3031b6786",
@@ -320,16 +320,16 @@
         "references/checklist-per-subsystem.md",
         "references/scoring-rubric.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.356197+00:00"
+      "last_modified": "2026-07-11T10:51:35.456071+00:00"
     },
     "plan-to-tickets": {
-      "content_hash": "sha256:aece46bf5026e97df0e8fb2d687e8384518b6466dbc8c5bf5dc4b54276f214c2",
-      "size_bytes": 2729,
+      "content_hash": "sha256:467ed638e6b4c6f25db47aca027fcf54ddebc990ee2626a928073994ec7ae432",
+      "size_bytes": 2794,
       "file_count": 1,
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-04T10:53:52.496531+00:00"
+      "last_modified": "2026-07-11T10:51:35.456071+00:00"
     },
     "video-production/product-meaning-extractor": {
       "content_hash": "sha256:ae4d982220cf68d07afa515bd68189b4f0fa32ce8c21c3367c8c774961f8b3dd",
@@ -338,7 +338,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.357241+00:00"
+      "last_modified": "2026-07-11T10:51:35.457070+00:00"
     },
     "video-production/remotion-production-guide": {
       "content_hash": "sha256:fb8eccaa7ed7158b0dae4a9a391cccdfd174859eb5dbc892764bf62d9b7504d8",
@@ -347,7 +347,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.357746+00:00"
+      "last_modified": "2026-07-11T10:51:35.457070+00:00"
     },
     "video-production/script-evaluator": {
       "content_hash": "sha256:0a3b6a5528fa252f4f208992ad6af3395bc1114198e66ccbe6adc27e6ece02da",
@@ -356,7 +356,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.358754+00:00"
+      "last_modified": "2026-07-11T10:51:35.458070+00:00"
     },
     "video-production/video-narrative-arc": {
       "content_hash": "sha256:4d79e1c373f0dac309930d87218a1f9712cf25f79cd94cb7b1a2db2cd70953cd",
@@ -365,7 +365,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.358754+00:00"
+      "last_modified": "2026-07-11T10:51:35.459094+00:00"
     },
     "video-production/video-post-production": {
       "content_hash": "sha256:14bfe94825bb860c2dcf35c53c0332f4ecd3174cdb1af85699fa84b3827ad467",
@@ -374,7 +374,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.359754+00:00"
+      "last_modified": "2026-07-11T10:51:35.467917+00:00"
     },
     "writing/article-structure-review": {
       "content_hash": "sha256:d36f05ee4e5e845b40140a14473b2a018253397dd6311fb6f7b81e83badc583d",
@@ -383,7 +383,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.360753+00:00"
+      "last_modified": "2026-07-11T10:51:35.469422+00:00"
     },
     "writing/humanize-english": {
       "content_hash": "sha256:d754b609da80e147c404a009a99f4890cad826144cf6da2a7173fee5361392a5",
@@ -392,7 +392,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.360753+00:00"
+      "last_modified": "2026-07-11T10:51:35.470430+00:00"
     },
     "writing/humanize-russian": {
       "content_hash": "sha256:beeaac07a5630070e306d3a7f7d4ebf6dbe2a82a19cc8077eb043e6f342479f3",
@@ -401,7 +401,7 @@
       "files": [
         "SKILL.md"
       ],
-      "last_modified": "2026-07-03T11:58:06.361753+00:00"
+      "last_modified": "2026-07-11T10:51:35.471429+00:00"
     }
   }
 }

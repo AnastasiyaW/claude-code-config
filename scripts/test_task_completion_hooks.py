@@ -11,6 +11,7 @@ These tests make the hook expectations executable:
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -19,6 +20,7 @@ from pathlib import Path
 
 
 HOOKS_JSON = Path.home() / ".codex" / "hooks.json"
+CLAUDE_SETTINGS = Path.home() / ".claude" / "settings.json"
 STOP_GUARD = Path.home() / ".claude" / "claude-code-config" / "hooks" / "stop-phrase-guard.py"
 PLUGIN_CACHE = Path.home() / ".codex" / "plugins" / "cache"
 
@@ -28,6 +30,8 @@ REQUIRED_STOP_HOOKS = (
     "problems-md-validator.py",
     "feature-list-validator.py",
     "session-handoff-reminder.py",
+    "kb-validate-gate.py",
+    "git-source-gate.py",
 )
 
 REQUIRED_PRECOMPACT_HOOKS = (
@@ -37,11 +41,17 @@ REQUIRED_PRECOMPACT_HOOKS = (
 REQUIRED_SESSIONSTART_HOOKS = (
     "session-handoff-check.py",
     "review_handoff_memory_loop.py",
+    "docs-staleness-guard.py",
+)
+
+REQUIRED_PRETOOLUSE_HOOKS = (
+    "handoff-closure-audit-guard.py",
+    "github-workflow-security.py",
 )
 
 
-def hook_commands(event_name: str) -> list[str]:
-    config = json.loads(HOOKS_JSON.read_text(encoding="utf-8"))
+def hook_commands_from(config_path: Path, event_name: str) -> list[str]:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
     commands: list[str] = []
     for group in config["hooks"].get(event_name, []):
         for hook in group.get("hooks", []):
@@ -51,12 +61,37 @@ def hook_commands(event_name: str) -> list[str]:
     return commands
 
 
+def hook_commands(event_name: str) -> list[str]:
+    return hook_commands_from(HOOKS_JSON, event_name)
+
+
+def all_hook_commands_from(config_path: Path) -> list[str]:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    commands: list[str] = []
+    for groups in config["hooks"].values():
+        for group in groups:
+            for hook in group.get("hooks", []):
+                command = hook.get("command")
+                if isinstance(command, str):
+                    commands.append(command)
+    return commands
+
+
+def all_hook_commands() -> list[str]:
+    return all_hook_commands_from(HOOKS_JSON)
+
+
 class TaskCompletionHookTests(unittest.TestCase):
+    def test_codex_hook_config_uses_the_supported_wrapper_only(self) -> None:
+        config = json.loads(HOOKS_JSON.read_text(encoding="utf-8"))
+        self.assertEqual(set(config), {"hooks"})
+        self.assertIsInstance(config["hooks"], dict)
+
     def test_plugin_hook_configs_have_supported_top_level_schema(self) -> None:
         if not PLUGIN_CACHE.exists():
             self.skipTest("plugin cache is absent")
         offenders: list[str] = []
-        for path in PLUGIN_CACHE.rglob("hooks/hooks.json"):
+        for path in PLUGIN_CACHE.rglob("hooks.json"):
             data = json.loads(path.read_text(encoding="utf-8"))
             extra = sorted(set(data) - {"hooks"})
             if extra:
@@ -64,6 +99,16 @@ class TaskCompletionHookTests(unittest.TestCase):
             if "hooks" not in data:
                 offenders.append(f"{path}: missing top-level hooks")
         self.assertEqual(offenders, [], "\n".join(offenders))
+
+    def test_hook_command_targets_exist(self) -> None:
+        missing: list[str] = []
+        for config_path in (HOOKS_JSON, CLAUDE_SETTINGS):
+            for command in all_hook_commands_from(config_path):
+                for raw_path in re.findall(r"[\"']([A-Za-z]:[\\/][^\"']+?\.py)[\"']", command):
+                    path = Path(raw_path)
+                    if not path.exists():
+                        missing.append(f"{config_path}: {path} <- {command}")
+        self.assertEqual(missing, [], "\n".join(missing))
 
     def test_stop_hooks_include_completion_guards(self) -> None:
         commands = "\n".join(hook_commands("Stop"))
@@ -79,6 +124,24 @@ class TaskCompletionHookTests(unittest.TestCase):
         commands = "\n".join(hook_commands("SessionStart"))
         for required in REQUIRED_SESSIONSTART_HOOKS:
             self.assertIn(required, commands)
+
+    def test_pretooluse_hooks_guard_handoff_writes(self) -> None:
+        commands = "\n".join(hook_commands("PreToolUse"))
+        for required in REQUIRED_PRETOOLUSE_HOOKS:
+            self.assertIn(required, commands)
+
+    def test_claude_runtime_has_the_same_core_lifecycle_guards(self) -> None:
+        self.assertTrue(CLAUDE_SETTINGS.exists(), f"missing live Claude settings: {CLAUDE_SETTINGS}")
+        required_by_event = {
+            "Stop": REQUIRED_STOP_HOOKS,
+            "PreCompact": REQUIRED_PRECOMPACT_HOOKS,
+            "SessionStart": REQUIRED_SESSIONSTART_HOOKS,
+            "PreToolUse": REQUIRED_PRETOOLUSE_HOOKS,
+        }
+        for event_name, required_hooks in required_by_event.items():
+            commands = "\n".join(hook_commands_from(CLAUDE_SETTINGS, event_name))
+            for required in required_hooks:
+                self.assertIn(required, commands, f"{event_name}: {required}")
 
     def test_stop_phrase_guard_blocks_defer_ending(self) -> None:
         with tempfile.TemporaryDirectory(prefix="task-completion-hook-") as tmp:
