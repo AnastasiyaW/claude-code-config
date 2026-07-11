@@ -228,7 +228,9 @@ def check_handoff_files(root: Path, findings: list[Finding], strict_legacy: bool
     for path in files:
         project = path.parent.name
         current = latest_by_project.get(project)
-        if current is None or path.stat().st_mtime > current.stat().st_mtime:
+        # Git checkout time is not handoff time. The canonical filename begins
+        # with an ISO date/time, so lexical order is stable across clones.
+        if current is None or path.name > current.name:
             latest_by_project[project] = path
 
     checked_latest: dict[str, dict] = {}
