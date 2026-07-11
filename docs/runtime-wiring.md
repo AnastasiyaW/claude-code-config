@@ -24,6 +24,9 @@ pass.
   public repository documents and tests only handlers it actually contains.
 - Raw session archives and operational credentials are private-only and are not
   part of this public repository.
+- High-frequency runtime reports are regenerable operational state. Route them
+  with `--report-dir` outside a project worktree; keep durable conclusions in a
+  handoff, chronicle, test artifact, or commit instead.
 
 ## Runtime Contract
 
