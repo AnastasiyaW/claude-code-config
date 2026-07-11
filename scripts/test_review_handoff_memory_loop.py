@@ -8,9 +8,11 @@ extra dependencies.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -242,6 +244,17 @@ class HandoffMemoryLoopTests(unittest.TestCase):
         result = self.run_validator(root, hooks, memory)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertIn("unparseable INDEX line", result.stdout)
+
+    def test_latest_handoff_uses_filename_timestamp_not_checkout_mtime(self) -> None:
+        root, hooks, memory = self.make_fixture(GOOD_HANDOFF)
+        older = root / ".claude" / "handoffs" / "sample-project" / "2026-06-23_23-59_old.md"
+        older.write_text(BAD_HANDOFF, encoding="utf-8")
+        future = time.time() + 3600
+        os.utime(older, (future, future))
+
+        result = self.run_validator(root, hooks, memory, "--strict-legacy")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('"pass": true', result.stdout)
 
     def test_missing_memory_note_fails(self) -> None:
         root, hooks, memory = self.make_fixture(GOOD_HANDOFF, include_memory_notes=False)
