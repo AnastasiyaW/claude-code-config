@@ -170,6 +170,25 @@ def check_hooks(hooks_path: Path, findings: list[Finding]) -> dict:
     return result
 
 
+LEGACY_INDEX_CUTOFF = "2026-06-20"
+
+
+def is_accepted_legacy_index_line(line: str) -> bool:
+    """Accept known pre-canonical index formats without weakening new records.
+
+    The hub used several pipe-delimited layouts before the canonical
+    ``date time | session | project | summary | status`` record was adopted.
+    Old history remains useful and should not create permanent health warnings,
+    while records on or after the cutoff must use the modern parser below.
+    """
+    candidate = line.strip().lstrip("-").strip().strip("|").strip()
+    parts = [part.strip() for part in candidate.split("|")]
+    if len(parts) < 4:
+        return False
+    date_match = re.match(r"(?P<date>\d{4}-\d{2}-\d{2})(?:\s+[^|]+)?$", parts[0])
+    return bool(date_match and date_match.group("date") < LEGACY_INDEX_CUTOFF)
+
+
 def parse_index(index_path: Path, findings: list[Finding]) -> list[dict]:
     entries: list[dict] = []
     if not index_path.exists():
@@ -186,6 +205,8 @@ def parse_index(index_path: Path, findings: list[Finding]) -> list[dict]:
             continue
         match = pattern.match(stripped)
         if not match:
+            if is_accepted_legacy_index_line(stripped):
+                continue
             findings.append(Finding("warn", "handoffs", f"unparseable INDEX line {lineno}: {stripped}", str(index_path)))
             continue
         entry = match.groupdict()

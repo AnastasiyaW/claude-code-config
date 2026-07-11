@@ -224,6 +224,25 @@ class HandoffMemoryLoopTests(unittest.TestCase):
         self.assertNotEqual(strict_result.returncode, 0, strict_result.stdout + strict_result.stderr)
         self.assertIn('"fail": 1', strict_result.stdout)
 
+    def test_precanonical_index_records_are_accepted(self) -> None:
+        root, hooks, memory = self.make_fixture(GOOD_HANDOFF)
+        index = root / ".claude" / "handoffs" / "INDEX.md"
+        with index.open("a", encoding="utf-8") as handle:
+            handle.write("- 2026-06-07 17:52 | e5d1fa70 | historical summary | ACTIVE\n")
+            handle.write("| 2026-06-19 | 00:35 | car-classifier-base | 019edc8e | historical summary |\n")
+        result = self.run_validator(root, hooks, memory, "--strict-legacy")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn('"warn": 0', result.stdout)
+
+    def test_post_cutoff_noncanonical_index_record_is_reported(self) -> None:
+        root, hooks, memory = self.make_fixture(GOOD_HANDOFF)
+        index = root / ".claude" / "handoffs" / "INDEX.md"
+        with index.open("a", encoding="utf-8") as handle:
+            handle.write("- 2026-07-01 10:00 | new-session | noncanonical summary | ACTIVE\n")
+        result = self.run_validator(root, hooks, memory)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("unparseable INDEX line", result.stdout)
+
     def test_missing_memory_note_fails(self) -> None:
         root, hooks, memory = self.make_fixture(GOOD_HANDOFF, include_memory_notes=False)
         result = self.run_validator(root, hooks, memory)
