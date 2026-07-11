@@ -17,7 +17,8 @@ Customization (env vars):
         Example (bash): export CLAUDE_WORKSPACE_ROOTS=~/code:/d/projects
 
 Exit codes:
-    0 = always (advice layer; warnings don't block session start)
+    0 = clean, or drift in advisory mode
+    1 = drift when --strict is supplied
 
 Output: writes report to ~/.claude/drift-report.md (always - even when clean,
         so stale reports from prior dirty runs don't mislead readers),
@@ -25,6 +26,7 @@ Output: writes report to ~/.claude/drift-report.md (always - even when clean,
 """
 from __future__ import annotations
 
+import argparse
 import os
 import re
 import sys
@@ -106,6 +108,10 @@ LINUX_SYSTEM_PREFIXES = ("/etc/", "/proc/", "/opt/", "/var/", "/usr/", "/dev/", 
 #   CROSS_MACHINE_PREFIXES = ("C:\\BuildVM\\", "/mnt/buildbot/")
 CROSS_MACHINE_PREFIXES: tuple[str, ...] = ()
 
+# A ``.skip-*`` file is an opt-out switch that may deliberately not exist until
+# a user creates it. It is a capability reference, not a stale documentation link.
+OPTIONAL_RUNTIME_FILE_RE = re.compile(r"^~[\\/]\.claude[\\/]\.skip-[^\\/`]+$")
+
 
 def extract_paths(content: str) -> set[str]:
     """Extract file path references from markdown text.
@@ -125,6 +131,8 @@ def extract_paths(content: str) -> set[str]:
         if is_windows and path.startswith(LINUX_SYSTEM_PREFIXES):
             continue
         if CROSS_MACHINE_PREFIXES and path.startswith(CROSS_MACHINE_PREFIXES):
+            continue
+        if OPTIONAL_RUNTIME_FILE_RE.match(path):
             continue
         paths.add(path)
     return paths
@@ -227,7 +235,15 @@ def validate_file(md_file: Path) -> list[str]:
     return issues
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="return exit code 1 when documented paths drift; use in CI and release checks",
+    )
+    args = parser.parse_args(argv)
+
     # Force UTF-8 output on Windows - broken refs may contain Cyrillic /
     # non-ASCII path components, default cp1252 stdout crashes on print.
     if (
@@ -303,8 +319,9 @@ def main() -> int:
     )
     print(f"[config-validator] Full report: {report_path}")
 
-    # Warnings don't block - return 0 so session still starts
-    return 0
+    # SessionStart stays advisory by default. CI and explicit verification use
+    # --strict, so documentation drift cannot silently pass a release gate.
+    return 1 if args.strict else 0
 
 
 if __name__ == "__main__":

@@ -112,6 +112,7 @@ class HandoffMemoryLoopTests(unittest.TestCase):
         handoffs = root / ".claude" / "handoffs" / "sample-project"
         handoffs.mkdir(parents=True)
         (handoffs / "2026-06-24_19-00_test.md").write_text(handoff_text, encoding="utf-8")
+        (handoffs / "PROBLEMS.md").write_text("# Problems\n", encoding="utf-8")
         index = root / ".claude" / "handoffs" / "INDEX.md"
         index.write_text(
             "2026-06-24 19:00 | test-session | sample-project | validator fixture | ACTIVE\n",

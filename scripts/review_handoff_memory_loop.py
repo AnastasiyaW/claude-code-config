@@ -27,6 +27,7 @@ REQUIRED_HANDOFF_SECTIONS = (
     "## Key decisions",
     "## Single next step",
 )
+HANDOFF_FILENAME_RE = re.compile(r"^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}_.+\.md$")
 
 REQUIRED_HOOK_KEYWORDS = (
     "session-handoff-check.py",
@@ -121,7 +122,7 @@ def rel(path: Path, root: Path) -> str:
 
 
 def read_text(path: Path) -> str:
-    return path.read_text(encoding="utf-8", errors="replace")
+    return path.read_text(encoding="utf-8-sig", errors="replace")
 
 
 def normalize_heading(value: str) -> str:
@@ -197,7 +198,11 @@ def check_handoff_files(root: Path, findings: list[Finding], strict_legacy: bool
     handoff_root = root / ".claude" / "handoffs"
     index_path = handoff_root / "INDEX.md"
     entries = parse_index(index_path, findings)
-    files = sorted(p for p in handoff_root.glob("*/*.md") if p.name.upper() != "INDEX.MD")
+    files = sorted(
+        p
+        for p in handoff_root.glob("*/*.md")
+        if HANDOFF_FILENAME_RE.fullmatch(p.name)
+    )
     latest_by_project: dict[str, Path] = {}
     for path in files:
         project = path.parent.name
