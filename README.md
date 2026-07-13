@@ -103,6 +103,11 @@ See [AGENTS.md](AGENTS.md) for the procedure an agent follows after install,
 - **Deep research results evaporate with the conversation?** Save structured findings to an incoming folder -> review -> knowledge base pipeline ([Research Pipeline](principles/13-research-pipeline.md))
 - **Building a brand-new agent and not sure what to decide first?** 15-section MVP blueprint: autonomy level -> tool risk classes -> permission matrix -> budgets -> evals -> release checklist ([MVP Agent Blueprint](principles/29-mvp-agent-blueprint.md))
 
+**Need smaller diagnostic command output?** The optional RTK integration is
+pinned, checksum-verified, fail-open, and tested separately from safety hooks.
+See [docs/rtk-integration.md](docs/rtk-integration.md) and
+`scripts/rtk_integration.py`; it is never a substitute for raw evidence.
+
 **Ready-to-use hooks** that enforce rules mechanically, not probabilistically (install via [scripts/install_hooks.py](scripts/install_hooks.py); full map with bypass keys in [rules/safety-hooks.md](rules/safety-hooks.md)):
 
 | Hook | Event | What It Does |

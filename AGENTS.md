@@ -75,3 +75,11 @@ This file is designed for KV-cache efficiency and the 150-line AGENTS.md standar
 - [AGENTS.md specification](https://agents.md) - Linux Foundation / Agentic AI Foundation
 - [How to write a great AGENTS.md](https://github.blog/ai-and-ml/github-copilot/how-to-write-a-great-agents-md-lessons-from-over-2500-repositories/) - GitHub best practices from 2500+ repos
 - See `CLAUDE.md` for Claude Code-specific extensions to this file
+
+## Optional RTK Output Compression
+
+When a verified RTK executable is available, use it only for repetitive,
+diagnostic shell output such as `rtk git status`, `rtk git diff`, `rtk git log`,
+`rtk read`, and supported test runners. Preserve raw output for exact evidence,
+novel commands, destructive operations, and logs where ordering matters. RTK
+does not replace safety hooks or test gates; its failure mode must be pass-through.
