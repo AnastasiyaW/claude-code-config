@@ -1,13 +1,13 @@
 {
   "lockfile_version": 2,
-  "generated_at": "2026-07-11T11:05:28+00:00",
+  "generated_at": "2026-07-13T08:37:23+00:00",
   "skill_count": 33,
-  "aggregate_hash": "sha256:388b996c8ae3fa0ca6633f6621418fed8b4a994759ead3c1022f490dcb329a11",
+  "aggregate_hash": "sha256:887957dbdc7f0e1322246154830e209096f881d5eb508567ae9f9ef2be5b4ad2",
   "skills": {
     "agent-harness-design": {
-      "content_hash": "sha256:1fc2dbd822d2ca82cfc698eab73296b19fa3be9ef3783354254f136d778467b9",
-      "size_bytes": 88430,
-      "file_count": 11,
+      "content_hash": "sha256:747805abf1b6b3025fbd3ce87e23e2476dc3b8626b5c49fb1ab7471f70b063a5",
+      "size_bytes": 95741,
+      "file_count": 12,
       "files": [
         "SKILL.md",
         "references/agent-approval-records.md",
@@ -19,6 +19,7 @@
         "references/agent-skill-install-checklist.md",
         "references/agent-streaming.md",
         "references/agent-tool-design.md",
+        "references/agentic-rag-model-policy.md",
         "references/context-trust-labels.md"
       ]
     },
