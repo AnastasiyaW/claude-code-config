@@ -44,6 +44,30 @@ Codex's current plugin loader accepts only a top-level `hooks` object in cached
 plugin hook files. `repair_codex_plugin_hook_schema.py --fix` safely removes the
 otherwise harmless Claude-compatible `description` field and preserves a backup.
 
+## Skill routing layers
+
+There are two deliberately separate routing layers:
+
+1. The agent client's semantic loader reads each skill's `SKILL.md` frontmatter
+   (`name` and `description`) and decides which skill body to inject. A skill's
+   `agents/openai.yaml` may set `policy.allow_implicit_invocation: false`; the
+   default is `true`. This is the mechanism that handles the full skill catalog.
+2. `hooks/keyword-skill-router.py` is a small, curated `UserPromptSubmit`
+   advisory. It catches only high-confidence phrases and prints a suggestion;
+   it does not inject a skill and must not become a second copy of the whole
+   semantic catalog.
+
+Run the live boundary audit after changing either side:
+
+```bash
+python scripts/audit_skill_hook_wiring.py --strict
+```
+
+The audit checks active and source skill metadata, implicit-invocation flags,
+all configured hook command targets, the live UserPromptSubmit wiring, and every
+curated router target. Duplicate nested plugin copies are reported as warnings;
+they are not silently treated as one canonical skill.
+
 ## Verification
 
 Run the following after changing the public configuration. The final two commands
@@ -75,7 +99,8 @@ and available tool names differ.
 
 Skill linting, the portable lockfile, and synchronization prove that a skill is
 valid, versioned, and available to the client. The lock normalizes UTF-8 text
-newlines, so the same checkout verifies on Windows and Linux. Router evals prove selected automatic
-triggers. They do **not** prove that every piece of advisory knowledge improves
-every task. Promote a skill to a mandatory route only after a task-specific
-before/after evaluation with a measurable acceptance criterion.
+newlines, so the same checkout verifies on Windows and Linux. Router evals prove
+selected automatic suggestions; the wiring audit proves that those suggestions
+cannot point at missing skills. Neither proves that every piece of advisory
+knowledge improves every task. Promote a skill to a mandatory route only after
+a task-specific before/after evaluation with a measurable acceptance criterion.

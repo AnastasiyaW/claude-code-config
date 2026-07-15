@@ -1,8 +1,8 @@
 {
   "lockfile_version": 2,
-  "generated_at": "2026-07-13T08:37:23+00:00",
-  "skill_count": 33,
-  "aggregate_hash": "sha256:887957dbdc7f0e1322246154830e209096f881d5eb508567ae9f9ef2be5b4ad2",
+  "generated_at": "2026-07-15T12:30:21+00:00",
+  "skill_count": 34,
+  "aggregate_hash": "sha256:58d38f42787f51fef7c04b0a064c9c910a62ae862776189cd0f667be27bf793d",
   "skills": {
     "agent-harness-design": {
       "content_hash": "sha256:747805abf1b6b3025fbd3ce87e23e2476dc3b8626b5c49fb1ab7471f70b063a5",
@@ -297,6 +297,15 @@
         "SKILL.md",
         "references/checklist-per-subsystem.md",
         "references/scoring-rubric.md"
+      ]
+    },
+    "operational/observability-monitoring": {
+      "content_hash": "sha256:23a225bcbd9070b0c7158ad16683c152666972b40f5bac1378292e70f10eadc7",
+      "size_bytes": 20270,
+      "file_count": 2,
+      "files": [
+        "SKILL.md",
+        "references/source-notes.md"
       ]
     },
     "plan-to-tickets": {

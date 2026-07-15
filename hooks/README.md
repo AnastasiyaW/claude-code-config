@@ -24,6 +24,14 @@ python evals/hooks/run_hook_evals.py
 their visible status labels. It is useful when the settings UI shows generic
 entries such as `Hook 1`.
 
+`keyword-skill-router.py` is advisory: it suggests a curated skill or built-in
+workflow, but the agent client's semantic skill loader performs the actual
+implicit invocation. Check both boundaries with:
+
+```bash
+python scripts/audit_skill_hook_wiring.py --strict
+```
+
 ## What Is Enforced
 
 | Concern | Primary scripts | Event |

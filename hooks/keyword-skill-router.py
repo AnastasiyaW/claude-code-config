@@ -77,7 +77,9 @@ ROUTES = [
         ],
         "required": True,
     },
-    # Clean architecture guardrails — auto-attach to any coding process
+    # Clean architecture guardrails — keep this as an advisory rule, not a
+    # skill route. The old target (clean-architecture) is not installed in the
+    # active skill catalog, so emitting it produced an unusable suggestion.
     {
         "patterns": [
             r"\b(напиши|запили|добавь|сделай|создай|почини|исправь|перепиши|спроектируй|отрефактор\w*|refactor\w*|implement|write|add|create|fix|build|design|rewrite)\b.{0,80}\b(код|функци\w*|класс\w*|модул\w*|сервис\w*|фич\w*|скрипт\w*|приложени\w*|проект\w*|endpoint|api|бэкенд|backend|frontend|парсер\w*|бот\w*|code|function|class|module|service|feature|script|app\b|application|component|library|parser|bot)\b",
@@ -85,13 +87,7 @@ ROUTES = [
             r"\b(архитектур\w*|architecture|структур\w* проект\w*|project structure|clean architecture|чист\w* архитектур\w*|solid|dependency rule|слои|layers?)\b",
             r"\b(новый проект|new project|с нуля|from scratch|scaffold|каркас)\b",
         ],
-        "skill": "clean-architecture",
-        "description": "Clean-architecture guardrails (dependency rule, SOLID, boundaries, Python patterns) — apply to any coding task",
-        "refs": [
-            "references/solid-and-components.md",
-            "references/boundaries-and-layers.md",
-            "references/python-implementation.md",
-        ],
+        "suggest": "Apply the quality-code rule and keep dependency boundaries explicit while implementing this change.",
     },
     # Planning & Architecture (plan mode is built-in, not a skill)
     {
@@ -109,6 +105,24 @@ ROUTES = [
         ],
         "skill": "deep-review",
         "description": "Parallel competency-based code review (security, perf, arch)",
+    },
+    # Monitoring and observability
+    {
+        "patterns": [
+            r"\b(monitoring|observability|alerts?|prometheus|grafana|opentelemetry|otel|tracing|telemetry|uptime|health check|service health|sli|slo|sla|error budget|burn[- ]rate|incident evidence)\b",
+            r"\b(мониторинг|наблюдаемост\w*|алерт\w*|прометеус|графан\w*|трассиров\w*|телеметр\w*|здоровь\w* сервиса|доступност\w* сервиса|бюджет ошибок|доказательств\w* инцидент\w*)\b",
+        ],
+        "skill": "observability-monitoring",
+        "description": "Evidence-backed monitoring, alerting, SLI/SLO, telemetry, and incident workflows",
+    },
+    # Harness/configuration audit
+    {
+        "patterns": [
+            r"\b(audit|auditing|проверь|аудит)\b.{0,80}\b(skills?|скилл\w*|hooks?|хуки|router|роутер|harness|харнесс)\b",
+            r"\b(skill|skills|hook|hooks|скилл\w*|хуки)\b.{0,80}\b(auto[- ]?load|implicit|automatic|автоматическ\w*|подтягив\w*)\b",
+        ],
+        "skill": "harness-audit",
+        "description": "Score and audit the existing agent harness, skills, hooks, and verification loop",
     },
     # Security
     {
@@ -151,8 +165,8 @@ ROUTES = [
         "patterns": [
             r"\b(упрости|simplify|clean up|почисти код|refactor)\b",
         ],
-        "skill": "simplify",
-        "description": "Review changed code for reuse, quality, and efficiency",
+        "skill": "lean-code",
+        "description": "Strip over-engineering while preserving correctness and verification",
     },
     # Init new project
     {
@@ -160,8 +174,7 @@ ROUTES = [
             r"\b(настрой проект|init|initialize|set up claude)\b.*\b(claude|project)\b",
             r"\b(создай claude\.md|create claude\.md)\b",
         ],
-        "skill": "init",
-        "description": "Initialize CLAUDE.md with codebase documentation",
+        "suggest": "Initialize CLAUDE.md with codebase documentation and run the config validation checks.",
     },
 ]
 

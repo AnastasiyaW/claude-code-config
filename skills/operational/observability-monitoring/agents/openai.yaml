@@ -1,0 +1,7 @@
+interface:
+  display_name: "Observability Monitoring"
+  short_description: "Practical monitoring and observability"
+  default_prompt: "Use $observability-monitoring to design or audit monitoring, alerts, SLOs, and incident evidence for a service."
+
+policy:
+  allow_implicit_invocation: true
