@@ -68,6 +68,8 @@ Read-only and full: `gpu_inventory_list`, `images_list`, `instances_list`, `inst
 
 Full only: `instances_launch`, `instances_restart`, `instances_terminate`, `ssh_keys_create`, `ssh_keys_delete`.
 
+Live server extensions observed in July 2026: `recipes_list`, `recipes_search`, and `recipes_get`. Call `recipes_search` before launching a VM for a known software setup, then read the matched recipe with `recipes_get`.
+
 ## Source documentation
 
 - Overview: `https://vm-docs.massedcompute.com/docs/mcp/overview`

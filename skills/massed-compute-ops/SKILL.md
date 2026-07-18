@@ -40,6 +40,8 @@ Read-only tokens expose inventory, images, instances, coupons, token validation,
 - A 429 is a rate limit; wait briefly and retry without duplicating a launch.
 - `instances_list` and `instances_get` redact cleartext VM passwords before the model sees them.
 - Environment-variable changes require a new Codex process before MCP authentication is available.
+- `ssh_keys_create` may return a generic `upstream_error` even for valid Ed25519 and RSA public keys. After two verified formats fail, stop retrying and have the user add the public key in the web settings; verify afterward with `ssh_keys_list`.
+- The live server may expose recipe discovery tools (`recipes_search`, `recipes_get`, `recipes_list`) beyond the published lifecycle-tool table. Search recipes before provisioning software or a training stack.
 
 ## Troubleshooting
 
@@ -47,4 +49,5 @@ Read-only tokens expose inventory, images, instances, coupons, token validation,
 - Read tools exist but launch/terminate does not: replace the read-only API key with a full-access key only if mutations are required.
 - Launch failed after a timeout: list instances before retrying; the first request may have succeeded.
 - Cannot SSH: verify instance state, registered public key, username/image instructions, host/port, and local private-key availability.
+- Cannot create an SSH key through MCP: validate the OpenSSH public-key format, try at most one alternative supported key type, then use the account UI and confirm the result through `ssh_keys_list`.
 - Unclear or stale price: refresh `gpu_inventory_list`; never reuse an old quote.
