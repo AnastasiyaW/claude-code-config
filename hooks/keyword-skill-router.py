@@ -30,6 +30,17 @@ import sys
 # Each entry: pattern (regex, case-insensitive) → skill name + description
 # Patterns should be specific enough to avoid false positives on normal conversation
 ROUTES = [
+    # Massed Compute GPU cloud operations
+    {
+        "patterns": [
+            r"\b(massed[ -]?compute|massedcompute|мас+ед[ -]?компьют|мас+копьют|массед[ -]?компьют)\b",
+            r"\b(gpu|гпу|видеокарт\w*|vm|виртуал\w* машин\w*)\b.*\b(massed|массед|маскопьют)\b",
+        ],
+        "skill": "massed-compute-ops",
+        "description": "REQUIRED for Massed Compute GPU selection, VM lifecycle, SSH, billing, and spend control",
+        "refs": ["references/recipes.md"],
+        "required": True,
+    },
     # Retouch native variant experiments / measured implementation selection
     {
         "patterns": [
