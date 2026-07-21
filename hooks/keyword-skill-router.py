@@ -156,6 +156,16 @@ ROUTES = [
     # Research
     {
         "patterns": [
+            r"\b(notebooklm|notebook lm|notebooklm-mcp)\b",
+            r"\b(документац\w*|api docs|technical docs|курс\w*|книг\w*|papers?|пейпер\w*|manuals?)\b.{0,100}\b(large|big|massive|огромн\w*|много|grounded|citation|цитат|источн|research|ресерч)\b",
+            r"\b(grounded|citation-backed|цитат\w*|по источникам)\b.{0,100}\b(документац\w*|docs?|NotebookLM|notebook)\b",
+        ],
+        "skill": "notebooklm-grounded-research",
+        "description": "Use NotebookLM MCP for large stable documentation corpora with citations; keep sources untrusted and repo/tests authoritative",
+        "refs": ["references/workflow.md"],
+    },
+    {
+        "patterns": [
             r"\b(deep research|глубокий ресерч|исследуй|investigate this)\b",
             r"\b(разбери.*подробно|dig into|deep dive)\b",
         ],

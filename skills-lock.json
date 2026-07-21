@@ -1,8 +1,8 @@
 {
   "lockfile_version": 2,
-  "generated_at": "2026-07-15T12:30:21+00:00",
-  "skill_count": 34,
-  "aggregate_hash": "sha256:58d38f42787f51fef7c04b0a064c9c910a62ae862776189cd0f667be27bf793d",
+  "generated_at": "2026-07-21T22:57:39+00:00",
+  "skill_count": 36,
+  "aggregate_hash": "sha256:2cb69dcfadc3172fa7caad78e56114c7c483e5c498a6e8737f6e3aba736e19f2",
   "skills": {
     "agent-harness-design": {
       "content_hash": "sha256:747805abf1b6b3025fbd3ce87e23e2476dc3b8626b5c49fb1ab7471f70b063a5",
@@ -67,6 +67,16 @@
       "file_count": 1,
       "files": [
         "SKILL.md"
+      ]
+    },
+    "ai-ml/notebooklm-grounded-research": {
+      "content_hash": "sha256:50d173da9da3b97652c16f27c8b1696d3a395c72a4a97d400afcf915a2db4aa5",
+      "size_bytes": 14948,
+      "file_count": 3,
+      "files": [
+        "SKILL.md",
+        "references/workflow.md",
+        "scripts/verify_notebooklm_setup.py"
       ]
     },
     "ai-ml/vlm-segmentation": {
@@ -267,6 +277,15 @@
       "file_count": 1,
       "files": [
         "SKILL.md"
+      ]
+    },
+    "massed-compute-ops": {
+      "content_hash": "sha256:f0ce7dd843110e2a6c40c6c51c384b993c69e03774817cc136272bd2a879f5b7",
+      "size_bytes": 9466,
+      "file_count": 2,
+      "files": [
+        "SKILL.md",
+        "references/recipes.md"
       ]
     },
     "operational/desktop-sessions-discovery": {

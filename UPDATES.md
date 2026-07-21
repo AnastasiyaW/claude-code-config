@@ -4,6 +4,20 @@ Changelog for claude-code-skills. Newest first.
 
 ---
 
+## 2026-07-22 (v3.33.0 - grounded NotebookLM research)
+
+- Added `skills/ai-ml/notebooklm-grounded-research` for large stable
+  documentation, courses, books, and papers with citation-preserving answers.
+- Added a keyword route for NotebookLM without making the optional browser
+  bridge mandatory for unrelated research.
+- Pinned the documented integration to `notebooklm-mcp@2.0.0` with the Codex
+  `minimal` profile (5 tools), and added a read-only setup verifier.
+- Added explicit trust, privacy, source-ingestion, and authentication bounds:
+  the bridge is community browser automation, not an official API; live code,
+  official docs, and tests remain authoritative.
+- Verified the route, skill lint, lock/catalog, lifecycle contracts, pinned
+  package age, stdio startup, and `tools/list` with the minimal profile.
+
 ## 2026-06-28 (v3.32.0 — skill description discipline + skill-lint)
 
 Applied the Google *Agent Skills* whitepaper (May 2026) description discipline to the whole skill
