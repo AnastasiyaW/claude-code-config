@@ -94,6 +94,7 @@ SKIP_PATTERNS = [
     "mailbox/all",  # mailbox convention, may not exist until enabled
     "~/.claude-restructure-backup-",  # historical backup path
     "~/.claude/launch.json",  # optional launcher path, may not exist
+    "~/.claude/logs/decisions.jsonl",  # optional append-only runtime decision log
 ]
 
 # Linux/macOS-only system paths - skip on Windows (validator can't resolve them
