@@ -1,6 +1,6 @@
 ---
 related_principles: [16, 18]
-last_reviewed: 2026-04-14
+last_reviewed: 2026-07-22
 ---
 
 # Session Handoff: Seamless Transitions Between Sessions

@@ -1,6 +1,6 @@
 ---
 related_principles: [19]
-last_reviewed: 2026-04-15
+last_reviewed: 2026-07-22
 ---
 
 # Agent Mailbox System: File-based Inter-Agent Communication

@@ -149,6 +149,19 @@ See [docs/rtk-integration.md](docs/rtk-integration.md) and
 | [task-inbox-show](hooks/task-inbox-show.py) | `SessionStart` | Surfaces pending tasks from `.claude/task-inbox/` |
 | [plan-gate](hooks/plan-gate.py) | `UserPromptSubmit` | Non-blocking nudge: substantive build/refactor ask + no plan artifact in the project -> one-line "freeze acceptance criteria first" reminder (max once/day) |
 
+**Supporting hooks and shared utilities** (wire these when the project needs the corresponding workflow):
+
+| Hook | Event | What It Does |
+|---|---|---|
+| [conversation-history-capture](hooks/conversation-history-capture.py) | `Stop` | Archives the local session transcript for searchable continuation |
+| [directory-creation-guard](hooks/directory-creation-guard.py) | `PreToolUse` | Applies lifecycle labels and placement checks to new directories |
+| [docs-staleness-guard](hooks/docs-staleness-guard.py) | `SessionStart` | Surfaces stale project guidance before work begins |
+| [feedback-pending-show](hooks/feedback-pending-show.py) | `SessionStart` | Shows queued corrections waiting for review |
+| [git-source-gate](hooks/git-source-gate.py) | `Stop` | Checks that durable work is represented in Git before closure |
+| [github-workflow-security](hooks/github-workflow-security.py) | `PreToolUse` | Adds a security checklist before editing GitHub Actions workflows |
+| [kb-validate-gate](hooks/kb-validate-gate.py) | `Stop` | Runs the project knowledge-base validator when opted in |
+| [session-feedback-capture](hooks/session-feedback-capture.py) | `Stop` | Queues durable correction notes without blocking session closure |
+| [safety_common.py](hooks/safety_common.py) | shared | Shared event parsing and decision helpers for opt-in hooks |
 **Starter templates** for common project types: [web-app](templates/CLAUDE-web-app.md), [ML project](templates/CLAUDE-ml-project.md), [library](templates/CLAUDE-library.md), [code review](templates/REVIEW.md), [project chronicle](templates/chronicle.md), [memory files](templates/memory-project.md), [memory reference](templates/memory-reference.md), [proof plan](templates/proof-plan.md), [bug-fix prompt](templates/bug-fix-prompt.md) (anti-"pre-existing" constraints baked in), [long-run project harness pack](templates/long-run-project/) (drop-in `feature_list.schema.json` + `feature_list.template.json` + `init.sh.template` for any project crossing 5+ features and 5+ sessions).
 
 **Dynamic workflow commands** ([workflows/](workflows/)) - ready-to-drop `.js` orchestration scripts for Claude Code dynamic workflows (`/deep-review-flow`, `/research-cn-ru`) plus [EFFECTIVE-AGENTS.md](workflows/EFFECTIVE-AGENTS.md) - measured cost lessons (one `agent()` ≈ 95-150k tokens; resume as the main economy lever).

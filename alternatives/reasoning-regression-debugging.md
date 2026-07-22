@@ -1,6 +1,6 @@
 ---
 related_principles: [02, 03, 04, 11]
-last_reviewed: 2026-04-15
+last_reviewed: 2026-07-22
 ---
 
 # Reasoning Regression Debugging - detecting and mitigating quality degradation

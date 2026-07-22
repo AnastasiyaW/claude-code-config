@@ -16,14 +16,16 @@
         "post-ui-change-review.md",
         "cross-harness-agents-md.md",
         "file-organization-cohesion.md",
-        "activity-journal-and-state-registry.md"
+        "activity-journal-and-state-registry.md",
+        "learn-from-corrections.md",
+        "session-handoff.md"
       ],
-      "add": ["rlm-context-as-program.md", "learn-from-corrections.md", "agent-docs-freshness.md"]
+      "add": ["rlm-context-as-program.md", "agent-docs-freshness.md"]
     },
-    { "from": "principles", "to": "principles", "deny": ["25-coordination-primitives-mapping.md"], "add": [] },
-    { "from": "templates", "to": "templates", "deny": [], "add": [] },
+    { "from": "principles", "to": "principles", "deny": ["25-coordination-primitives-mapping.md", "02-proof-loop.md"], "add": [] },
+    { "from": "templates", "to": "templates", "deny": ["README.md"], "add": [] },
     { "from": "agents", "to": "agents", "deny": [], "add": [] },
-    { "from": "alternatives", "to": "alternatives", "deny": [], "add": [] },
+    { "from": "alternatives", "to": "alternatives", "deny": ["README.md"], "add": [] },
     {
       "from": "claude-code-config/hooks",
       "to": "hooks",
@@ -39,14 +41,14 @@
     {
       "from": "skills/workflow-orchestration",
       "to": "skills/development/workflow-orchestration",
-      "deny": [],
+      "deny": ["SKILL.md"],
       "add": []
     },
     {
       "from": "skills/distill-feedback",
       "to": "skills/development/distill-feedback",
-      "deny": [],
-      "add": ["SKILL.md", "scripts/extract_feedback_queue.py"]
+      "deny": ["SKILL.md"],
+      "add": ["scripts/extract_feedback_queue.py"]
     }
   ],
   "privacy_markers": [
