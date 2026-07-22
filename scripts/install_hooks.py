@@ -35,6 +35,8 @@ Opt-in extras (use --extras):
   - over-engineering-advisor     PostToolUse   advisory nudge on large/dependency-adding code changes
   - precompact-handoff-guard     PreCompact    demands a fresh handoff before context compaction
   - handoff-closure-audit-guard  PreToolUse    blocks handoff writes without closure audit
+  - continuity-contract-guard    PreToolUse    protects incremental edits across Claude/Codex
+  - continuity-session-check     SessionStart  surfaces the shared continuation contract
   - test-gate-stop-hook          Stop          blocks closing a session with red tests
   - problems-md-validator        Stop          blocks closing with unresolved OPEN problems
   - plan-gate                    UserPromptSubmit  plan-artifact discipline for risky asks
@@ -83,6 +85,8 @@ SAFE_DEFAULTS: list[tuple[str, str, str | None]] = [
     ("directory-creation-guard.py",  "PreToolUse", "PowerShell"),
     ("self-harm-guard.py",           "PreToolUse", "Bash"),
     ("session-drift-validator.py",   "SessionStart", None),
+    ("continuity-contract-guard.py", "PreToolUse", "Write|Edit|MultiEdit|NotebookEdit"),
+    ("continuity-session-check.py",  "SessionStart", None),
 ]
 
 EXTRAS: list[tuple[str, str, str | None]] = [

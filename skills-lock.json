@@ -1,8 +1,8 @@
 {
   "lockfile_version": 2,
-  "generated_at": "2026-07-21T22:57:39+00:00",
-  "skill_count": 36,
-  "aggregate_hash": "sha256:2cb69dcfadc3172fa7caad78e56114c7c483e5c498a6e8737f6e3aba736e19f2",
+  "generated_at": "2026-07-22T08:47:50+00:00",
+  "skill_count": 37,
+  "aggregate_hash": "sha256:686c58fd775347ade95f3ec1d4cee8f91cba2208123bd2eec787dc3df5e5d2c1",
   "skills": {
     "agent-harness-design": {
       "content_hash": "sha256:747805abf1b6b3025fbd3ce87e23e2476dc3b8626b5c49fb1ab7471f70b063a5",
@@ -286,6 +286,15 @@
       "files": [
         "SKILL.md",
         "references/recipes.md"
+      ]
+    },
+    "operational/cross-harness-continuation": {
+      "content_hash": "sha256:324cce6a93311d368fe472df732e9d5a8c72e70075fb54a0806a4dda11d164a6",
+      "size_bytes": 5431,
+      "file_count": 2,
+      "files": [
+        "SKILL.md",
+        "references/CONTINUITY.example.json"
       ]
     },
     "operational/desktop-sessions-discovery": {

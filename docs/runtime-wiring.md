@@ -35,6 +35,7 @@ pass.
 | Destructive-operation guards | `PreToolUse` | `PreToolUse` | hook eval cases |
 | Handoff completeness | `PreToolUse`, `Stop`, `PreCompact` | `PreToolUse`, `Stop`, `PreCompact` | `test_task_completion_hooks.py` |
 | Handoff to memory continuity | `SessionStart` | `SessionStart` | `test_review_handoff_memory_loop.py` |
+| Claude/Codex continuation contract | `PreToolUse`, `SessionStart` | `PreToolUse`, `SessionStart` | `scripts/test_continuity_contract.py` |
 | Agent-doc freshness | `SessionStart` advisory + `Stop` gate | `SessionStart` advisory + `Stop` gate | hook self-tests |
 | Git source-of-truth setup | `Stop` for long-run projects | `Stop` for long-run projects | `test_lifecycle_hook_contracts.py` |
 | Skills availability | active skill directory | `~/.claude/skills` | `sync_skills_to_codex.py --check` and `skills-lock.json` |
@@ -104,3 +105,10 @@ selected automatic suggestions; the wiring audit proves that those suggestions
 cannot point at missing skills. Neither proves that every piece of advisory
 knowledge improves every task. Promote a skill to a mandatory route only after
 a task-specific before/after evaluation with a measurable acceptance criterion.
+
+## Continuation Contract
+
+When a project declares `mode: continuation` in `CONTINUITY.json`, the guard
+protects existing tracked files from silent whole-file rewrites and can enforce
+the claimed scope. Intentional redesign requires `AGENT_CONTINUITY_MODE=replan`
+and a non-empty `AGENT_CONTINUITY_REASON` recorded in the handoff.

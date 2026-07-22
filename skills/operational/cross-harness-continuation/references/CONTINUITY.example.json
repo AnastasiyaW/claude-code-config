@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "mode": "continuation",
+  "project": "retouch-app",
+  "goal": "Finish one verified implementation slice without replacing accepted work.",
+  "baseline": {
+    "repo_root": "C:/path/to/repo",
+    "branch": "feature/example",
+    "head": "0000000",
+    "preexisting_paths": []
+  },
+  "scope": {
+    "enforce": true,
+    "protect_unlisted": true,
+    "files": ["src/example.cpp", "tests/example_test.cpp"]
+  },
+  "preserve": [
+    "Keep the public ABI stable.",
+    "Keep the existing ownership model unless a test disproves it."
+  ],
+  "do_not_redo": [
+    "Do not replace the allocator with a new abstraction without a measured regression."
+  ],
+  "verification": [
+    {"command": "cmake --build build", "status": "pending", "evidence": ""},
+    {"command": "ctest --test-dir build --output-on-failure", "status": "pending", "evidence": ""}
+  ]
+}

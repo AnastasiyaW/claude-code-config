@@ -70,6 +70,27 @@ ROUTES = [
         ],
         "required": True,
     },
+    # ComfyUI driven through MCP / comfy-cli (agent-orchestrated graphs)
+    {
+        "patterns": [
+            r"\bcomfy[- ]?mcp\b",
+            r"\b(comfy-cli|comfy cli)\b",
+            r"\b(comfy ?ui|comfyui|комфи\w*)\b.*\b(mcp|api|workflow|воркфлоу|граф|node|узл\w*|queue|очеред\w*|автоматиз\w*|automat\w*|агент|agent)\b",
+            r"\b(mcp|workflow|воркфлоу|граф|автоматиз\w*|automat\w*)\b.*\b(comfy ?ui|comfyui|комфи\w*)\b",
+        ],
+        "suggest": "Use the Comfy MCP/comfy-cli workflow guidance if this task drives ComfyUI from an agent.",
+    },
+    # Claude/Codex continuation: preserve an accepted implementation and decisions.
+    {
+        "patterns": [
+            r"\b(claude|кодекс|codex)\b.{0,80}\b(codex|claude|handoff|хенд[ао]ф|продолж|перенос)\b",
+            r"\b(продолж\w*|додел\w*|перенест\w*|синерг\w*|не передел\w*|не перепис\w*)\b.{0,100}\b(код|работ\w*|агент\w*|сесс\w*|кодекс|codex|claude|клавд)\b",
+            r"\b(cross[- ]harness|continuity contract|continuation contract|replan mode)\b",
+        ],
+        "skill": "cross-harness-continuation",
+        "description": "REQUIRED when continuing work across Claude/Codex: load CONTINUITY.json, preserve decisions, and verify scope before edits",
+        "required": True,
+    },
     # Retouch native / low-level memory
     {
         "patterns": [

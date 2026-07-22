@@ -42,11 +42,13 @@ REQUIRED_SESSIONSTART_HOOKS = (
     "session-handoff-check.py",
     "review_handoff_memory_loop.py",
     "docs-staleness-guard.py",
+    "continuity-session-check.py",
 )
 
 REQUIRED_PRETOOLUSE_HOOKS = (
     "handoff-closure-audit-guard.py",
     "github-workflow-security.py",
+    "continuity-contract-guard.py",
 )
 
 
