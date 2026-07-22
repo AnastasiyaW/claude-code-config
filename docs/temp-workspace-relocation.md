@@ -11,6 +11,9 @@ without silently changing callers that still use the old path.
 - Copying uses Windows `robocopy` when available (`/E`, `/COPY:DAT`, `/XJ`, one
   retry) and verifies source stability, file count, total bytes, and every file
   size before cutover.
+- A live workspace may change during a copy. The script repeats additive sync
+  and verification up to `--max-sync-attempts` (three by default), then fails
+  closed without removing the source if no stable snapshot is reached.
 - Cutover first renames the source to a reversible sibling backup, creates and
   verifies a junction, and restores the backup if link creation fails.
 - The old copy is removed only with the explicit `--purge-source` flag after
@@ -24,7 +27,7 @@ without silently changing callers that still use the old path.
 python scripts/relocate_temp_workspace.py `
   --source <system-temp-workspace> `
   --target <data-drive>\agent-temp\legacy-workspace `
-  --apply --purge-source --link junction --json
+  --apply --purge-source --link junction --max-sync-attempts 5 --json
 ```
 
 For a dry run, omit `--apply`. To preserve a rollback copy, omit

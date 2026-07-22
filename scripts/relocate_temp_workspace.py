@@ -7,14 +7,13 @@ import json
 import os
 import shutil
 import subprocess
-import sys
+import time
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 
 
 WINDOWS_REPARSE_POINT = 0x400
-DEFAULT_RESERVE_BYTES = 1 << 30
 
 
 @dataclass(frozen=True)
@@ -23,12 +22,31 @@ class Inventory:
     bytes: int
 
 
+def is_reparse_point(path: Path) -> bool:
+    if path.is_symlink():
+        return True
+    if os.name != "nt":
+        return False
+    attributes = getattr(os.lstat(path), "st_file_attributes", 0)
+    return bool(attributes & WINDOWS_REPARSE_POINT)
+
+
+def iter_regular_files(root: Path):
+    for directory, directory_names, file_names in os.walk(root, topdown=True):
+        directory_path = Path(directory)
+        directory_names[:] = [
+            name for name in directory_names if not is_reparse_point(directory_path / name)
+        ]
+        for name in file_names:
+            path = directory_path / name
+            if not is_reparse_point(path):
+                yield path
+
+
 def inventory(root: Path) -> Inventory:
     files = 0
     total = 0
-    for path in root.rglob("*"):
-        if not path.is_file() or path.is_symlink():
-            continue
+    for path in iter_regular_files(root):
         files += 1
         total += path.stat().st_size
     return Inventory(files, total)
@@ -62,18 +80,8 @@ def validate_paths(source: Path, target: Path) -> None:
 
 def copy_with_robocopy(source: Path, target: Path) -> int:
     command = [
-        "robocopy",
-        str(source),
-        str(target),
-        "/E",
-        "/COPY:DAT",
-        "/DCOPY:DAT",
-        "/XJ",
-        "/R:1",
-        "/W:1",
-        "/NP",
-        "/NFL",
-        "/NDL",
+        "robocopy", str(source), str(target), "/E", "/COPY:DAT", "/DCOPY:DAT",
+        "/XJ", "/R:1", "/W:1", "/NP", "/NFL", "/NDL",
     ]
     completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if completed.returncode > 7:
@@ -103,14 +111,30 @@ def verify_copy(source: Path, target: Path, expected: Inventory) -> Inventory:
     target_inventory = inventory(target)
     if target_inventory.files < expected.files or target_inventory.bytes < expected.bytes:
         raise RuntimeError(f"target is incomplete: source={expected} target={target_inventory}")
-    for source_path in source.rglob("*"):
-        if not source_path.is_file() or source_path.is_symlink():
-            continue
+    for source_path in iter_regular_files(source):
         relative = source_path.relative_to(source)
         target_path = target / relative
         if not target_path.is_file() or target_path.stat().st_size != source_path.stat().st_size:
             raise RuntimeError(f"target mismatch: {relative}")
     return target_inventory
+
+
+def sync_and_verify(source: Path, target: Path, engine: str, max_attempts: int) -> tuple[Inventory, Inventory, str, int]:
+    last_error: Exception | None = None
+    for attempt in range(1, max_attempts + 1):
+        expected = inventory(source)
+        selected_engine = copy_tree(source, target, engine)
+        try:
+            target_inventory = verify_copy(source, target, expected)
+            return expected, target_inventory, selected_engine, attempt
+        except RuntimeError as error:
+            last_error = error
+            message = str(error)
+            retryable = any(marker in message for marker in ("source changed during copy", "target is incomplete", "target mismatch"))
+            if not retryable or attempt == max_attempts:
+                raise
+            time.sleep(0.5)
+    raise RuntimeError(f"copy did not reach a stable snapshot: {last_error}")
 
 
 def is_directory_link(path: Path) -> bool:
@@ -126,10 +150,7 @@ def create_compat_link(link: Path, target: Path, kind: str) -> None:
     if kind == "junction":
         completed = subprocess.run(
             ["cmd", "/c", "mklink", "/J", str(link), str(target)],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
         )
         if completed.returncode != 0:
             raise RuntimeError(f"mklink failed: {completed.stderr or completed.stdout}")
@@ -164,10 +185,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--engine", choices=("auto", "robocopy", "python"), default="auto")
     parser.add_argument("--link", choices=("junction", "symlink"), default="junction")
     parser.add_argument("--reserve-gib", type=float, default=1.0)
+    parser.add_argument("--max-sync-attempts", type=int, default=3)
     parser.add_argument("--apply", action="store_true", help="copy and verify; without this flag only report")
     parser.add_argument("--purge-source", action="store_true", help="remove the verified source after link cutover")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
+    if args.max_sync_attempts < 1:
+        raise SystemExit("--max-sync-attempts must be positive")
 
     source = args.source.resolve()
     target = args.target.resolve(strict=False)
@@ -177,26 +201,26 @@ def main(argv: list[str] | None = None) -> int:
     target.parent.mkdir(parents=True, exist_ok=True)
     expected, free_bytes = ensure_capacity(source, target.parent, int(args.reserve_gib * (1 << 30)))
     result: dict[str, object] = {
-        "source": str(source),
-        "target": str(target),
-        "source_files": expected.files,
-        "source_bytes": expected.bytes,
-        "target_free_bytes_before": free_bytes,
-        "apply": args.apply,
-        "purge_source": args.purge_source,
-        "link": args.link,
+        "source": str(source), "target": str(target), "source_files": expected.files,
+        "source_bytes": expected.bytes, "target_free_bytes_before": free_bytes,
+        "apply": args.apply, "purge_source": args.purge_source, "link": args.link,
     }
     if args.apply:
-        result["engine"] = copy_tree(source, target, args.engine)
-        result["target_inventory"] = inventory(target).__dict__
-        verify_copy(source, target, expected)
+        final_expected, target_inventory, selected_engine, attempts = sync_and_verify(
+            source, target, args.engine, args.max_sync_attempts
+        )
+        result.update({
+            "source_files": final_expected.files, "source_bytes": final_expected.bytes,
+            "target_inventory": target_inventory.__dict__, "engine": selected_engine,
+            "sync_attempts": attempts,
+        })
         result["backup"] = str(cutover(source, target, args.link, args.purge_source) or "")
         result["link_verified"] = source.resolve() == target.resolve()
     if args.json:
         print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
     else:
         print(
-            f"relocate: source_files={expected.files} source_bytes={expected.bytes} "
+            f"relocate: source_files={result['source_files']} source_bytes={result['source_bytes']} "
             f"apply={args.apply} purge_source={args.purge_source}"
         )
     return 0
