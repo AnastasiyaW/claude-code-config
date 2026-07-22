@@ -41,6 +41,10 @@ may choose a competing design.
 5. Parallel work still uses isolated Git worktrees and a fresh verifier. The
    contract is for serial handoff and scope protection; it is not a substitute
    for merge conflict resolution or tests.
+6. If handoff state already exists but the contract is missing, ordinary code
+   edits are blocked until the baseline contract is created. New/one-shot
+   repositories without handoff state remain advisory rather than being
+   falsely gated.
 
 ## Rejected shortcuts
 
@@ -49,7 +53,8 @@ may choose a competing design.
 - Automatically reverting the next agent's changes: destructive and unable to
   distinguish a valid improvement from a regression.
 - Blocking every edit without a contract: it breaks new projects and one-shot
-  fixes. The guard is dormant until a project declares continuation state.
+  fixes. The guard instead blocks only repositories that already advertise
+  continuation state through handoffs.
 
 ## Sources
 

@@ -115,6 +115,35 @@ class ContinuityContractTests(unittest.TestCase):
         self.assertEqual(decision, "context")
         self.assertIn("No CONTINUITY.json", reason)
 
+    def test_existing_handoff_state_requires_contract_before_code_edit(self):
+        (self.root / ".claude" / "handoffs").mkdir(parents=True)
+        decision, reason = guard.decision_for_event(
+            self.event(file_path=str(self.root / "src" / "main.cpp"), old_string="return 0;", new_string="return 1;"),
+            self.root,
+            None,
+            existing_status=set(),
+            tracked_paths={"src/main.cpp"},
+        )
+        self.assertEqual(decision, "block")
+        self.assertIn("already has handoff state", reason)
+
+    def test_contract_file_can_be_created_when_handoff_state_exists(self):
+        (self.root / ".claude" / "handoffs").mkdir(parents=True)
+        contract_path = self.root / ".claude" / "continuity" / "CONTINUITY.json"
+        decision, _ = guard.decision_for_event(
+            self.event(tool="Write", file_path=str(contract_path), content="{}\n"),
+            self.root,
+            None,
+            existing_status=set(),
+            tracked_paths=set(),
+        )
+        self.assertEqual(decision, "context")
+
+    def test_repo_root_probe_uses_existing_ancestor_for_new_contract_path(self):
+        public_root = MODULE_PATH.parents[1].resolve()
+        new_contract = public_root / ".claude" / "continuity" / "CONTINUITY.json"
+        self.assertEqual(guard.repo_root_for(new_contract), public_root)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

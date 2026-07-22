@@ -7,9 +7,11 @@ missing control-plane state.  This hook protects continuation mode from the
 most damaging accidental reset: overwriting an existing tracked file with
 Write, expanding outside the declared scope, or replacing a large region.
 
-No contract means no gate: new projects and ordinary one-shot work remain
-unaffected.  A malformed contract is fail-closed because silently ignoring a
-declared boundary is worse than asking for repair.
+No contract means no gate for new projects and ordinary one-shot work.  A
+repository that already has handoff state must create the contract before
+editing existing code; otherwise the handoff would remain advisory only.  A
+malformed contract is fail-closed because silently ignoring a declared boundary
+is worse than asking for repair.
 """
 from __future__ import annotations
 
@@ -38,11 +40,32 @@ def read_event() -> dict[str, Any]:
 
 
 def normalize(path: str | Path) -> str:
-    return str(path).replace("\\", "/").lstrip("./").lower()
+    value = str(path).replace("\\", "/").lower()
+    while value.startswith("./"):
+        value = value[2:]
+    return value
+
+
+def has_continuation_state(root: Path) -> bool:
+    return any(
+        candidate.exists()
+        for candidate in (
+            root / ".claude" / "handoffs",
+            root / ".claude" / "HANDOFF.md",
+            root / ".agent" / "handoffs",
+        )
+    )
+
+
+def is_internal_continuity_path(root: Path, raw_path: str) -> bool:
+    rel = relative_path(root, raw_path)
+    return rel is not None and any(rel.startswith(prefix) for prefix in INTERNAL_PREFIXES)
 
 
 def repo_root_for(path: Path) -> Path | None:
     probe = path if path.is_dir() else path.parent
+    while not probe.exists() and probe != probe.parent:
+        probe = probe.parent
     try:
         result = subprocess.run(
             ["git", "-C", str(probe), "rev-parse", "--show-toplevel"],
@@ -246,6 +269,15 @@ def decision_for_event(
     if not paths:
         return "allow", ""
     if contract is None:
+        if has_continuation_state(root) and any(
+            not is_internal_continuity_path(root, raw) for raw in paths
+        ):
+            return "block", (
+                "This repository already has handoff state but no CONTINUITY.json. "
+                "Create .claude/continuity/CONTINUITY.json from the current Git baseline "
+                "before editing existing code; this prevents Claude/Codex from silently "
+                "restarting the implementation."
+            )
         return "context", (
             "[continuity] No CONTINUITY.json found for this repository. "
             "For Claude/Codex handoff work, create the shared contract before editing."
