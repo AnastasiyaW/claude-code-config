@@ -1,0 +1,23 @@
+[
+  {
+    "pattern": "handoff-loop-test-*",
+    "label": "TEMP_REPRODUCIBLE",
+    "safe_to_delete": true,
+    "ttl_days": 7,
+    "rebuild": "python scripts/test_review_handoff_memory_loop.py"
+  },
+  {
+    "pattern": "lifecycle-hook-*",
+    "label": "TEMP_REPRODUCIBLE",
+    "safe_to_delete": true,
+    "ttl_days": 7,
+    "rebuild": "python scripts/test_lifecycle_hook_contracts.py"
+  },
+  {
+    "pattern": "codex-probe-*",
+    "label": "TEMP_REPRODUCIBLE",
+    "safe_to_delete": true,
+    "ttl_days": 7,
+    "rebuild": "rerun the explicit probe that created this directory"
+  }
+]
